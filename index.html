@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAD Platform</title>
+  <link rel="stylesheet" href="src/css/style.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+    .landing {
+      max-width: 540px;
+      width: 100%;
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .landing-logo {
+      width: 60px; height: 60px;
+      background: var(--blue);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 24px;
+      box-shadow: var(--shadow-blue);
+    }
+
+    .landing h1 {
+      font-family: var(--font-j);
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .landing h1 span { color: var(--blue); }
+    .landing p { color: var(--t2); font-size: .95rem; margin-bottom: 36px; line-height: 1.6; }
+
+    .landing-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .portal-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all var(--trans-m);
+      box-shadow: var(--shadow-xs);
+      text-decoration: none;
+    }
+
+    .portal-btn:hover {
+      border-color: var(--blue-mid);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .portal-btn.primary { background: var(--blue); border-color: var(--blue); }
+    .portal-btn.primary .pb-title,
+    .portal-btn.primary .pb-sub { color: #fff; }
+
+    .pb-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .portal-btn:not(.primary) .pb-icon { background: var(--blue-soft); }
+    .portal-btn.primary .pb-icon { background: rgba(255,255,255,.2); }
+
+    .pb-title { font-family: var(--font-j); font-weight: 700; font-size: .95rem; color: var(--t1); }
+    .pb-sub   { font-size: .76rem; color: var(--t3); }
+
+    .landing-footer { font-size: .74rem; color: var(--t4); }
+    .landing-footer a { color: var(--t3); }
+  </style>
+</head>
+<body>
+
+<div class="landing">
+  <div class="landing-logo">🎓</div>
+  <h1>EAD<span>Platform</span></h1>
+  <p>Plataforma de ensino a distância simples, rápida e profissional.<br>
+     Escolha como deseja acessar:</p>
+
+  <div class="landing-btns">
+    <a href="aluno.html" class="portal-btn">
+      <div class="pb-icon">📚</div>
+      <div class="pb-title">Portal do Aluno</div>
+      <div class="pb-sub">Acessar meus cursos</div>
+    </a>
+    <a href="admin.html" class="portal-btn primary">
+      <div class="pb-icon">⚙️</div>
+      <div class="pb-title">Painel Admin</div>
+      <div class="pb-sub">Gerenciar a plataforma</div>
+    </a>
+  </div>
+
+  <div class="landing-footer">
+    EAD Platform v1.0 · HTML + CSS + JS puro ·
+    <a href="https://github.com/seu-usuario/ead-platform" target="_blank">GitHub</a>
+  </div>
+</div>
+
+</body>
+</html>

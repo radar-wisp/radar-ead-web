@@ -1,0 +1,6 @@
+# _config.yml — GitHub Pages
+# Desativa o processamento Jekyll para servir os arquivos estáticos diretamente.
+# Necessário para que pastas que começam com _ ou src/ sejam servidas corretamente.
+
+exclude: []
+include: ["src"]

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAD — Portal do Aluno</title>
+  <link rel="stylesheet" href="src/css/style.css">
+  <style>
+    #cadForm { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     LOGIN / CADASTRO
+════════════════════════════════════════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-brand-logo">🎓</div>
+      <div class="login-brand-name">EAD<span>Platform</span></div>
+    </div>
+
+    <div class="login-err" id="loginErr"></div>
+
+    <!-- LOGIN -->
+    <form id="loginForm">
+      <h2>Bem-vindo de volta!</h2>
+      <p class="sub">Entre para continuar seus estudos</p>
+      <div class="fg">
+        <label>E-mail</label>
+        <input type="email" name="email" placeholder="seu@email.com" required>
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input type="password" name="senha" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top:16px">
+        Entrar →
+      </button>
+      <div class="login-toggle">
+        Não tem conta? <a href="#" id="btnParaCad">Criar conta grátis</a>
+      </div>
+    </form>
+
+    <!-- CADASTRO -->
+    <form id="cadForm">
+      <h2>Criar conta</h2>
+      <p class="sub">Comece a aprender hoje mesmo</p>
+      <div class="fg">
+        <label>Nome completo</label>
+        <input type="text" name="nome" placeholder="Seu nome completo" required>
+      </div>
+      <div class="fg">
+        <label>E-mail</label>
+        <input type="email" name="email" placeholder="seu@email.com" required>
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input type="password" name="senha" placeholder="Mínimo 6 caracteres" minlength="6" required>
+      </div>
+      <div class="fg">
+        <label>Confirmar senha</label>
+        <input type="password" name="conf" placeholder="Repita a senha" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top:16px">
+        Criar conta →
+      </button>
+      <div class="login-toggle">
+        Já tem conta? <a href="#" id="btnParaLogin">Fazer login</a>
+      </div>
+    </form>
+
+    <div class="login-hint-box">
+      💡 Teste: <strong>ana@aluno.com</strong> / <strong>123456</strong>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════ -->
+<div class="app-shell" id="alunoShell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🎓</div>
+        <div class="sidebar-logo-name">EAD<span>Platform</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sideAvatar">A</div>
+      <div>
+        <div class="sidebar-user-name" id="sideName">—</div>
+        <div class="sidebar-user-role">Aluno</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Aprendizado</div>
+      <button class="nav-btn active" data-pg="home">
+        <div class="nb-icon">🏠</div> Início
+      </button>
+      <button class="nav-btn" data-pg="cursos">
+        <div class="nb-icon">📚</div> Meus Cursos
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="btn btn-ghost btn-full" id="btnLogout">↩ Sair</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topTitle">Início</div>
+    </header>
+
+    <div class="content">
+
+      <!-- ════ HOME ════════════════════════════ -->
+      <div class="page active" id="pg-home">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Olá, <span id="hNome">Aluno</span>! 👋</h2>
+            <p>Veja seu progresso e continue aprendendo</p>
+          </div>
+        </div>
+
+        <!-- Stats pessoais -->
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-top"><div class="stat-icon blue">📚</div></div>
+            <div class="stat-val" id="hCursos">0</div>
+            <div class="stat-label">Cursos disponíveis</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top"><div class="stat-icon green">✅</div></div>
+            <div class="stat-val" id="hConc">0</div>
+            <div class="stat-label">Cursos concluídos</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top"><div class="stat-icon amber">🎬</div></div>
+            <div class="stat-val" id="hAulas">0</div>
+            <div class="stat-label">Aulas assistidas</div>
+          </div>
+        </div>
+
+        <!-- Banner "continuar de onde parou" -->
+        <div id="h-continue" style="margin-bottom:20px"></div>
+
+        <!-- Grid de cursos -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">
+            Todos os cursos
+          </div>
+          <button class="btn btn-ghost btn-sm" data-pg="cursos">Ver todos →</button>
+        </div>
+        <div class="course-grid" id="h-cursos-grid"></div>
+      </div>
+
+
+      <!-- ════ CURSOS ══════════════════════════ -->
+      <div class="page" id="pg-cursos">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Meus Cursos</h2>
+            <p>Explore e continue aprendendo</p>
+          </div>
+        </div>
+        <div class="course-grid" id="cursos-grid"></div>
+      </div>
+
+
+      <!-- ════ PLAYER ══════════════════════════ -->
+      <div class="page" id="pg-player">
+
+        <!-- Header do player -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="btnVoltarPlayer">← Voltar</button>
+          <div style="font-family:var(--font-j);font-weight:700;font-size:.9rem;flex:1;min-width:0;
+               white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="playerCursoNome"></div>
+          <div style="display:flex;align-items:center;gap:8px;min-width:180px">
+            <div class="prog-bar" style="flex:1;height:5px">
+              <div class="prog-fill" id="playerTopFill" style="width:0%"></div>
+            </div>
+            <span style="font-size:.72rem;font-weight:700;color:var(--blue);min-width:28px;text-align:right"
+              id="playerTopPct">0%</span>
+          </div>
+        </div>
+
+        <!-- Player + índice -->
+        <div class="player-wrap">
+
+          <!-- Coluna esquerda: vídeo/texto -->
+          <div class="player-main">
+            <div class="player-screen" id="playerScreen">
+              <div style="color:#8896A9;text-align:center;padding:60px">
+                <div style="font-size:3rem;margin-bottom:12px">▶️</div>
+                <p style="font-size:.88rem">Selecione uma aula no índice ao lado</p>
+              </div>
+            </div>
+
+            <div class="player-info">
+              <div class="player-aula-title" id="playerAulaTitulo">—</div>
+              <div class="player-aula-meta"  id="playerAulaMeta"></div>
+            </div>
+
+            <div class="player-actions">
+              <button class="btn btn-primary" id="btnConcluir">☑️ Marcar como concluída</button>
+              <div class="player-nav">
+                <button class="btn btn-ghost btn-sm" id="btnPrev" disabled>← Anterior</button>
+                <button class="btn btn-ghost btn-sm" id="btnNext" disabled>Próxima →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna direita: índice do curso -->
+          <div class="course-index">
+            <div class="ci-head">
+              <div class="ci-head-title">Conteúdo do curso</div>
+              <div class="ci-prog">
+                <div class="prog-bar" style="height:4px">
+                  <div class="prog-fill" id="ci-pct-fill" style="width:0%"></div>
+                </div>
+                <span class="ci-prog-pct" id="ci-pct-num">0%</span>
+              </div>
+            </div>
+            <div class="ci-scroll" id="ci-body"></div>
+          </div>
+
+        </div><!-- /player-wrap -->
+      </div><!-- /pg-player -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+
+<!-- ════════════════════════════════════════
+     CERTIFICADO
+════════════════════════════════════════ -->
+<div class="cert-bg" id="certBg">
+  <div class="cert-box">
+    <div class="cert-seal">🏆</div>
+    <h2>Certificado de Conclusão</h2>
+    <p class="cert-sub">Parabéns! Você completou o curso com sucesso.</p>
+
+    <p style="color:var(--t3);font-size:.8rem;margin-bottom:10px">Certificamos que</p>
+    <div class="cert-name" id="certNome">—</div>
+
+    <div class="cert-course-lbl">concluiu com êxito o curso</div>
+    <div class="cert-course-name" id="certCurso">—</div>
+    <div class="cert-date" id="certData">—</div>
+
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:22px;
+                font-size:.72rem;color:var(--t4)">
+      Certificado emitido pela EAD Platform
+    </div>
+
+    <div class="cert-actions">
+      <button class="btn btn-ghost" id="btnFecharCert">Fechar</button>
+      <button class="btn btn-primary" id="btnImprimirCert">🖨️ Imprimir</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-stack" id="toasts"></div>
+
+<script src="src/js/storage.js"></script>
+<script src="src/js/aluno.js"></script>
+</body>
+</html>

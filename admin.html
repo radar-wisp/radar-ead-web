@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAD — Admin</title>
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-brand-logo">🎓</div>
+      <div class="login-brand-name">EAD<span>Platform</span></div>
+    </div>
+    <h2>Painel Administrativo</h2>
+    <p class="sub">Entre com suas credenciais para gerenciar a plataforma</p>
+
+    <div class="login-err" id="loginErr"></div>
+
+    <form id="loginForm">
+      <div class="fg">
+        <label>E-mail</label>
+        <input type="email" name="email" placeholder="admin@ead.com" value="admin@ead.com" required>
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input type="password" name="senha" placeholder="••••••••" value="admin123" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top:16px">
+        Entrar →
+      </button>
+    </form>
+
+    <div class="login-hint-box">
+      💡 Padrão: <strong>admin@ead.com</strong> / <strong>admin123</strong>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════ -->
+<div class="app-shell" id="adminShell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🎓</div>
+        <div class="sidebar-logo-name">EAD<span>Platform</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">A</div>
+      <div>
+        <div class="sidebar-user-name">Administrador</div>
+        <div class="sidebar-user-role">Admin</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Principal</div>
+      <button class="nav-btn" data-pg="dashboard">
+        <div class="nb-icon">📊</div> Dashboard
+      </button>
+
+      <div class="nav-group-label">Conteúdo</div>
+      <button class="nav-btn" data-pg="cursos">
+        <div class="nb-icon">📚</div> Cursos
+      </button>
+      <button class="nav-btn" data-pg="conteudo">
+        <div class="nb-icon">🎬</div> Módulos & Aulas
+      </button>
+
+      <div class="nav-group-label">Alunos</div>
+      <button class="nav-btn" data-pg="alunos">
+        <div class="nb-icon">👥</div> Alunos
+      </button>
+      <button class="nav-btn" data-pg="progresso">
+        <div class="nb-icon">📈</div> Progresso
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="btn btn-ghost btn-full" id="btnLogout">↩ Sair</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topTitle">Dashboard</div>
+      <div class="topbar-crumb" id="topDate"></div>
+    </header>
+
+    <div class="content">
+
+      <!-- ════ DASHBOARD ══════════════════════ -->
+      <div class="page" id="pg-dashboard">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Dashboard</h2>
+            <p>Visão geral da plataforma em tempo real</p>
+          </div>
+          <button class="btn btn-primary" id="btnNovoCurso">➕ Novo Curso</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-icon blue">📚</div>
+            </div>
+            <div class="stat-val" id="dsh-ncursos">0</div>
+            <div class="stat-label">Cursos publicados</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-icon green">👥</div>
+            </div>
+            <div class="stat-val" id="dsh-nalunos">0</div>
+            <div class="stat-label">Alunos cadastrados</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-icon amber">🎬</div>
+            </div>
+            <div class="stat-val" id="dsh-naulas">0</div>
+            <div class="stat-label">Aulas criadas</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-icon purple">✅</div>
+            </div>
+            <div class="stat-val" id="dsh-nconc">0</div>
+            <div class="stat-label">Conclusões de aulas</div>
+          </div>
+        </div>
+
+        <!-- Grid 2 cols -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+          <!-- Cursos + progresso -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><div class="ct-icon">📚</div>Cursos · Progresso médio</div>
+              <button class="btn btn-soft btn-sm" onclick="Admin.go?.('cursos') || go('cursos')">Ver todos</button>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Curso</th><th>Progresso médio</th><th>Status</th></tr></thead>
+                <tbody id="dsh-cursos-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Alunos recentes -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><div class="ct-icon">👥</div>Alunos recentes</div>
+              <button class="btn btn-soft btn-sm" id="btnNovoAluno">➕ Novo</button>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Aluno</th><th>Aulas</th><th>Status</th></tr></thead>
+                <tbody id="dsh-alunos-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════ CURSOS ═════════════════════════ -->
+      <div class="page" id="pg-cursos">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Cursos</h2>
+            <p>Gerencie o catálogo de cursos da plataforma</p>
+          </div>
+          <button class="btn btn-primary" onclick="Admin.modalEditCurso(null)">➕ Novo Curso</button>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><div class="ct-icon">📚</div>Todos os cursos</div>
+          </div>
+          <div id="cursos-list"></div>
+        </div>
+      </div>
+
+
+      <!-- ════ CONTEÚDO (módulos + aulas) ═════ -->
+      <div class="page" id="pg-conteudo">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Módulos & Aulas</h2>
+            <p>Organize o conteúdo dentro de cada curso</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-body">
+            <div class="fg">
+              <label>Selecione o curso para gerenciar</label>
+              <select id="ctCursoSel"><option value="">— Selecione —</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div id="ct-detalhe"></div>
+      </div>
+
+
+      <!-- ════ ALUNOS ══════════════════════════ -->
+      <div class="page" id="pg-alunos">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Alunos</h2>
+            <p>Gerencie os alunos cadastrados</p>
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('modalAluno').classList.add('open')">
+            ➕ Novo Aluno
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title"><div class="ct-icon">👥</div>Alunos cadastrados</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Aluno</th><th>Status</th><th>Cursos</th><th>Aulas concluídas</th><th>Cadastro</th></tr>
+              </thead>
+              <tbody id="alunos-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ════ PROGRESSO ═══════════════════════ -->
+      <div class="page" id="pg-progresso">
+        <div class="ph">
+          <div class="ph-text">
+            <h2>Progresso</h2>
+            <p>Acompanhe o desempenho dos alunos por curso</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title"><div class="ct-icon">📈</div>Progresso por aluno</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Aluno</th><th>Curso</th><th>Progresso</th><th>Status</th></tr></thead>
+              <tbody id="prog-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+
+<!-- ════════════════════════════════════════
+     MODAIS
+════════════════════════════════════════ -->
+
+<!-- Modal: Curso -->
+<div class="modal-bg" id="modalCurso">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Novo Curso</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formCurso">
+        <div class="form-row">
+          <div class="fg">
+            <label>Título *</label>
+            <input type="text" id="fcTitulo" placeholder="Ex: Fundamentos de JavaScript" required>
+          </div>
+          <div class="fg">
+            <label>Emoji / Ícone</label>
+            <input type="text" id="fcEmoji" placeholder="📚" maxlength="4">
+          </div>
+          <div class="fg span-2">
+            <label>Descrição</label>
+            <textarea id="fcDesc" placeholder="Descreva o objetivo e conteúdo..." rows="2"></textarea>
+          </div>
+          <div class="fg">
+            <label>Carga horária (h)</label>
+            <input type="number" id="fcCarga" placeholder="40" min="1">
+          </div>
+        </div>
+        <div class="modal-foot" style="margin-top:16px">
+          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Módulo -->
+<div class="modal-bg" id="modalModulo">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Novo Módulo</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formModulo">
+        <div class="fg">
+          <label>Título do módulo *</label>
+          <input type="text" id="fmTitulo" placeholder="Ex: Introdução e Setup" required>
+        </div>
+        <div class="fg">
+          <label>Descrição</label>
+          <input type="text" id="fmDesc" placeholder="Breve descrição...">
+        </div>
+        <div class="modal-foot" style="margin-top:16px">
+          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Aula -->
+<div class="modal-bg" id="modalAula">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-head">
+      <h3>Nova Aula</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formAula">
+        <div class="form-row">
+          <div class="fg span-2">
+            <label>Título da aula *</label>
+            <input type="text" id="faTitulo" placeholder="Ex: Variáveis e tipos de dados" required>
+          </div>
+          <div class="fg">
+            <label>Tipo</label>
+            <select id="faTipo">
+              <option value="video">🎬 Vídeo</option>
+              <option value="texto">📝 Texto</option>
+              <option value="pdf">📄 PDF</option>
+              <option value="link">🔗 Link externo</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Duração (minutos)</label>
+            <input type="number" id="faDuracao" placeholder="15" min="1">
+          </div>
+          <div class="fg span-2">
+            <label id="faConteudoLabel">URL do vídeo</label>
+            <input type="text" id="faConteudo" placeholder="https://youtube.com/embed/...">
+          </div>
+        </div>
+        <div class="modal-foot" style="margin-top:16px">
+          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Aluno -->
+<div class="modal-bg" id="modalAluno">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>➕ Novo Aluno</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formAluno">
+        <div class="fg">
+          <label>Nome completo *</label>
+          <input type="text" id="faNome" placeholder="João da Silva" required>
+        </div>
+        <div class="fg">
+          <label>E-mail *</label>
+          <input type="email" id="faEmail" placeholder="joao@email.com" required>
+        </div>
+        <div class="fg">
+          <label>Senha inicial *</label>
+          <input type="text" id="faSenha" placeholder="senha123" required>
+        </div>
+        <div class="modal-foot" style="margin-top:16px">
+          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">👤 Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar -->
+<div class="modal-bg confirm-modal" id="confirmModal">
+  <div class="modal" style="max-width:360px">
+    <div class="c-icon">🗑️</div>
+    <h3 id="confirmTitle">Confirmar ação</h3>
+    <p id="confirmMsg">Tem certeza que deseja continuar?</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" id="confirmCancel">Cancelar</button>
+      <button class="btn btn-danger" id="confirmOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-stack" id="toasts"></div>
+
+<script src="src/js/storage.js"></script>
+<script src="src/js/admin.js"></script>
+</body>
+</html>
