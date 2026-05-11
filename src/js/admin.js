@@ -1,14 +1,8 @@
-
 /**
  * admin.js — Painel Admin EAD (Refatorado)
  * Modal-driven • Mínimo de cliques • Dashboard profissional
  */
-document.addEventListener('DOMContentLoaded', () => {
-  Storage.seed();
-  Admin.boot();
-});
-
-const Admin = (() => {
+var Admin = (() => {
 
   /* ── estado ── */
   let curPage = 'dashboard';
@@ -546,3 +540,8 @@ const Admin = (() => {
 
   return Admin;
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  Storage.seed();
+  Admin.boot();
+});
