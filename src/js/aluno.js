@@ -2,12 +2,7 @@
  * aluno.js — Portal do Aluno EAD (Refatorado)
  * Continuação automática · Progresso visual · Certificado
  */
-document.addEventListener('DOMContentLoaded', () => {
-  Storage.seed();
-  Aluno.boot();
-});
-
-const Aluno = (() => {
+var Aluno = (() => {
 
   let me = null; // aluno logado
   let cur = { cursoId: null, aulaId: null };
@@ -436,3 +431,8 @@ const Aluno = (() => {
 
   return Aluno;
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  Storage.seed();
+  Aluno.boot();
+});
