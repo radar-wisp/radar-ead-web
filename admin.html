@@ -1,96 +1,267 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EAD — Admin</title>
-  <link rel="stylesheet" href="src/css/style.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Radar Internet — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens ── */
+:root {
+  --blue:      #2F45FF;
+  --blue-h:    #3D5AFE;
+  --blue-s:    #EEF3FF;
+  --blue-m:    #C7D3FF;
+  --bg:        #F5F7FA;
+  --surface:   #FFFFFF;
+  --border:    #E4E9F2;
+  --border-d:  #CDD5E0;
+  --t1:        #1A202C;
+  --t2:        #4A5568;
+  --t3:        #8896A9;
+  --t4:        #C0CAD5;
+  --green:     #16A34A;
+  --green-s:   #DCFCE7;
+  --red:       #DC2626;
+  --red-s:     #FEE2E2;
+  --amber:     #D97706;
+  --amber-s:   #FEF3C7;
+  --sw:        240px;
+  --hh:        56px;
+  --r:         8px;
+  --rl:        12px;
+  --font:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --sh:        0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shm:       0 4px 16px rgba(47,69,255,.08),0 1px 4px rgba(0,0,0,.04);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-d);border-radius:99px}
+
+/* ── Login ── */
+.login-screen{display:none;min-height:100vh;background:linear-gradient(135deg,#EEF3FF,#F8FAFF);align-items:center;justify-content:center;padding:20px}
+.login-screen.active{display:flex}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(47,69,255,.1);padding:40px 36px;width:100%;max-width:400px;animation:popIn .3s cubic-bezier(.34,1.5,.64,1)}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.brand-icon{width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem}
+.brand-name{font-weight:800;font-size:1.05rem}
+.brand-name small{color:var(--t3);font-weight:500;font-size:.78rem;display:block;margin-top:-2px}
+.login-box h2{font-size:1.3rem;margin-bottom:4px}
+.login-box p{color:var(--t2);font-size:.85rem;margin-bottom:24px}
+.login-err{background:var(--red-s);border:1px solid #FECACA;color:var(--red);padding:8px 12px;border-radius:var(--r);font-size:.82rem;margin-bottom:12px;display:none}
+.login-err.show{display:block}
+.login-hint{margin-top:14px;padding:9px 12px;background:var(--blue-s);border-radius:var(--r);font-size:.76rem;color:var(--blue)}
+
+/* ── App shell ── */
+.app-wrap{display:none;min-height:100vh}
+.app-wrap.active{display:flex}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.sb-brand-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;flex-shrink:0}
+.sb-brand-name{font-weight:800;font-size:.95rem}
+.sb-brand-name small{color:var(--t3);font-weight:500;font-size:.72rem;display:block}
+.sb-nav{padding:10px 10px;flex:1}
+.sb-label{font-size:.65rem;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;padding:14px 8px 4px}
+.sb-label:first-child{padding-top:6px}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:var(--r);color:var(--t2);font-size:.84rem;font-weight:500;transition:all .15s ease;cursor:pointer;background:none;border:none;text-align:left;margin-bottom:1px}
+.sb-item .ico{width:28px;height:28px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:background .15s}
+.sb-item:hover{background:var(--blue-s);color:var(--t1)}
+.sb-item:hover .ico{background:var(--blue-m)}
+.sb-item.active{background:var(--blue-s);color:var(--blue);font-weight:600}
+.sb-item.active .ico{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(47,69,255,.3)}
+.sb-foot{padding:10px;border-top:1px solid var(--border)}
+
+/* ── Main ── */
+.main{margin-left:var(--sw);flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:var(--hh);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:50}
+.topbar-title{font-weight:700;font-size:1rem;flex:1}
+.content{padding:22px;flex:1;max-width:1100px}
+
+/* ── Pages ── */
+.pg{display:none;animation:fadeUp .2s ease}
+.pg.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── Page header ── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.ph h2{font-size:1.2rem;font-weight:700;margin-bottom:2px}
+.ph p{font-size:.82rem;color:var(--t2)}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;box-shadow:var(--sh)}
+.stat-icon{font-size:1.3rem;margin-bottom:8px}
+.stat-val{font-size:1.7rem;font-weight:800;line-height:1;margin-bottom:3px}
+.stat-lbl{font-size:.72rem;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh);margin-bottom:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.card-title{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:7px}
+.card-body{padding:16px 18px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);font-size:.82rem;font-weight:600;border:1.5px solid transparent;transition:all .15s ease;white-space:nowrap;cursor:pointer;font-family:var(--font)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:var(--blue-h);box-shadow:0 4px 12px rgba(47,69,255,.3)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--t2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--bg);color:var(--t1);border-color:var(--border-d)}
+.btn-soft{background:var(--blue-s);color:var(--blue);border-color:var(--blue-s)}
+.btn-soft:hover{background:var(--blue-m);border-color:var(--blue-m)}
+.btn-danger{background:transparent;color:var(--red);border-color:var(--border)}
+.btn-danger:hover{background:var(--red-s);border-color:var(--red)}
+.btn-sm{padding:4px 10px;font-size:.75rem;border-radius:6px}
+.btn-full{width:100%;justify-content:center}
+
+/* ── Forms ── */
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg+.fg{margin-top:10px}
+label,.fg label{font-size:.72rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+input,select,textarea,.sel-sm{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);color:var(--t1);font-size:.88rem;padding:8px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;font-family:var(--font)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,69,255,.1);background:#fff}
+textarea{resize:vertical;min-height:70px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238896A9' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.sel-sm{padding:5px 28px 5px 8px;font-size:.78rem;width:auto}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--bg);padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:.84rem;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAFBFE}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-blue{background:var(--blue-s);color:var(--blue)}
+.badge-green{background:var(--green-s);color:var(--green)}
+.badge-red{background:var(--red-s);color:var(--red)}
+.badge-amber{background:var(--amber-s);color:var(--amber)}
+.badge-gray{background:var(--bg);color:var(--t3);border:1px solid var(--border)}
+
+/* ── Curso card ── */
+.curso-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;box-shadow:var(--sh);flex-wrap:wrap;transition:border-color .15s}
+.curso-card:hover{border-color:var(--blue-m)}
+.curso-card-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.curso-emoji{width:40px;height:40px;background:var(--blue-s);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.curso-titulo{font-weight:700;font-size:.9rem;margin-bottom:2px}
+.curso-meta{font-size:.76rem;color:var(--t3)}
+.curso-card-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── Módulos editor ── */
+.mod-bloco{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.mod-header{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.83rem;font-weight:600}
+.aula-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border);font-size:.8rem}
+.aula-row:last-child{border-bottom:none}
+
+/* ── Acesso/Restrição ── */
+.ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.restricoes-lista{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.restricao-tag{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:.8rem}
+
+/* ── Setor card ── */
+.setor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.equipe-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:var(--r);margin-bottom:4px;font-size:.82rem}
+
+/* ── Publicação ── */
+.pub-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;box-shadow:var(--sh);flex-wrap:wrap}
+.pub-card-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.pub-card-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── Modal ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.12);padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:popIn .22s ease}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-head h3{font-size:1rem;font-weight:700}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--t3);cursor:pointer;border:none;transition:background .15s}
+.modal-close:hover{background:var(--border)}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* ── Toast ── */
+.toast-stack{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:11px 15px;display:flex;align-items:center;gap:10px;min-width:240px;box-shadow:var(--shm);animation:slideIn .25s cubic-bezier(.34,1.4,.64,1);font-size:.84rem}
+.toast.s{border-left:3px solid var(--green)}
+.toast.e{border-left:3px solid var(--red)}
+.toast.i{border-left:3px solid var(--blue)}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+
+/* ── Empty ── */
+.empty{text-align:center;padding:40px 20px;color:var(--t3)}
+.ei{font-size:2.2rem;margin-bottom:10px}
+.empty p{font-size:.85rem}
+
+/* ── Upload zone ── */
+.upload-zone{border:1.5px dashed var(--border-d);border-radius:var(--rl);padding:28px;text-align:center;cursor:pointer;transition:all .15s;color:var(--t3)}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-s);color:var(--blue)}
+.upload-zone .uz-icon{font-size:2rem;margin-bottom:8px}
+.upload-zone p{font-size:.82rem}
+</style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════
-     LOGIN
-════════════════════════════════════════ -->
-<div class="login-wrap" id="loginWrap">
+<!-- LOGIN -->
+<div class="login-screen" id="loginWrap">
   <div class="login-box">
-    <div class="login-brand">
-      <div class="login-brand-logo">🎓</div>
-      <div class="login-brand-name">Radar Internet<span> Cursos EAD</span></div>
+    <div class="brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">Radar Internet <small>Painel Administrativo</small></div>
     </div>
-    <h2>Painel Administrativo</h2>
-    <p class="sub">Entre com suas credenciais para gerenciar a plataforma</p>
-
+    <h2>Entrar</h2>
+    <p>Acesse o painel de gestão de treinamentos</p>
     <div class="login-err" id="loginErr"></div>
-
     <form id="loginForm">
-      <div class="fg">
+      <div class="fg" style="margin-bottom:12px">
         <label>E-mail</label>
         <input type="email" name="email" placeholder="admin@ead.com" value="admin@ead.com" required>
       </div>
-      <div class="fg">
+      <div class="fg" style="margin-bottom:16px">
         <label>Senha</label>
         <input type="password" name="senha" placeholder="••••••••" value="admin123" required>
       </div>
-      <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top:16px">
-        Entrar →
-      </button>
+      <button type="submit" class="btn btn-primary btn-full">Entrar →</button>
     </form>
-
-    <div class="login-hint-box">
-      💡 Padrão: <strong>admin@ead.com</strong> / <strong>admin123</strong>
-    </div>
+    <div class="login-hint">💡 Padrão: admin@ead.com / admin123</div>
   </div>
 </div>
 
 
-<!-- ════════════════════════════════════════
-     APP SHELL
-════════════════════════════════════════ -->
-<div class="app-shell" id="adminShell">
+<!-- APP -->
+<div class="app-wrap" id="appWrap">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-head">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">🎓</div>
-        <div class="sidebar-logo-name">EAD<span>Platform</span></div>
-      </div>
+    <div class="sb-brand">
+      <div class="sb-brand-icon">🎓</div>
+      <div class="sb-brand-name">Radar Internet <small>Admin</small></div>
     </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Principal</div>
+      <button class="sb-item" data-pg="dashboard"><div class="ico">📊</div> Dashboard</button>
 
-    <div class="sidebar-user">
-      <div class="sidebar-avatar">A</div>
-      <div>
-        <div class="sidebar-user-name">Administrador</div>
-        <div class="sidebar-user-role">Admin</div>
-      </div>
-    </div>
+      <div class="sb-label">Conteúdo</div>
+      <button class="sb-item" data-pg="cursos"><div class="ico">📚</div> Gestão de Cursos</button>
+      <button class="sb-item" data-pg="materiais"><div class="ico">📁</div> Materiais de Apoio</button>
+      <button class="sb-item" data-pg="publicacao"><div class="ico">🚀</div> Publicação</button>
 
-    <nav class="sidebar-nav">
-      <div class="nav-group-label">Principal</div>
-      <button class="nav-btn" data-pg="dashboard">
-        <div class="nb-icon">📊</div> Dashboard
-      </button>
-
-      <div class="nav-group-label">Conteúdo</div>
-      <button class="nav-btn" data-pg="cursos">
-        <div class="nb-icon">📚</div> Cursos
-      </button>
-      <button class="nav-btn" data-pg="conteudo">
-        <div class="nb-icon">🎬</div> Módulos & Aulas
-      </button>
-
-      <div class="nav-group-label">Alunos</div>
-      <button class="nav-btn" data-pg="alunos">
-        <div class="nb-icon">👥</div> Alunos
-      </button>
-      <button class="nav-btn" data-pg="progresso">
-        <div class="nb-icon">📈</div> Progresso
-      </button>
+      <div class="sb-label">Pessoas</div>
+      <button class="sb-item" data-pg="colaboradores"><div class="ico">👥</div> Colaboradores</button>
+      <button class="sb-item" data-pg="acessos"><div class="ico">🔒</div> Controle de Acessos</button>
     </nav>
-
-    <div class="sidebar-foot">
+    <div class="sb-foot">
       <button class="btn btn-ghost btn-full" id="btnLogout">↩ Sair</button>
     </div>
   </aside>
@@ -99,332 +270,226 @@
   <div class="main">
     <header class="topbar">
       <div class="topbar-title" id="topTitle">Dashboard</div>
-      <div class="topbar-crumb" id="topDate"></div>
     </header>
 
     <div class="content">
 
-      <!-- ════ DASHBOARD ══════════════════════ -->
-      <div class="page" id="pg-dashboard">
+      <!-- ═══ DASHBOARD ═══════════════════════ -->
+      <div class="pg" id="pg-dashboard">
         <div class="ph">
-          <div class="ph-text">
-            <h2>Dashboard</h2>
-            <p>Visão geral da plataforma em tempo real</p>
-          </div>
-          <button class="btn btn-primary" id="btnNovoCurso">➕ Novo Curso</button>
+          <div><h2>Dashboard</h2><p>Visão geral da plataforma</p></div>
+          <button class="btn btn-primary" onclick="Admin.openModalCurso(null)">+ Novo Curso</button>
         </div>
 
-        <!-- Stats -->
         <div class="stats">
           <div class="stat">
-            <div class="stat-top">
-              <div class="stat-icon blue">📚</div>
-            </div>
-            <div class="stat-val" id="dsh-ncursos">0</div>
-            <div class="stat-label">Cursos publicados</div>
+            <div class="stat-icon">📚</div>
+            <div class="stat-val" id="ds-cursos">0</div>
+            <div class="stat-lbl">Cursos</div>
           </div>
           <div class="stat">
-            <div class="stat-top">
-              <div class="stat-icon green">👥</div>
-            </div>
-            <div class="stat-val" id="dsh-nalunos">0</div>
-            <div class="stat-label">Alunos cadastrados</div>
+            <div class="stat-icon">🚀</div>
+            <div class="stat-val" id="ds-publicados">0</div>
+            <div class="stat-lbl">Publicados</div>
           </div>
           <div class="stat">
-            <div class="stat-top">
-              <div class="stat-icon amber">🎬</div>
-            </div>
-            <div class="stat-val" id="dsh-naulas">0</div>
-            <div class="stat-label">Aulas criadas</div>
+            <div class="stat-icon">👥</div>
+            <div class="stat-val" id="ds-colab">0</div>
+            <div class="stat-lbl">Colaboradores</div>
           </div>
           <div class="stat">
-            <div class="stat-top">
-              <div class="stat-icon purple">✅</div>
-            </div>
-            <div class="stat-val" id="dsh-nconc">0</div>
-            <div class="stat-label">Conclusões de aulas</div>
+            <div class="stat-icon">✅</div>
+            <div class="stat-val" id="ds-concl">0</div>
+            <div class="stat-lbl">Conclusões</div>
           </div>
-        </div>
-
-        <!-- Grid 2 cols -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-
-          <!-- Cursos + progresso -->
-          <div class="card">
-            <div class="card-head">
-              <div class="card-title"><div class="ct-icon">📚</div>Cursos · Progresso médio</div>
-              <button class="btn btn-soft btn-sm" onclick="Admin.go?.('cursos') || go('cursos')">Ver todos</button>
-            </div>
-            <div class="tbl-wrap">
-              <table>
-                <thead><tr><th>Curso</th><th>Progresso médio</th><th>Status</th></tr></thead>
-                <tbody id="dsh-cursos-body"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Alunos recentes -->
-          <div class="card">
-            <div class="card-head">
-              <div class="card-title"><div class="ct-icon">👥</div>Alunos recentes</div>
-              <button class="btn btn-soft btn-sm" id="btnNovoAluno">➕ Novo</button>
-            </div>
-            <div class="tbl-wrap">
-              <table>
-                <thead><tr><th>Aluno</th><th>Aulas</th><th>Status</th></tr></thead>
-                <tbody id="dsh-alunos-body"></tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- ════ CURSOS ═════════════════════════ -->
-      <div class="page" id="pg-cursos">
-        <div class="ph">
-          <div class="ph-text">
-            <h2>Cursos</h2>
-            <p>Gerencie o catálogo de cursos da plataforma</p>
-          </div>
-          <button class="btn btn-primary" onclick="Admin.modalEditCurso(null)">➕ Novo Curso</button>
         </div>
 
         <div class="card">
           <div class="card-head">
-            <div class="card-title"><div class="ct-icon">📚</div>Todos os cursos</div>
+            <div class="card-title">📚 Cursos recentes</div>
+            <button class="btn btn-sm btn-soft" data-pg="cursos">Ver todos →</button>
           </div>
-          <div id="cursos-list"></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Curso</th><th>Aulas</th><th>Status</th><th></th></tr></thead>
+              <tbody id="ds-cursos-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
 
-      <!-- ════ CONTEÚDO (módulos + aulas) ═════ -->
-      <div class="page" id="pg-conteudo">
+      <!-- ═══ GESTÃO DE CURSOS ══════════════════ -->
+      <div class="pg" id="pg-cursos">
         <div class="ph">
-          <div class="ph-text">
-            <h2>Módulos & Aulas</h2>
-            <p>Organize o conteúdo dentro de cada curso</p>
-          </div>
+          <div><h2>Gestão de Cursos</h2><p>Crie, edite e organize os treinamentos</p></div>
+          <button class="btn btn-primary" onclick="Admin.openModalCurso(null)">+ Novo Curso</button>
+        </div>
+        <div id="cursos-list"></div>
+      </div>
+
+
+      <!-- ═══ MATERIAIS DE APOIO ════════════════ -->
+      <div class="pg" id="pg-materiais">
+        <div class="ph">
+          <div><h2>Materiais de Apoio</h2><p>PDFs, vídeos e documentos por curso</p></div>
         </div>
 
-        <div class="card" style="margin-bottom:18px">
-          <div class="card-body">
-            <div class="fg">
-              <label>Selecione o curso para gerenciar</label>
-              <select id="ctCursoSel"><option value="">— Selecione —</option></select>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-body" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div class="fg" style="flex:1;min-width:200px;margin:0">
+              <label>Filtrar por curso</label>
+              <select id="mat-curso-sel"></select>
+            </div>
+            <div style="padding-top:18px;display:flex;gap:8px">
+              <button class="btn btn-primary" id="mat-upload-btn">📎 Upload de material</button>
+              <input type="file" id="mat-file-input" style="display:none" accept=".pdf,.doc,.docx,.mp4,.pptx,.xlsx">
             </div>
           </div>
         </div>
 
-        <div id="ct-detalhe"></div>
-      </div>
-
-
-      <!-- ════ ALUNOS ══════════════════════════ -->
-      <div class="page" id="pg-alunos">
-        <div class="ph">
-          <div class="ph-text">
-            <h2>Alunos</h2>
-            <p>Gerencie os alunos cadastrados</p>
-          </div>
-          <button class="btn btn-primary" onclick="document.getElementById('modalAluno').classList.add('open')">
-            ➕ Novo Aluno
-          </button>
-        </div>
-
         <div class="card">
-          <div class="card-head"><div class="card-title"><div class="ct-icon">👥</div>Alunos cadastrados</div></div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr><th>Aluno</th><th>Status</th><th>Cursos</th><th>Aulas concluídas</th><th>Cadastro</th></tr>
-              </thead>
-              <tbody id="alunos-tbody"></tbody>
-            </table>
-          </div>
+          <div class="card-body-np" id="mat-lista"></div>
         </div>
       </div>
 
 
-      <!-- ════ PROGRESSO ═══════════════════════ -->
-      <div class="page" id="pg-progresso">
+      <!-- ═══ CONTROLE DE ACESSOS ═══════════════ -->
+      <div class="pg" id="pg-acessos">
         <div class="ph">
-          <div class="ph-text">
-            <h2>Progresso</h2>
-            <p>Acompanhe o desempenho dos alunos por curso</p>
+          <div><h2>Controle de Acessos</h2><p>Restrinja cursos por setor, equipe ou colaborador</p></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-body">
+            <div class="fg">
+              <label>Selecione o curso para configurar restrições</label>
+              <select id="ac-curso-sel"></select>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-head"><div class="card-title"><div class="ct-icon">📈</div>Progresso por aluno</div></div>
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>Aluno</th><th>Curso</th><th>Progresso</th><th>Status</th></tr></thead>
-              <tbody id="prog-tbody"></tbody>
-            </table>
+          <div class="card-body" id="ac-restricoes">
+            <p style="color:var(--t3);font-size:.85rem">Selecione um curso acima.</p>
           </div>
         </div>
+      </div>
+
+
+      <!-- ═══ COLABORADORES ═════════════════════ -->
+      <div class="pg" id="pg-colaboradores">
+        <div class="ph">
+          <div><h2>Colaboradores</h2><p>Gerencie pessoas, equipes e setores</p></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" id="btn-novo-setor">+ Setor</button>
+            <button class="btn btn-ghost" id="btn-nova-equipe">+ Equipe</button>
+            <button class="btn btn-primary" id="btn-novo-colab">+ Colaborador</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
+          <div class="card">
+            <div class="card-head"><div class="card-title">👤 Colaboradores</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Nome</th><th>Setor</th><th>Equipe</th><th>Status</th><th>Aulas</th><th></th></tr></thead>
+                <tbody id="colab-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-head"><div class="card-title">🏢 Setores e Equipes</div></div>
+              <div class="card-body" id="setores-equipes"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══ PUBLICAÇÃO ════════════════════════ -->
+      <div class="pg" id="pg-publicacao">
+        <div class="ph">
+          <div><h2>Publicação</h2><p>Gerencie o status e visibilidade dos cursos</p></div>
+        </div>
+        <div id="pub-lista"></div>
       </div>
 
     </div><!-- /content -->
   </div><!-- /main -->
-</div><!-- /app-shell -->
+</div><!-- /app-wrap -->
 
 
-<!-- ════════════════════════════════════════
-     MODAIS
-════════════════════════════════════════ -->
-
-<!-- Modal: Curso -->
-<div class="modal-bg" id="modalCurso">
-  <div class="modal">
+<!-- ═══ MODAL: CURSO ══════════════════════════ -->
+<div class="modal-bg" id="modal-curso">
+  <div class="modal" style="max-width:640px">
     <div class="modal-head">
-      <h3>Novo Curso</h3>
+      <h3 id="mc-form-title">Novo Curso</h3>
       <button class="modal-close">✕</button>
     </div>
-    <div class="modal-body">
-      <form id="formCurso">
-        <div class="form-row">
-          <div class="fg">
-            <label>Título *</label>
-            <input type="text" id="fcTitulo" placeholder="Ex: Fundamentos de JavaScript" required>
-          </div>
-          <div class="fg">
-            <label>Emoji / Ícone</label>
-            <input type="text" id="fcEmoji" placeholder="📚" maxlength="4">
-          </div>
-          <div class="fg span-2">
-            <label>Descrição</label>
-            <textarea id="fcDesc" placeholder="Descreva o objetivo e conteúdo..." rows="2"></textarea>
-          </div>
-          <div class="fg">
-            <label>Carga horária (h)</label>
-            <input type="number" id="fcCarga" placeholder="40" min="1">
-          </div>
+    <form id="mc-form">
+      <div class="form-row">
+        <div class="fg full">
+          <label>Título *</label>
+          <input type="text" id="mc-titulo" placeholder="Nome do treinamento" required>
         </div>
-        <div class="modal-foot" style="margin-top:16px">
-          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
-          <button type="submit" class="btn btn-primary">💾 Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Módulo -->
-<div class="modal-bg" id="modalModulo">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>Novo Módulo</h3>
-      <button class="modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <form id="formModulo">
-        <div class="fg">
-          <label>Título do módulo *</label>
-          <input type="text" id="fmTitulo" placeholder="Ex: Introdução e Setup" required>
-        </div>
-        <div class="fg">
+        <div class="fg full">
           <label>Descrição</label>
-          <input type="text" id="fmDesc" placeholder="Breve descrição...">
+          <textarea id="mc-desc" placeholder="Objetivo do curso..." rows="2"></textarea>
         </div>
-        <div class="modal-foot" style="margin-top:16px">
-          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
-          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        <div class="fg">
+          <label>Emoji</label>
+          <input type="text" id="mc-emoji" placeholder="📚" maxlength="4">
         </div>
-      </form>
-    </div>
+        <div class="fg">
+          <label>Carga horária (h)</label>
+          <input type="number" id="mc-carga" placeholder="8" min="1">
+        </div>
+        <div class="fg full">
+          <label>Validade (deixe em branco = sem validade)</label>
+          <input type="date" id="mc-validade">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+        <button type="submit" class="btn btn-primary">💾 Salvar curso</button>
+      </div>
+    </form>
+    <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+    <div id="mc-modulos"></div>
   </div>
 </div>
 
-<!-- Modal: Aula -->
-<div class="modal-bg" id="modalAula">
-  <div class="modal" style="max-width:540px">
-    <div class="modal-head">
-      <h3>Nova Aula</h3>
-      <button class="modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <form id="formAula">
-        <div class="form-row">
-          <div class="fg span-2">
-            <label>Título da aula *</label>
-            <input type="text" id="faTitulo" placeholder="Ex: Variáveis e tipos de dados" required>
-          </div>
-          <div class="fg">
-            <label>Tipo</label>
-            <select id="faTipo">
-              <option value="video">🎬 Vídeo</option>
-              <option value="texto">📝 Texto</option>
-              <option value="pdf">📄 PDF</option>
-              <option value="link">🔗 Link externo</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label>Duração (minutos)</label>
-            <input type="number" id="faDuracao" placeholder="15" min="1">
-          </div>
-          <div class="fg span-2">
-            <label id="faConteudoLabel">URL do vídeo</label>
-            <input type="text" id="faConteudo" placeholder="https://youtube.com/embed/...">
-          </div>
-        </div>
-        <div class="modal-foot" style="margin-top:16px">
-          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
-          <button type="submit" class="btn btn-primary">💾 Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
-<!-- Modal: Aluno -->
-<div class="modal-bg" id="modalAluno">
+<!-- ═══ MODAL: COLABORADOR ════════════════════ -->
+<div class="modal-bg" id="modal-colab">
   <div class="modal">
     <div class="modal-head">
-      <h3>➕ Novo Aluno</h3>
+      <h3>Novo Colaborador</h3>
       <button class="modal-close">✕</button>
     </div>
-    <div class="modal-body">
-      <form id="formAluno">
-        <div class="fg">
-          <label>Nome completo *</label>
-          <input type="text" id="faNome" placeholder="João da Silva" required>
-        </div>
-        <div class="fg">
-          <label>E-mail *</label>
-          <input type="email" id="faEmail" placeholder="joao@email.com" required>
-        </div>
-        <div class="fg">
-          <label>Senha inicial *</label>
-          <input type="text" id="faSenha" placeholder="senha123" required>
-        </div>
-        <div class="modal-foot" style="margin-top:16px">
-          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
-          <button type="submit" class="btn btn-primary">👤 Cadastrar</button>
-        </div>
-      </form>
-    </div>
+    <form id="colab-form">
+      <div class="fg"><label>Nome completo *</label><input type="text" id="colab-nome" placeholder="Nome do colaborador" required></div>
+      <div class="fg"><label>E-mail *</label><input type="email" id="colab-email" placeholder="email@empresa.com" required></div>
+      <div class="fg"><label>Senha inicial *</label><input type="text" id="colab-senha" placeholder="senha123" required></div>
+      <div class="form-row" style="margin-top:10px">
+        <div class="fg"><label>Setor</label><select id="colab-setor"></select></div>
+        <div class="fg"><label>Equipe</label><select id="colab-equipe"></select></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+        <button type="submit" class="btn btn-primary">👤 Cadastrar</button>
+      </div>
+    </form>
   </div>
 </div>
 
-<!-- Modal: Confirmar -->
-<div class="modal-bg confirm-modal" id="confirmModal">
-  <div class="modal" style="max-width:360px">
-    <div class="c-icon">🗑️</div>
-    <h3 id="confirmTitle">Confirmar ação</h3>
-    <p id="confirmMsg">Tem certeza que deseja continuar?</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" id="confirmCancel">Cancelar</button>
-      <button class="btn btn-danger" id="confirmOk">Confirmar</button>
-    </div>
-  </div>
-</div>
 
 <!-- TOASTS -->
 <div class="toast-stack" id="toasts"></div>
+
 <script src="src/js/storage.js"></script>
 <script src="src/js/admin.js"></script>
 </body>
