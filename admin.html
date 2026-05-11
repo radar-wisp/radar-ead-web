@@ -1213,11 +1213,6 @@ var Storage = (() => {
  * admin.js — Painel Admin EAD (Refatorado)
  * Modal-driven • Mínimo de cliques • Dashboard profissional
  */
-document.addEventListener('DOMContentLoaded', () => {
-  Storage.seed();
-  Admin.boot();
-});
-
 var Admin = (() => {
 
   /* ── estado ── */
@@ -1756,6 +1751,11 @@ var Admin = (() => {
 
   return Admin;
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  Storage.seed();
+  Admin.boot();
+});
 
 </script>
 </body>
