@@ -42,14 +42,14 @@ const Storage = (() => {
 
     const a1=uid(),a2=uid(),a3=uid(),a4=uid(),a5=uid(),a6=uid(),a7=uid(),a8=uid();
     set(K.AULAS, [
-      { id:a1, moduloId:m1, titulo:'O que é JavaScript?',       tipo:'video',  conteudo:'https://www.youtube.com/embed/W6NZfCO5SIk', duracao:15, ordem:1 },
-      { id:a2, moduloId:m1, titulo:'Configurando o ambiente',   tipo:'texto',  conteudo:'<h3>Setup do ambiente de desenvolvimento</h3><p>Para começar a programar em JavaScript você precisa de apenas um navegador moderno e um editor de código.</p><p>Recomendamos o <strong>Visual Studio Code</strong> por ser gratuito, leve e com excelente suporte à linguagem.</p><h4>Passos:</h4><ol><li>Baixe o VS Code em code.visualstudio.com</li><li>Instale a extensão "Live Server"</li><li>Crie um arquivo index.html e um script.js</li><li>Abra o terminal integrado com Ctrl+`</li></ol>', duracao:10, ordem:2 },
-      { id:a3, moduloId:m2, titulo:'Variáveis: var, let e const', tipo:'video', conteudo:'https://www.youtube.com/embed/9WIJQDvt4Us', duracao:20, ordem:1 },
-      { id:a4, moduloId:m2, titulo:'Funções e Arrow Functions',  tipo:'texto',  conteudo:'<h3>Funções em JavaScript</h3><p>Funções são blocos de código reutilizáveis. Existem três formas principais:</p><pre style="background:#f4f6fb;padding:16px;border-radius:8px;font-size:13px">// Declaração tradicional\nfunction somar(a, b) {\n  return a + b;\n}\n\n// Expressão de função\nconst subtrair = function(a, b) {\n  return a - b;\n};\n\n// Arrow function (ES6+)\nconst multiplicar = (a, b) => a * b;</pre>', duracao:18, ordem:2 },
-      { id:a5, moduloId:m3, titulo:'Os 10 princípios de Dieter Rams', tipo:'video', conteudo:'https://www.youtube.com/embed/qclHMGBEsKM', duracao:12, ordem:1 },
-      { id:a6, moduloId:m3, titulo:'Teoria das cores na prática',     tipo:'texto',  conteudo:'<h3>Teoria das Cores</h3><p>A cor é uma das ferramentas mais poderosas do design. Uma paleta bem escolhida transmite emoção, hierarquia e identidade.</p><h4>Conceitos fundamentais</h4><p><strong>Matiz (Hue):</strong> a cor em si — vermelho, azul, verde.</p><p><strong>Saturação:</strong> a intensidade da cor. Alta saturação = vibrante. Baixa = acinzentado.</p><p><strong>Luminosidade:</strong> o quão claro ou escuro é o tom.</p><h4>Paletas eficazes</h4><p>Use a regra <strong>60-30-10</strong>: 60% cor dominante, 30% secundária, 10% de destaque.</p>', duracao:14, ordem:2 },
-      { id:a7, moduloId:m4, titulo:'Introdução ao Figma',   tipo:'link',  conteudo:'https://www.figma.com/resources/learn-design/', duracao:20, ordem:1 },
-      { id:a8, moduloId:m4, titulo:'Prototipagem interativa', tipo:'video', conteudo:'https://www.youtube.com/embed/A2_HzVqmRoI', duracao:16, ordem:2 },
+      {id:a1,moduloId:m1,titulo:'O que e JavaScript?',tipo:'video',conteudo:'https://www.youtube.com/embed/W6NZfCO5SIk',duracao:15,ordem:1},
+      {id:a2,moduloId:m1,titulo:'Configurando o ambiente',tipo:'video',conteudo:'https://www.youtube.com/embed/i0MuaVA0cD4',duracao:10,ordem:2},
+      {id:a3,moduloId:m2,titulo:'Variaveis: var, let e const',tipo:'video',conteudo:'https://www.youtube.com/embed/9WIJQDvt4Us',duracao:20,ordem:1},
+      {id:a4,moduloId:m2,titulo:'Funcoes e Arrow Functions',tipo:'video',conteudo:'https://www.youtube.com/embed/FVmAZAbEHuo',duracao:18,ordem:2},
+      {id:a5,moduloId:m3,titulo:'Os 10 principios de Dieter Rams',tipo:'video',conteudo:'https://www.youtube.com/embed/qclHMGBEsKM',duracao:12,ordem:1},
+      {id:a6,moduloId:m3,titulo:'Teoria das cores na pratica',tipo:'video',conteudo:'https://www.youtube.com/embed/4GXcNEMoNpo',duracao:14,ordem:2},
+      {id:a7,moduloId:m4,titulo:'Introducao ao Figma',tipo:'link',conteudo:'https://www.figma.com/resources/learn-design/',duracao:20,ordem:1},
+      {id:a8,moduloId:m4,titulo:'Prototipagem interativa',tipo:'video',conteudo:'https://www.youtube.com/embed/A2_HzVqmRoI',duracao:16,ordem:2},
     ]);
 
     const al1=uid(), al2=uid();
