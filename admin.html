@@ -1082,22 +1082,11 @@ var Storage = (() => {
     const a1=uid(),a2=uid(),a3=uid(),a4=uid(),a5=uid(),a6=uid(),a7=uid(),a8=uid();
     set(K.AULAS, [
       { id:a1, moduloId:m1, titulo:'O que é JavaScript?',       tipo:'video',  conteudo:'https://www.youtube.com/embed/W6NZfCO5SIk', duracao:15, ordem:1 },
-      { id:a2, moduloId:m1, titulo:'Configurando o ambiente',   tipo:'texto',  conteudo:'<h3>Setup do ambiente de desenvolvimento</h3><p>Para começar a programar em JavaScript você precisa de apenas um navegador moderno e um editor de código.</p><p>Recomendamos o <strong>Visual Studio Code</strong> por ser gratuito, leve e com excelente suporte à linguagem.</p><h4>Passos:</h4><ol><li>Baixe o VS Code em code.visualstudio.com</li><li>Instale a extensão "Live Server"</li><li>Crie um arquivo index.html e um script.js</li><li>Abra o terminal integrado com Ctrl+`</li></ol>', duracao:10, ordem:2 },
+      { id:a2, moduloId:m1, titulo:'Configurando o ambiente', tipo:'texto', conteudo:'<h3>Setup do ambiente</h3><p>Para programar em JavaScript voce precisa de um navegador moderno e um editor de codigo.</p><p>Recomendamos o Visual Studio Code por ser gratuito e leve.</p><h4>Passos:</h4><ol><li>Baixe o VS Code em code.visualstudio.com</li><li>Instale a extensao Live Server</li><li>Crie um arquivo index.html e um script.js</li></ol>', duracao:10, ordem:2 },
       { id:a3, moduloId:m2, titulo:'Variáveis: var, let e const', tipo:'video', conteudo:'https://www.youtube.com/embed/9WIJQDvt4Us', duracao:20, ordem:1 },
-      { id:a4, moduloId:m2, titulo:'Funções e Arrow Functions',  tipo:'texto',  conteudo:'<h3>Funções em JavaScript</h3><p>Funções são blocos de código reutilizáveis. Existem três formas principais:</p><pre style="background:#f4f6fb;padding:16px;border-radius:8px;font-size:13px">// Declaração tradicional
-function somar(a, b) {
-  return a + b;
-}
-
-// Expressão de função
-const subtrair = function(a, b) {
-  return a - b;
-};
-
-// Arrow function (ES6+)
-const multiplicar = (a, b) => a * b;</pre>', duracao:18, ordem:2 },
+      { id:a4, moduloId:m2, titulo:'Funcoes e Arrow Functions', tipo:'texto', conteudo:'<h3>Funcoes em JavaScript</h3><p>Funcoes sao blocos de codigo reutilizaveis. Existem tres formas principais:</p><p><strong>Declaracao tradicional:</strong> function somar(a, b) { return a + b; }</p><p><strong>Expressao de funcao:</strong> const subtrair = function(a, b) { return a - b; }</p><p><strong>Arrow function (ES6+):</strong> const multiplicar = (a, b) => a * b;</p>', duracao:18, ordem:2 },
       { id:a5, moduloId:m3, titulo:'Os 10 princípios de Dieter Rams', tipo:'video', conteudo:'https://www.youtube.com/embed/qclHMGBEsKM', duracao:12, ordem:1 },
-      { id:a6, moduloId:m3, titulo:'Teoria das cores na prática',     tipo:'texto',  conteudo:'<h3>Teoria das Cores</h3><p>A cor é uma das ferramentas mais poderosas do design. Uma paleta bem escolhida transmite emoção, hierarquia e identidade.</p><h4>Conceitos fundamentais</h4><p><strong>Matiz (Hue):</strong> a cor em si — vermelho, azul, verde.</p><p><strong>Saturação:</strong> a intensidade da cor. Alta saturação = vibrante. Baixa = acinzentado.</p><p><strong>Luminosidade:</strong> o quão claro ou escuro é o tom.</p><h4>Paletas eficazes</h4><p>Use a regra <strong>60-30-10</strong>: 60% cor dominante, 30% secundária, 10% de destaque.</p>', duracao:14, ordem:2 },
+      { id:a6, moduloId:m3, titulo:'Teoria das cores na pratica', tipo:'texto', conteudo:'<h3>Teoria das Cores</h3><p>A cor e uma das ferramentas mais poderosas do design. Uma paleta bem escolhida transmite emocao, hierarquia e identidade.</p><h4>Conceitos fundamentais</h4><p>Matiz: a cor em si - vermelho, azul, verde.</p><p>Saturacao: a intensidade da cor. Alta saturacao = vibrante. Baixa = acinzentado.</p><p>Luminosidade: o quao claro ou escuro e o tom.</p><h4>Paletas eficazes</h4><p>Use a regra 60-30-10: 60% cor dominante, 30% secundaria, 10% de destaque.</p>', duracao:14, ordem:2 },
       { id:a7, moduloId:m4, titulo:'Introdução ao Figma',   tipo:'link',  conteudo:'https://www.figma.com/resources/learn-design/', duracao:20, ordem:1 },
       { id:a8, moduloId:m4, titulo:'Prototipagem interativa', tipo:'video', conteudo:'https://www.youtube.com/embed/A2_HzVqmRoI', duracao:16, ordem:2 },
     ]);
