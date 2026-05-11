@@ -174,7 +174,7 @@ var Admin = (() => {
     }).join('');
   }
 
-  Admin.openConteudo = cursoId => {
+  function openConteudo(cursoId) {
     go('conteudo');
     setTimeout(() => {
       const sel = q('#ctCursoSel');
@@ -182,7 +182,7 @@ var Admin = (() => {
     }, 50);
   };
 
-  Admin.modalEditCurso = id => {
+  function modalEditCurso(id) {
     const c = id ? Storage.Cursos.obter(id) : null;
     editCtx = { tipo: 'curso', id };
     setModalTitle('modalCurso', id ? '✏️ Editar Curso' : '➕ Novo Curso');
@@ -193,11 +193,13 @@ var Admin = (() => {
     openModal('modalCurso');
   };
 
-  Admin.delCurso = id => confirm2(
+  function delCurso(id) {
+    confirm2(
     'Excluir curso?',
     'Todos os módulos e aulas serão removidos permanentemente.',
     () => { Storage.Cursos.excluir(id); toast('Curso excluído', 'i'); cursos(); }
   );
+  };
 
   /* ── Conteúdo (Módulos + Aulas em uma tela) ── */
   function conteudo() {
@@ -273,7 +275,7 @@ var Admin = (() => {
       }).join('')}`;
   }
 
-  Admin.modalNovoModulo = cursoId => {
+  function modalNovoModulo(cursoId) {
     editCtx = { tipo: 'modulo', cursoId };
     setModalTitle('modalModulo', '➕ Novo Módulo');
     q('#fmTitulo').value = '';
@@ -281,7 +283,7 @@ var Admin = (() => {
     openModal('modalModulo');
   };
 
-  Admin.modalEditModulo = id => {
+  function modalEditModulo(id) {
     const m = Storage.Modulos.obter(id);
     editCtx = { tipo: 'modulo', id, cursoId: m.cursoId };
     setModalTitle('modalModulo', '✏️ Editar Módulo');
@@ -290,12 +292,14 @@ var Admin = (() => {
     openModal('modalModulo');
   };
 
-  Admin.delModulo = (id, cursoId) => confirm2(
+  function delModulo(id, cursoId) {
+    confirm2(
     'Excluir módulo?', 'As aulas também serão removidas.',
     () => { Storage.Modulos.excluir(id); toast('Módulo excluído', 'i'); renderConteudoDetalhe(cursoId); }
   );
+  };
 
-  Admin.modalNovaAula = (moduloId, cursoId) => {
+  function modalNovaAula(moduloId, cursoId) {
     editCtx = { tipo: 'aula', moduloId, cursoId };
     setModalTitle('modalAula', '➕ Nova Aula');
     q('#faTitulo').value   = '';
@@ -306,7 +310,7 @@ var Admin = (() => {
     openModal('modalAula');
   };
 
-  Admin.modalEditAula = (id, cursoId) => {
+  function modalEditAula(id, cursoId) {
     const a = Storage.Aulas.obter(id);
     editCtx = { tipo: 'aula', id, moduloId: a.moduloId, cursoId };
     setModalTitle('modalAula', '✏️ Editar Aula');
@@ -318,10 +322,12 @@ var Admin = (() => {
     openModal('modalAula');
   };
 
-  Admin.delAula = (id, moduloId, cursoId) => confirm2(
+  function delAula(id, moduloId, cursoId) {
+    confirm2(
     'Excluir aula?', 'O progresso relacionado também será removido.',
     () => { Storage.Aulas.excluir(id); toast('Aula excluída', 'i'); renderConteudoDetalhe(cursoId); }
   );
+  };
 
   /* ── Alunos ── */
   function alunos() {
@@ -537,6 +543,17 @@ var Admin = (() => {
     stack.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
+
+  // Expõe funções públicas (chamadas via onclick no HTML)
+  Admin.openConteudo    = openConteudo;
+  Admin.modalEditCurso  = modalEditCurso;
+  Admin.delCurso        = delCurso;
+  Admin.modalNovoModulo = modalNovoModulo;
+  Admin.modalEditModulo = modalEditModulo;
+  Admin.delModulo       = delModulo;
+  Admin.modalNovaAula   = modalNovaAula;
+  Admin.modalEditAula   = modalEditAula;
+  Admin.delAula         = delAula;
 
   return Admin;
 })();
