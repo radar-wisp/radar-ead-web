@@ -232,7 +232,7 @@ var Aluno = (() => {
     </div>`;
   }
 
-  Aluno.iniciarCurso = cursoId => {
+  function iniciarCurso(cursoId) {
     const modulos = Storage.Modulos.listarPorCurso(cursoId);
     if (!modulos.length) { toast('Este curso não tem conteúdo ainda.', 'i'); return; }
     const todas = modulos.flatMap(m => Storage.Aulas.listarPorModulo(m.id));
@@ -242,7 +242,7 @@ var Aluno = (() => {
     Aluno.abrirAula(cursoId, prox.id);
   };
 
-  Aluno.abrirAula = (cursoId, aulaId) => {
+  function abrirAula(cursoId, aulaId) {
     cur = { cursoId, aulaId };
     go('player', { cursoId, aulaId });
   };
@@ -382,7 +382,7 @@ var Aluno = (() => {
     }).join('');
   }
 
-  Aluno.selAula = selAula;
+  
   function selAula(aulaId) {
     cur.aulaId = aulaId;
     renderPlayer({ aulaId });
@@ -428,6 +428,11 @@ var Aluno = (() => {
     stack.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
+
+  // Expõe funções públicas
+  Aluno.iniciarCurso = iniciarCurso;
+  Aluno.abrirAula    = abrirAula;
+  Aluno.selAula      = selAula;
 
   return Aluno;
 })();
