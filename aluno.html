@@ -1062,11 +1062,6 @@ var Storage = (() => {
  * aluno.js — Portal do Aluno EAD (Refatorado)
  * Continuação automática · Progresso visual · Certificado
  */
-document.addEventListener('DOMContentLoaded', () => {
-  Storage.seed();
-  Aluno.boot();
-});
-
 var Aluno = (() => {
 
   let me = null; // aluno logado
@@ -1496,6 +1491,11 @@ var Aluno = (() => {
 
   return Aluno;
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  Storage.seed();
+  Aluno.boot();
+});
 
 </script>
 </body>
