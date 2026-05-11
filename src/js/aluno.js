@@ -429,12 +429,12 @@ var Aluno = (() => {
     setTimeout(() => el.remove(), 3000);
   }
 
-  // Expõe funções públicas
-  Aluno.iniciarCurso = iniciarCurso;
-  Aluno.abrirAula    = abrirAula;
-  Aluno.selAula      = selAula;
-
-  return Aluno;
+  return {
+    boot,
+    iniciarCurso,
+    abrirAula,
+    selAula,
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
