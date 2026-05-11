@@ -1,516 +1,641 @@
 /**
- * admin.js — Painel Admin EAD (Refatorado)
- * Modal-driven • Mínimo de cliques • Dashboard profissional
+ * admin.js — Painel Admin Corporativo EAD
+ * Módulos: Dashboard · Cursos · Materiais · Acessos · Colaboradores · Publicação
  */
+
 var Admin = (() => {
 
-  /* ── estado ── */
-  let curPage = 'dashboard';
-  let editCtx  = {};   // { tipo, id }
+  let pg = 'dashboard';
+  let modal = { id: null, ctx: {} };
 
-  /* ════════════════════════════════════
+  /* ══════════════════════════════════
      BOOT
-  ════════════════════════════════════ */
+  ══════════════════════════════════ */
   function boot() {
     const s = Storage.Sessao.obter();
-    if (s?.tipo === 'admin') {
-      go('dashboard');
-      showShell();
+    if (s && s.tipo === 'admin') {
+      showApp();
     } else {
-      showLogin();
+      q('#loginWrap').classList.add('active');
+      q('#loginForm').onsubmit = doLogin;
     }
-  }
-
-  function showLogin() {
-    document.getElementById('loginWrap').classList.add('active');
-    document.getElementById('adminShell').classList.remove('active');
-    document.getElementById('loginForm').onsubmit = doLogin;
-  }
-
-  function showShell() {
-    document.getElementById('loginWrap').classList.remove('active');
-    document.getElementById('adminShell').classList.add('active');
-    bindNav();
-    bindModals();
-    updateDate();
   }
 
   function doLogin(e) {
     e.preventDefault();
-    const email = e.target.email.value.trim();
-    const senha = e.target.senha.value;
-    if (Storage.Admin.auth(email, senha)) {
-      Storage.Sessao.salvar({ tipo: 'admin', email });
-      showShell();
-      go('dashboard');
+    const em = e.target.email.value.trim();
+    const pw = e.target.senha.value;
+    const err = q('#loginErr');
+    if (Storage.Admin.auth(em, pw)) {
+      Storage.Sessao.salvar({ tipo:'admin', email:em });
+      err.classList.remove('show');
+      showApp();
     } else {
-      const el = document.getElementById('loginErr');
-      el.textContent = 'Credenciais inválidas.';
-      el.classList.add('show');
+      err.textContent = 'Credenciais inválidas.';
+      err.classList.add('show');
     }
   }
 
-  /* ════════════════════════════════════
+  function showApp() {
+    q('#loginWrap').classList.remove('active');
+    q('#appWrap').classList.add('active');
+    bindNav();
+    bindModals();
+    go('dashboard');
+  }
+
+  /* ══════════════════════════════════
      NAV
-  ════════════════════════════════════ */
+  ══════════════════════════════════ */
   function bindNav() {
-    document.querySelectorAll('.nav-btn[data-pg]').forEach(btn =>
-      btn.addEventListener('click', () => go(btn.dataset.pg))
+    document.querySelectorAll('[data-pg]').forEach(el =>
+      el.addEventListener('click', () => go(el.dataset.pg))
     );
-    document.getElementById('btnLogout').onclick = () => {
-      Storage.Sessao.encerrar(); location.reload();
+    q('#btnLogout').onclick = () => { Storage.Sessao.encerrar(); location.reload(); };
+  }
+
+  function go(p) {
+    pg = p;
+    document.querySelectorAll('[data-pg]').forEach(el =>
+      el.classList.toggle('active', el.dataset.pg === p)
+    );
+    document.querySelectorAll('.pg').forEach(el =>
+      el.classList.toggle('active', el.id === 'pg-' + p)
+    );
+    const titles = {
+      dashboard:'Dashboard', cursos:'Gestão de Cursos',
+      materiais:'Materiais de Apoio', acessos:'Controle de Acessos',
+      colaboradores:'Colaboradores', publicacao:'Publicação',
     };
+    q('#topTitle').textContent = titles[p] || p;
+    renders[p]?.();
   }
 
-  function go(pg) {
-    curPage = pg;
-    editCtx = {};
-    document.querySelectorAll('.nav-btn[data-pg]').forEach(b =>
-      b.classList.toggle('active', b.dataset.pg === pg)
-    );
-    document.querySelectorAll('.page').forEach(el =>
-      el.classList.toggle('active', el.id === 'pg-' + pg)
-    );
-    document.getElementById('topTitle').textContent = {
-      dashboard:'Dashboard', cursos:'Cursos', conteudo:'Módulos & Aulas',
-      alunos:'Alunos', progresso:'Progresso'
-    }[pg] || pg;
-    renders[pg]?.();
-  }
+  const renders = { dashboard, cursos, materiais, acessos, colaboradores, publicacao };
 
-  function updateDate() {
-    const el = document.getElementById('topDate');
-    if (el) el.textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
-  }
-
-  /* ════════════════════════════════════
-     RENDERS
-  ════════════════════════════════════ */
-  const renders = { dashboard, cursos, conteudo, alunos, progresso };
-
-  /* ── Dashboard ── */
+  /* ══════════════════════════════════
+     DASHBOARD
+  ══════════════════════════════════ */
   function dashboard() {
-    const allCursos  = Storage.Cursos.listar();
-    const allAlunos  = Storage.Alunos.listar();
-    const allAulas   = Storage.Aulas.listar();
-    const allProg    = Storage.Progresso.listar();
+    const allCursos = Storage.Cursos.listar();
+    const allAlunos = Storage.Alunos.listar();
+    const allProg   = Storage.Progresso.listar();
+    const publicados = allCursos.filter(c=>c.status==='publicado').length;
 
-    q('#dsh-ncursos').textContent  = allCursos.length;
-    q('#dsh-nalunos').textContent  = allAlunos.length;
-    q('#dsh-naulas').textContent   = allAulas.length;
-    q('#dsh-nconc').textContent    = allProg.length;
+    q('#ds-cursos').textContent    = allCursos.length;
+    q('#ds-publicados').textContent = publicados;
+    q('#ds-colab').textContent     = allAlunos.length;
+    q('#ds-concl').textContent     = allProg.length;
 
-    /* Cursos com progresso médio */
-    const cursosBody = q('#dsh-cursos-body');
-    if (!allCursos.length) {
-      cursosBody.innerHTML = emptyRow(4, 'Nenhum curso ainda');
-    } else {
-      cursosBody.innerHTML = allCursos.slice(0, 6).map(c => {
-        const mods  = Storage.Modulos.listarPorCurso(c.id).length;
-        const aulas = Storage.Aulas.totalPorCurso(c.id);
-        const pctList = allAlunos.map(a => Storage.Progresso.pctCurso(a.id, c.id));
-        const avg  = pctList.length ? Math.round(pctList.reduce((s,v)=>s+v,0)/pctList.length) : 0;
-        return `<tr>
-          <td><div class="td-name">
-            <strong>${c.emoji||'📚'} ${x(c.titulo)}</strong>
-            <span>${mods} módulos · ${aulas} aulas${c.carga?' · '+c.carga+'h':''}</span>
-          </div></td>
-          <td>
-            <div class="prog-row">
-              <div class="prog-bar"><div class="prog-fill ${avg===100?'g':''}" style="width:${avg}%"></div></div>
-              <span class="prog-pct">${avg}%</span>
-            </div>
-          </td>
-          <td>${badge(avg===100?'Completo':avg>0?'Em andamento':'Não iniciado', avg===100?'green':avg>0?'amber':'gray')}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    /* Alunos recentes */
-    const alunosBody = q('#dsh-alunos-body');
-    if (!allAlunos.length) {
-      alunosBody.innerHTML = emptyRow(3, 'Nenhum aluno cadastrado');
-    } else {
-      alunosBody.innerHTML = allAlunos.slice(-5).reverse().map(a => {
-        const conc = Storage.Progresso.concluidas(a.id).length;
-        return `<tr>
-          <td><div class="td-name">
-            <strong>${x(a.nome)}</strong>
-            <span>${x(a.email)}</span>
-          </div></td>
-          <td>${conc} aulas</td>
-          <td>${badge(a.ativo?'Ativo':'Inativo',a.ativo?'green':'red')}</td>
-        </tr>`;
-      }).join('');
-    }
+    // Cursos recentes
+    const tbody = q('#ds-cursos-body');
+    if (!allCursos.length) { tbody.innerHTML = tdEmpty(4, 'Nenhum curso'); return; }
+    tbody.innerHTML = allCursos.slice(0,6).map(c => {
+      const totalAulas = Storage.Aulas.totalPorCurso(c.id);
+      const concluidos = allProg.filter(p => {
+        const mids = Storage.Modulos.listarPorCurso(c.id).map(m=>m.id);
+        const aids = Storage.Aulas.listar().filter(a=>mids.includes(a.moduloId)).map(a=>a.id);
+        return aids.includes(p.aulaId);
+      }).length;
+      return `<tr>
+        <td><span style="font-size:1.1rem">${c.emoji||'📚'}</span> <strong>${x(c.titulo)}</strong></td>
+        <td>${totalAulas} aulas</td>
+        <td>${statusBadge(c.status)}</td>
+        <td><button class="btn btn-sm btn-ghost" onclick="Admin.goEdit('${c.id}')">Editar →</button></td>
+      </tr>`;
+    }).join('');
   }
 
-  /* ── Cursos ── */
+  function goEdit(cursoId) {
+    go('cursos');
+    setTimeout(() => openModalCurso(cursoId), 100);
+  }
+
+  /* ══════════════════════════════════
+     GESTÃO DE CURSOS
+  ══════════════════════════════════ */
   function cursos() {
+    renderCursosList();
+  }
+
+  function renderCursosList() {
     const lista = Storage.Cursos.listar();
-    const body  = q('#cursos-list');
+    const wrap  = q('#cursos-list');
 
     if (!lista.length) {
-      body.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>
-        <h3>Nenhum curso</h3><p>Clique em "Novo Curso" para começar</p></div>`;
+      wrap.innerHTML = `<div class="empty"><div class="ei">📭</div><p>Nenhum curso. Crie o primeiro!</p></div>`;
       return;
     }
 
-    body.innerHTML = lista.map(c => {
+    wrap.innerHTML = lista.map(c => {
       const mods  = Storage.Modulos.listarPorCurso(c.id).length;
-      const naulas = Storage.Aulas.totalPorCurso(c.id);
-      return `<div class="curso-row">
-        <div class="cr-emoji">${c.emoji||'📚'}</div>
-        <div class="cr-info">
-          <div class="cr-title">${x(c.titulo)}</div>
-          <div class="cr-meta">${mods} módulos · ${naulas} aulas${c.carga?' · '+c.carga+'h':''}</div>
+      const aulas = Storage.Aulas.totalPorCurso(c.id);
+      const mats  = Storage.Materiais.listarPorCurso(c.id).length;
+      const rest  = Storage.Restricoes.porCurso(c.id).length;
+      return `
+      <div class="curso-card">
+        <div class="curso-card-left">
+          <div class="curso-emoji">${c.emoji||'📚'}</div>
+          <div class="curso-info">
+            <div class="curso-titulo">${x(c.titulo)}</div>
+            <div class="curso-meta">${mods} módulos · ${aulas} aulas · ${mats} materiais · ${c.carga||0}h${c.validadeAte?' · válido até '+fmtDate(c.validadeAte):''}</div>
+          </div>
         </div>
-        <div class="cr-actions">
-          <button class="btn btn-soft btn-sm" onclick="Admin.openConteudo('${c.id}')">📂 Conteúdo</button>
-          <button class="btn btn-ghost btn-sm" onclick="Admin.modalEditCurso('${c.id}')">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="Admin.delCurso('${c.id}')">🗑️</button>
+        <div class="curso-card-right">
+          ${statusBadge(c.status)}
+          ${rest ? `<span class="badge badge-blue">${rest} restrição(ões)</span>` : ''}
+          <button class="btn btn-sm btn-ghost" onclick="Admin.openModalCurso('${c.id}')">✏️ Editar</button>
+          <button class="btn btn-sm btn-soft" onclick="Admin.duplicarCurso('${c.id}')" title="Duplicar">⧉</button>
+          <button class="btn btn-sm btn-danger" onclick="Admin.excluirCurso('${c.id}')">🗑️</button>
         </div>
       </div>`;
     }).join('');
   }
 
-  function openConteudo(cursoId) {
-    go('conteudo');
-    setTimeout(() => {
-      const sel = q('#ctCursoSel');
-      if (sel) { sel.value = cursoId; sel.dispatchEvent(new Event('change')); }
-    }, 50);
-  };
-
-  function modalEditCurso(id) {
+  function openModalCurso(id) {
     const c = id ? Storage.Cursos.obter(id) : null;
-    editCtx = { tipo: 'curso', id };
-    setModalTitle('modalCurso', id ? '✏️ Editar Curso' : '➕ Novo Curso');
-    q('#fcTitulo').value    = c?.titulo    || '';
-    q('#fcDesc').value      = c?.descricao || '';
-    q('#fcEmoji').value     = c?.emoji     || '';
-    q('#fcCarga').value     = c?.carga     || '';
-    openModal('modalCurso');
-  };
+    modal.ctx = { cursoId: id };
 
-  function delCurso(id) {
-    confirm2(
-    'Excluir curso?',
-    'Todos os módulos e aulas serão removidos permanentemente.',
-    () => { Storage.Cursos.excluir(id); toast('Curso excluído', 'i'); cursos(); }
-  );
-  };
+    q('#mc-titulo').value    = c?.titulo    || '';
+    q('#mc-desc').value      = c?.descricao || '';
+    q('#mc-emoji').value     = c?.emoji     || '';
+    q('#mc-carga').value     = c?.carga     || '';
+    q('#mc-validade').value  = c?.validadeAte ? c.validadeAte.split('T')[0] : '';
+    q('#mc-form-title').textContent = id ? 'Editar Curso' : 'Novo Curso';
 
-  /* ── Conteúdo (Módulos + Aulas em uma tela) ── */
-  function conteudo() {
-    const allCursos = Storage.Cursos.listar();
-    const sel = q('#ctCursoSel');
-    sel.innerHTML = '<option value="">— Selecione um curso —</option>'
-      + allCursos.map(c => `<option value="${c.id}">${c.emoji||'📚'} ${x(c.titulo)}</option>`).join('');
-    sel.onchange = () => renderConteudoDetalhe(sel.value);
-
-    if (allCursos.length === 1) {
-      sel.value = allCursos[0].id;
-      renderConteudoDetalhe(sel.value);
-    } else {
-      q('#ct-detalhe').innerHTML = `<div class="empty"><div class="empty-icon">📂</div>
-        <h3>Selecione um curso</h3><p>Escolha um curso acima para gerenciar seus módulos e aulas</p></div>`;
-    }
+    // Carrega módulos/aulas
+    renderModulosEditor(id);
+    openModal('modal-curso');
   }
 
-  function renderConteudoDetalhe(cursoId) {
-    const wrap = q('#ct-detalhe');
-    if (!cursoId) { wrap.innerHTML = ''; return; }
+  function renderModulosEditor(cursoId) {
+    const wrap = q('#mc-modulos');
+    if (!cursoId) { wrap.innerHTML = '<p style="color:var(--t3);font-size:.82rem">Salve o curso primeiro para adicionar módulos.</p>'; return; }
 
     const modulos = Storage.Modulos.listarPorCurso(cursoId);
-    if (!modulos.length) {
-      wrap.innerHTML = `<div class="empty"><div class="empty-icon">📂</div>
-        <h3>Nenhum módulo</h3><p>Adicione o primeiro módulo para este curso</p></div>
-        <div style="text-align:center;margin-top:12px">
-          <button class="btn btn-primary" onclick="Admin.modalNovoModulo('${cursoId}')">➕ Novo Módulo</button>
-        </div>`;
-      return;
-    }
-
     wrap.innerHTML = `
-      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-        <button class="btn btn-primary btn-sm" onclick="Admin.modalNovoModulo('${cursoId}')">➕ Módulo</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <strong style="font-size:.85rem">Módulos e Aulas</strong>
+        <button class="btn btn-sm btn-soft" onclick="Admin.addModulo('${cursoId}')">+ Módulo</button>
       </div>
-      ${modulos.map(m => {
+      ${modulos.length ? modulos.map(m => {
         const aulas = Storage.Aulas.listarPorModulo(m.id);
         return `
-        <div class="card" style="margin-bottom:14px">
-          <div class="card-head">
-            <div class="card-title">
-              <div class="ct-icon">📂</div>
-              ${m.ordem}. ${x(m.titulo)}
-            </div>
-            <div class="btn-row">
-              <button class="btn btn-ghost btn-sm" onclick="Admin.modalEditModulo('${m.id}')">✏️ Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="Admin.delModulo('${m.id}','${cursoId}')">🗑️</button>
-              <button class="btn btn-soft btn-sm" onclick="Admin.modalNovaAula('${m.id}','${cursoId}')">➕ Aula</button>
+        <div class="mod-bloco">
+          <div class="mod-header">
+            <span>${m.ordem}. ${x(m.titulo)}</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-soft" onclick="Admin.addAula('${m.id}','${cursoId}')">+ Aula</button>
+              <button class="btn btn-sm btn-danger" onclick="Admin.delModulo('${m.id}','${cursoId}')">🗑️</button>
             </div>
           </div>
-          ${aulas.length ? `
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>#</th><th>Aula</th><th>Tipo</th><th>Duração</th><th></th></tr></thead>
-              <tbody>
-                ${aulas.map(a => `<tr>
-                  <td style="color:var(--t4);width:32px">${a.ordem}</td>
-                  <td><div class="td-name"><strong>${x(a.titulo)}</strong></div></td>
-                  <td>${badge(a.tipo, tipoBadge(a.tipo))}</td>
-                  <td style="color:var(--t3);font-size:.78rem">${a.duracao?a.duracao+' min':'—'}</td>
-                  <td><div class="td-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="Admin.modalEditAula('${a.id}','${cursoId}')">✏️</button>
-                    <button class="btn btn-danger btn-sm" onclick="Admin.delAula('${a.id}','${m.id}','${cursoId}')">🗑️</button>
-                  </div></td>
-                </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>` : `<div class="card-body" style="color:var(--t3);font-size:.82rem">
-            Nenhuma aula — <a href="#" onclick="Admin.modalNovaAula('${m.id}','${cursoId}');return false">adicionar aula</a>
-          </div>`}
+          ${aulas.map(a => `
+            <div class="aula-row">
+              <span class="badge ${tipoBadge(a.tipo)}">${a.tipo}</span>
+              <span>${x(a.titulo)}</span>
+              <span style="color:var(--t3);font-size:.76rem;margin-left:auto">${a.duracao||0}min</span>
+              <button class="btn btn-sm btn-danger" onclick="Admin.delAula('${a.id}','${m.id}','${cursoId}')">🗑️</button>
+            </div>`).join('')}
         </div>`;
-      }).join('')}`;
+      }).join('') : '<p style="color:var(--t3);font-size:.82rem">Nenhum módulo ainda.</p>'}`;
   }
 
-  function modalNovoModulo(cursoId) {
-    editCtx = { tipo: 'modulo', cursoId };
-    setModalTitle('modalModulo', '➕ Novo Módulo');
-    q('#fmTitulo').value = '';
-    q('#fmDesc').value   = '';
-    openModal('modalModulo');
-  };
+  function addModulo(cursoId) {
+    const titulo = prompt('Nome do módulo:');
+    if (!titulo) return;
+    Storage.Modulos.criar({ cursoId, titulo });
+    renderModulosEditor(cursoId);
+  }
 
-  function modalEditModulo(id) {
-    const m = Storage.Modulos.obter(id);
-    editCtx = { tipo: 'modulo', id, cursoId: m.cursoId };
-    setModalTitle('modalModulo', '✏️ Editar Módulo');
-    q('#fmTitulo').value = m.titulo;
-    q('#fmDesc').value   = m.descricao || '';
-    openModal('modalModulo');
-  };
+  function addAula(moduloId, cursoId) {
+    const titulo = prompt('Título da aula:');
+    if (!titulo) return;
+    const tipo = prompt('Tipo (video/texto/pdf/link):', 'video') || 'video';
+    const url  = prompt('URL ou conteúdo:') || '';
+    const dur  = parseInt(prompt('Duração em minutos:', '10')) || 10;
+    Storage.Aulas.criar({ moduloId, titulo, tipo, conteudo: url, duracao: dur });
+    renderModulosEditor(cursoId);
+  }
 
-  function delModulo(id, cursoId) {
-    confirm2(
-    'Excluir módulo?', 'As aulas também serão removidas.',
-    () => { Storage.Modulos.excluir(id); toast('Módulo excluído', 'i'); renderConteudoDetalhe(cursoId); }
-  );
-  };
+  function delModulo(moduloId, cursoId) {
+    if (!confirm('Excluir módulo e suas aulas?')) return;
+    Storage.Modulos.excluir(moduloId);
+    renderModulosEditor(cursoId);
+  }
 
-  function modalNovaAula(moduloId, cursoId) {
-    editCtx = { tipo: 'aula', moduloId, cursoId };
-    setModalTitle('modalAula', '➕ Nova Aula');
-    q('#faTitulo').value   = '';
-    q('#faTipo').value     = 'video';
-    q('#faConteudo').value = '';
-    q('#faDuracao').value  = '';
-    atualizarHintAula('video');
-    openModal('modalAula');
-  };
+  function delAula(aulaId, moduloId, cursoId) {
+    Storage.Aulas.excluir(aulaId);
+    renderModulosEditor(cursoId);
+  }
 
-  function modalEditAula(id, cursoId) {
-    const a = Storage.Aulas.obter(id);
-    editCtx = { tipo: 'aula', id, moduloId: a.moduloId, cursoId };
-    setModalTitle('modalAula', '✏️ Editar Aula');
-    q('#faTitulo').value   = a.titulo;
-    q('#faTipo').value     = a.tipo;
-    q('#faConteudo').value = a.conteudo || '';
-    q('#faDuracao').value  = a.duracao  || '';
-    atualizarHintAula(a.tipo);
-    openModal('modalAula');
-  };
+  function duplicarCurso(id) {
+    const novo = Storage.Cursos.duplicar(id);
+    if (novo) { toast('Curso duplicado!', 's'); renderCursosList(); }
+  }
 
-  function delAula(id, moduloId, cursoId) {
-    confirm2(
-    'Excluir aula?', 'O progresso relacionado também será removido.',
-    () => { Storage.Aulas.excluir(id); toast('Aula excluída', 'i'); renderConteudoDetalhe(cursoId); }
-  );
-  };
+  function excluirCurso(id) {
+    if (!confirm('Excluir curso permanentemente?')) return;
+    Storage.Cursos.excluir(id);
+    toast('Curso excluído.', 'i');
+    renderCursosList();
+  }
 
-  /* ── Alunos ── */
-  function alunos() {
-    const lista = Storage.Alunos.listar();
-    const body  = q('#alunos-tbody');
+  /* ══════════════════════════════════
+     MATERIAIS DE APOIO
+  ══════════════════════════════════ */
+  function materiais() {
+    const cursos = Storage.Cursos.listar();
+    const sel    = q('#mat-curso-sel');
+    sel.innerHTML = '<option value="">Todos os cursos</option>'
+      + cursos.map(c => `<option value="${c.id}">${x(c.titulo)}</option>`).join('');
+    sel.onchange = () => renderMateriais(sel.value);
+    renderMateriais('');
+
+    q('#mat-upload-btn').onclick = () => {
+      const cursoId = sel.value;
+      if (!cursoId) { toast('Selecione um curso primeiro', 'e'); return; }
+      q('#mat-file-input').click();
+    };
+
+    q('#mat-file-input').onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const cursoId = sel.value;
+      Storage.Materiais.criar({
+        cursoId,
+        nome: file.name,
+        tipo: file.type.includes('pdf') ? 'pdf' : file.type.includes('video') ? 'video' : 'doc',
+        tamanho: formatBytes(file.size),
+        url: '#simulado',
+      });
+      toast(`"${file.name}" adicionado!`, 's');
+      renderMateriais(cursoId);
+      e.target.value = '';
+    };
+  }
+
+  function renderMateriais(cursoId) {
+    const lista = cursoId
+      ? Storage.Materiais.listarPorCurso(cursoId)
+      : Storage.Materiais.listar();
+    const wrap = q('#mat-lista');
 
     if (!lista.length) {
-      body.innerHTML = emptyRow(5, 'Nenhum aluno cadastrado');
+      wrap.innerHTML = `<div class="empty"><div class="ei">📁</div><p>Nenhum material. Faça upload acima.</p></div>`;
       return;
     }
 
-    body.innerHTML = lista.map(a => {
-      const conc = Storage.Progresso.concluidas(a.id).length;
-      const cursosCurr = Storage.Cursos.listar();
-      const cursosAtiv = cursosCurr.filter(c => Storage.Progresso.pctCurso(a.id,c.id) > 0).length;
+    const cursos = Storage.Cursos.listar();
+    wrap.innerHTML = `<table><thead><tr><th>Nome</th><th>Curso</th><th>Tipo</th><th>Tamanho</th><th>Adicionado</th><th></th></tr></thead><tbody>
+      ${lista.map(m => {
+        const c = cursos.find(c=>c.id===m.cursoId);
+        return `<tr>
+          <td><strong>${x(m.nome)}</strong></td>
+          <td>${x(c?.titulo||'—')}</td>
+          <td>${badge(m.tipo,'badge-blue')}</td>
+          <td style="color:var(--t3)">${m.tamanho||'—'}</td>
+          <td style="color:var(--t3)">${fmtDate(m.criadoEm)}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="Admin.delMaterial('${m.id}')">🗑️</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody></table>`;
+  }
+
+  function delMaterial(id) {
+    Storage.Materiais.excluir(id);
+    const sel = q('#mat-curso-sel');
+    renderMateriais(sel.value);
+    toast('Material removido.', 'i');
+  }
+
+  /* ══════════════════════════════════
+     CONTROLE DE ACESSOS
+  ══════════════════════════════════ */
+  function acessos() {
+    const cursos  = Storage.Cursos.listar();
+    const sel     = q('#ac-curso-sel');
+    sel.innerHTML = '<option value="">Selecione um curso</option>'
+      + cursos.map(c => `<option value="${c.id}">${x(c.titulo)}</option>`).join('');
+    sel.onchange  = () => renderAcessos(sel.value);
+    renderAcessos('');
+  }
+
+  function renderAcessos(cursoId) {
+    const wrap = q('#ac-restricoes');
+    if (!cursoId) { wrap.innerHTML = '<p style="color:var(--t3);font-size:.85rem">Selecione um curso acima.</p>'; return; }
+
+    const restricoes = Storage.Restricoes.porCurso(cursoId);
+    const setores    = Storage.Setores.listar();
+    const equipes    = Storage.Equipes.listar();
+    const alunos     = Storage.Alunos.listar();
+
+    const getNome = (tipo, refId) => {
+      if (tipo==='setor')       return setores.find(s=>s.id===refId)?.nome || refId;
+      if (tipo==='equipe')      return equipes.find(e=>e.id===refId)?.nome || refId;
+      if (tipo==='colaborador') return alunos.find(a=>a.id===refId)?.nome  || refId;
+      return refId;
+    };
+
+    wrap.innerHTML = `
+      <div class="ac-header">
+        <span style="font-size:.85rem;font-weight:600">Restrições ativas</span>
+        <div style="display:flex;gap:8px">
+          <select id="ac-tipo" class="sel-sm">
+            <option value="setor">Por Setor</option>
+            <option value="equipe">Por Equipe</option>
+            <option value="colaborador">Por Colaborador</option>
+          </select>
+          <select id="ac-ref" class="sel-sm"><option value="">Selecione</option></select>
+          <button class="btn btn-sm btn-primary" onclick="Admin.addRestricao('${cursoId}')">+ Adicionar</button>
+        </div>
+      </div>
+      ${restricoes.length ? `
+        <div class="restricoes-lista">
+          ${restricoes.map(r => `
+            <div class="restricao-tag">
+              <span class="badge ${r.tipo==='setor'?'badge-blue':r.tipo==='equipe'?'badge-green':'badge-amber'}">${r.tipo}</span>
+              ${x(getNome(r.tipo, r.refId))}
+              <button onclick="Admin.remRestricao('${cursoId}','${r.tipo}','${r.refId}')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:.9rem;padding:0 4px">×</button>
+            </div>`).join('')}
+        </div>` : '<p style="color:var(--t3);font-size:.82rem;margin-top:8px">Sem restrições — curso visível para todos.</p>'}`;
+
+    // Atualiza o select de referência ao mudar o tipo
+    const tipoSel = q('#ac-tipo');
+    const refSel  = q('#ac-ref');
+
+    const atualizaRefSel = () => {
+      const tipo = tipoSel.value;
+      const opts = tipo==='setor' ? setores
+                 : tipo==='equipe' ? equipes
+                 : alunos;
+      refSel.innerHTML = '<option value="">Selecione</option>'
+        + opts.map(o => `<option value="${o.id}">${x(o.nome)}</option>`).join('');
+    };
+    tipoSel.onchange = atualizaRefSel;
+    atualizaRefSel();
+  }
+
+  function addRestricao(cursoId) {
+    const tipo  = q('#ac-tipo').value;
+    const refId = q('#ac-ref').value;
+    if (!refId) { toast('Selecione um item', 'e'); return; }
+    Storage.Restricoes.adicionar({ cursoId, tipo, refId });
+    toast('Restrição adicionada!', 's');
+    renderAcessos(cursoId);
+  }
+
+  function remRestricao(cursoId, tipo, refId) {
+    Storage.Restricoes.remover(cursoId, tipo, refId);
+    renderAcessos(cursoId);
+  }
+
+  /* ══════════════════════════════════
+     COLABORADORES
+  ══════════════════════════════════ */
+  function colaboradores() {
+    renderColabList();
+    renderSetoresEquipes();
+
+    q('#btn-novo-colab').onclick = () => openModal('modal-colab');
+    q('#btn-novo-setor').onclick = () => {
+      const nome = prompt('Nome do setor:');
+      if (!nome) return;
+      const cor = prompt('Cor hex (ex: #2F45FF):', '#2F45FF') || '#2F45FF';
+      Storage.Setores.criar({ nome, cor });
+      renderSetoresEquipes();
+      toast('Setor criado!', 's');
+    };
+    q('#btn-nova-equipe').onclick = () => {
+      const setores = Storage.Setores.listar();
+      if (!setores.length) { toast('Crie um setor primeiro', 'e'); return; }
+      const nome = prompt('Nome da equipe:');
+      if (!nome) return;
+      const setorId = prompt('ID do setor (veja a lista):') || setores[0].id;
+      Storage.Equipes.criar({ nome, setorId });
+      renderSetoresEquipes();
+      toast('Equipe criada!', 's');
+    };
+  }
+
+  function renderColabList() {
+    const lista   = Storage.Alunos.listar();
+    const setores = Storage.Setores.listar();
+    const equipes = Storage.Equipes.listar();
+    const tbody   = q('#colab-tbody');
+
+    if (!lista.length) { tbody.innerHTML = tdEmpty(6,'Nenhum colaborador'); return; }
+
+    tbody.innerHTML = lista.map(a => {
+      const setor  = setores.find(s=>s.id===a.setorId);
+      const equipe = equipes.find(e=>e.id===a.equipeId);
+      const prog   = Storage.Progresso.listar().filter(p=>p.alunoId===a.id).length;
       return `<tr>
-        <td><div class="td-name"><strong>${x(a.nome)}</strong><span>${x(a.email)}</span></div></td>
-        <td>${badge(a.ativo?'Ativo':'Inativo',a.ativo?'green':'red')}</td>
-        <td>${cursosAtiv} cursos</td>
-        <td>${conc} aulas</td>
-        <td class="text-sm" style="color:var(--t3)">${fmtDate(a.criadoEm)}</td>
+        <td><strong>${x(a.nome)}</strong><br><span style="color:var(--t3);font-size:.76rem">${x(a.email)}</span></td>
+        <td>${setor  ? `<span class="badge badge-blue">${x(setor.nome)}</span>`  : '—'}</td>
+        <td>${equipe ? `<span class="badge badge-green">${x(equipe.nome)}</span>` : '—'}</td>
+        <td>${badge(a.ativo?'Ativo':'Inativo', a.ativo?'badge-green':'badge-red')}</td>
+        <td>${prog} aulas</td>
+        <td>
+          <button class="btn btn-sm btn-ghost" onclick="Admin.toggleColab('${a.id}',${!a.ativo})">${a.ativo?'Desativar':'Ativar'}</button>
+        </td>
       </tr>`;
     }).join('');
   }
 
-  /* ── Progresso ── */
-  function progresso() {
-    const allA  = Storage.Alunos.listar();
-    const allC  = Storage.Cursos.listar();
-    const body  = q('#prog-tbody');
+  function renderSetoresEquipes() {
+    const setores = Storage.Setores.listar();
+    const equipes = Storage.Equipes.listar();
+    const wrap    = q('#setores-equipes');
 
-    if (!allA.length || !allC.length) {
-      body.innerHTML = emptyRow(4, 'Sem dados de progresso');
-      return;
-    }
-
-    const rows = allA.flatMap(a =>
-      allC.map(c => ({
-        aluno: a, curso: c,
-        pct: Storage.Progresso.pctCurso(a.id, c.id)
-      }))
-    ).sort((a,b) => b.pct - a.pct);
-
-    body.innerHTML = rows.map(r => `<tr>
-      <td><div class="td-name"><strong>${x(r.aluno.nome)}</strong><span>${x(r.aluno.email)}</span></div></td>
-      <td>${r.curso.emoji||'📚'} ${x(r.curso.titulo)}</td>
-      <td style="min-width:160px">
-        <div class="prog-row">
-          <div class="prog-bar"><div class="prog-fill ${r.pct===100?'g':''}" style="width:${r.pct}%"></div></div>
-          <span class="prog-pct">${r.pct}%</span>
+    wrap.innerHTML = setores.length ? setores.map(s => {
+      const eqs = equipes.filter(e=>e.setorId===s.id);
+      const colab= Storage.Alunos.porSetor(s.id).length;
+      return `
+      <div class="setor-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${s.cor||'#2F45FF'}"></div>
+          <strong style="font-size:.9rem">${x(s.nome)}</strong>
+          <span style="color:var(--t3);font-size:.78rem;margin-left:auto">${colab} colaboradores</span>
+          <button class="btn btn-sm btn-danger" onclick="Admin.delSetor('${s.id}')">🗑️</button>
         </div>
-      </td>
-      <td>${badge(r.pct===100?'✅ Concluído':r.pct>0?r.pct+'%':'Não iniciado',r.pct===100?'green':r.pct>0?'amber':'gray')}</td>
-    </tr>`).join('');
+        ${eqs.map(e => `
+          <div class="equipe-row">
+            <span>👥 ${x(e.nome)}</span>
+            <span style="color:var(--t3);font-size:.76rem">${Storage.Alunos.porEquipe(e.id).length} membros</span>
+            <button class="btn btn-sm btn-danger" onclick="Admin.delEquipe('${e.id}')">🗑️</button>
+          </div>`).join('')}
+        ${!eqs.length ? '<p style="color:var(--t3);font-size:.78rem;padding:4px 0">Sem equipes neste setor</p>' : ''}
+      </div>`;
+    }).join('') : '<p style="color:var(--t3);font-size:.85rem">Nenhum setor cadastrado.</p>';
   }
 
-  /* ════════════════════════════════════
-     MODAIS — BIND
-  ════════════════════════════════════ */
-  function bindModals() {
+  function toggleColab(id, ativo) {
+    Storage.Alunos.atualizar(id, { ativo });
+    toast(ativo ? 'Colaborador ativado.' : 'Colaborador desativado.', 'i');
+    renderColabList();
+  }
 
-    /* Fechar ao clicar fora */
+  function delSetor(id) {
+    if (!confirm('Excluir setor?')) return;
+    Storage.Setores.excluir(id);
+    renderSetoresEquipes();
+  }
+
+  function delEquipe(id) {
+    if (!confirm('Excluir equipe?')) return;
+    Storage.Equipes.excluir(id);
+    renderSetoresEquipes();
+  }
+
+  /* ══════════════════════════════════
+     PUBLICAÇÃO
+  ══════════════════════════════════ */
+  function publicacao() {
+    const cursos = Storage.Cursos.listar();
+    const wrap   = q('#pub-lista');
+
+    wrap.innerHTML = cursos.length ? cursos.map(c => {
+      const aulas   = Storage.Aulas.totalPorCurso(c.id);
+      const mods    = Storage.Modulos.listarPorCurso(c.id).length;
+      const rest    = Storage.Restricoes.porCurso(c.id).length;
+      const valido  = c.validadeAte ? new Date(c.validadeAte) > new Date() : true;
+      const pronto  = aulas > 0 && mods > 0;
+
+      return `
+      <div class="pub-card">
+        <div class="pub-card-left">
+          <div style="font-size:1.6rem">${c.emoji||'📚'}</div>
+          <div>
+            <div style="font-weight:600;font-size:.92rem">${x(c.titulo)}</div>
+            <div style="color:var(--t3);font-size:.78rem;margin-top:2px">
+              ${mods} módulos · ${aulas} aulas · ${rest ? rest+' restrição(ões)' : 'Acesso livre'}
+              ${c.validadeAte ? ` · Validade: ${fmtDate(c.validadeAte)}` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="pub-card-right">
+          ${statusBadge(c.status)}
+          ${!valido ? '<span class="badge badge-red">Expirado</span>' : ''}
+          ${!pronto && c.status==='rascunho' ? '<span class="badge badge-amber">Sem conteúdo</span>' : ''}
+          ${c.status === 'rascunho' ?
+            `<button class="btn btn-sm btn-primary" onclick="Admin.publicar('${c.id}')" ${!pronto?'disabled title="Adicione módulos e aulas primeiro"':''}>
+              ▶ Publicar
+            </button>` :
+            c.status === 'publicado' ?
+            `<button class="btn btn-sm btn-ghost" onclick="Admin.arquivar('${c.id}')">⏸ Arquivar</button>
+             <button class="btn btn-sm btn-soft"  onclick="Admin.publicar('${c.id}')">↺ Republicar</button>` :
+            `<button class="btn btn-sm btn-primary" onclick="Admin.publicar('${c.id}')">▶ Reativar</button>`
+          }
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm btn-ghost" onclick="Admin.openValidade('${c.id}')">📅 Validade</button>
+            <button class="btn btn-sm btn-ghost" onclick="Admin.duplicarCurso('${c.id}')">⧉ Duplicar</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') : `<div class="empty"><div class="ei">📭</div><p>Nenhum curso cadastrado.</p></div>`;
+  }
+
+  function publicar(id) {
+    Storage.Cursos.publicar(id);
+    toast('Curso publicado!', 's');
+    publicacao();
+  }
+
+  function arquivar(id) {
+    Storage.Cursos.arquivar(id);
+    toast('Curso arquivado.', 'i');
+    publicacao();
+  }
+
+  function openValidade(cursoId) {
+    const c   = Storage.Cursos.obter(cursoId);
+    const val = prompt('Data de validade (AAAA-MM-DD):', c?.validadeAte ? c.validadeAte.split('T')[0] : '');
+    if (val === null) return;
+    Storage.Cursos.atualizar(cursoId, { validadeAte: val ? new Date(val).toISOString() : null });
+    toast('Validade atualizada!', 's');
+    publicacao();
+  }
+
+  /* ══════════════════════════════════
+     MODAIS
+  ══════════════════════════════════ */
+  function bindModals() {
+    // Fecha ao clicar fora
     document.querySelectorAll('.modal-bg').forEach(bg =>
       bg.addEventListener('click', e => { if (e.target === bg) closeModals(); })
     );
-    document.querySelectorAll('.modal-close').forEach(btn =>
-      btn.addEventListener('click', closeModals)
-    );
+    document.querySelectorAll('.modal-close').forEach(b => b.addEventListener('click', closeModals));
 
-    /* Novo curso (btn header) */
-    q('#btnNovoCurso').onclick = () => Admin.modalEditCurso(null);
-
-    /* Novo aluno */
-    q('#btnNovoAluno').onclick = () => openModal('modalAluno');
-
-    /* Form: Curso */
-    q('#formCurso').onsubmit = e => {
+    // Form Curso
+    q('#mc-form').onsubmit = e => {
       e.preventDefault();
       const d = {
-        titulo:    q('#fcTitulo').value.trim(),
-        descricao: q('#fcDesc').value.trim(),
-        emoji:     q('#fcEmoji').value.trim() || '📚',
-        carga:     q('#fcCarga').value,
+        titulo:     q('#mc-titulo').value.trim(),
+        descricao:  q('#mc-desc').value.trim(),
+        emoji:      q('#mc-emoji').value.trim() || '📚',
+        carga:      parseInt(q('#mc-carga').value) || 0,
+        validadeAte: q('#mc-validade').value ? new Date(q('#mc-validade').value).toISOString() : null,
       };
       if (!d.titulo) return;
-      if (editCtx.id) Storage.Cursos.atualizar(editCtx.id, d);
-      else             Storage.Cursos.criar(d);
-      toast(editCtx.id ? 'Curso atualizado!' : 'Curso criado!', 's');
-      closeModals();
-      cursos();
+      if (modal.ctx.cursoId) {
+        Storage.Cursos.atualizar(modal.ctx.cursoId, d);
+        toast('Curso atualizado!', 's');
+      } else {
+        const novo = Storage.Cursos.criar(d);
+        modal.ctx.cursoId = novo.id;
+        renderModulosEditor(novo.id);
+        toast('Curso criado!', 's');
+      }
+      renderCursosList();
     };
 
-    /* Form: Módulo */
-    q('#formModulo').onsubmit = e => {
+    // Form Colaborador
+    q('#colab-form').onsubmit = e => {
       e.preventDefault();
+      const setores = Storage.Setores.listar();
+      const equipes = Storage.Equipes.listar();
+      const setorId = q('#colab-setor').value;
+      const equipeId= q('#colab-equipe').value;
       const d = {
-        cursoId:   editCtx.cursoId,
-        titulo:    q('#fmTitulo').value.trim(),
-        descricao: q('#fmDesc').value.trim(),
-      };
-      if (!d.titulo || !d.cursoId) return;
-      if (editCtx.id) Storage.Modulos.atualizar(editCtx.id, d);
-      else             Storage.Modulos.criar(d);
-      toast(editCtx.id ? 'Módulo atualizado!' : 'Módulo criado!', 's');
-      closeModals();
-      renderConteudoDetalhe(editCtx.cursoId);
-    };
-
-    /* Form: Aula */
-    q('#faTipo').onchange = e => atualizarHintAula(e.target.value);
-    q('#formAula').onsubmit = e => {
-      e.preventDefault();
-      const d = {
-        moduloId: editCtx.moduloId,
-        titulo:   q('#faTitulo').value.trim(),
-        tipo:     q('#faTipo').value,
-        conteudo: q('#faConteudo').value.trim(),
-        duracao:  q('#faDuracao').value,
-      };
-      if (!d.titulo || !d.moduloId) return;
-      if (editCtx.id) Storage.Aulas.atualizar(editCtx.id, d);
-      else             Storage.Aulas.criar(d);
-      toast(editCtx.id ? 'Aula atualizada!' : 'Aula criada!', 's');
-      closeModals();
-      renderConteudoDetalhe(editCtx.cursoId);
-    };
-
-    /* Form: Aluno */
-    q('#formAluno').onsubmit = e => {
-      e.preventDefault();
-      const d = {
-        nome:  q('#faNome').value.trim(),
-        email: q('#faEmail').value.trim(),
-        senha: q('#faSenha').value,
+        nome:     q('#colab-nome').value.trim(),
+        email:    q('#colab-email').value.trim(),
+        senha:    q('#colab-senha').value,
+        setorId:  setorId  || null,
+        equipeId: equipeId || null,
       };
       const res = Storage.Alunos.criar(d);
       if (!res) { toast('E-mail já cadastrado!', 'e'); return; }
-      toast('Aluno cadastrado!', 's');
+      toast('Colaborador cadastrado!', 's');
       closeModals();
-      q('#formAluno').reset();
-      alunos();
+      e.target.reset();
+      renderColabList();
     };
 
-    /* Confirm modal */
-    q('#confirmCancel').onclick = closeModals;
+    // Preenche selects do modal colab
+    q('#modal-colab').addEventListener('transitionend', () => {});
+    document.getElementById('modal-colab').addEventListener('click', function handler() {
+      // remove listener após primeiro click
+    });
   }
 
-  /* ════════════════════════════════════
-     MODAL UTILS
-  ════════════════════════════════════ */
   function openModal(id) {
+    // Preenche selects dinâmicos antes de abrir
+    if (id === 'modal-colab') {
+      const setores = Storage.Setores.listar();
+      const equipes = Storage.Equipes.listar();
+      q('#colab-setor').innerHTML  = '<option value="">— Setor —</option>'  + setores.map(s=>`<option value="${s.id}">${x(s.nome)}</option>`).join('');
+      q('#colab-equipe').innerHTML = '<option value="">— Equipe —</option>' + equipes.map(e=>`<option value="${e.id}">${x(e.nome)}</option>`).join('');
+    }
     document.getElementById(id).classList.add('open');
   }
+
   function closeModals() {
     document.querySelectorAll('.modal-bg').forEach(el => el.classList.remove('open'));
   }
-  function setModalTitle(modalId, title) {
-    document.querySelector(`#${modalId} .modal-head h3`).textContent = title;
-  }
 
-  function confirm2(title, msg, cb) {
-    q('#confirmTitle').textContent = title;
-    q('#confirmMsg').textContent   = msg;
-    openModal('confirmModal');
-    q('#confirmOk').onclick = () => { closeModals(); cb(); };
-  }
-
-  /* ════════════════════════════════════
+  /* ══════════════════════════════════
      HELPERS
-  ════════════════════════════════════ */
-  function atualizarHintAula(tipo) {
-    const hints = {
-      video: 'URL do YouTube (ex: https://youtube.com/embed/xxx)',
-      texto: 'Conteúdo HTML da aula',
-      pdf:   'URL do arquivo PDF',
-      link:  'URL do material externo',
-    };
-    const label = q('#faConteudoLabel');
-    const input = q('#faConteudo');
-    if (label) label.textContent = hints[tipo] || 'Conteúdo';
-    if (input) input.placeholder = hints[tipo] || '';
-  }
-
+  ══════════════════════════════════ */
   function q(sel) { return document.querySelector(sel); }
 
   function x(s) {
@@ -523,15 +648,25 @@ var Admin = (() => {
     return new Date(iso).toLocaleDateString('pt-BR');
   }
 
-  function badge(txt, tipo) {
-    return `<span class="badge badge-${tipo}">${txt}</span>`;
+  function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
   }
 
-  function tipoBadge(t) {
-    return { video:'amber', texto:'blue', pdf:'red', link:'green' }[t] || 'gray';
+  function badge(txt, cls) { return `<span class="badge ${cls}">${txt}</span>`; }
+
+  function statusBadge(status) {
+    const map = { publicado:'badge-green', rascunho:'badge-amber', arquivado:'badge-gray' };
+    const labels = { publicado:'✅ Publicado', rascunho:'✏️ Rascunho', arquivado:'📦 Arquivado' };
+    return badge(labels[status]||status, map[status]||'badge-gray');
   }
 
-  function emptyRow(cols, msg) {
+  function tipoBadge(tipo) {
+    return { video:'badge-amber', texto:'badge-blue', pdf:'badge-red', link:'badge-green' }[tipo]||'badge-gray';
+  }
+
+  function tdEmpty(cols, msg) {
     return `<tr><td colspan="${cols}" style="text-align:center;padding:28px;color:var(--t3)">${msg}</td></tr>`;
   }
 
@@ -539,17 +674,19 @@ var Admin = (() => {
     const stack = document.getElementById('toasts');
     const el    = document.createElement('div');
     el.className = `toast ${tipo}`;
-    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]}</span><span>${msg}</span>`;
+    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]||'ℹ️'}</span><span>${msg}</span>`;
     stack.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
 
   return {
-    boot,
-    openConteudo,
-    modalEditCurso, delCurso,
-    modalNovoModulo, modalEditModulo, delModulo,
-    modalNovaAula, modalEditAula, delAula,
+    boot, go, goEdit,
+    openModalCurso, addModulo, addAula, delModulo, delAula,
+    duplicarCurso, excluirCurso,
+    delMaterial,
+    addRestricao, remRestricao,
+    toggleColab, delSetor, delEquipe,
+    publicar, arquivar, openValidade,
   };
 })();
 
