@@ -544,18 +544,13 @@ var Admin = (() => {
     setTimeout(() => el.remove(), 3000);
   }
 
-  // Expõe funções públicas (chamadas via onclick no HTML)
-  Admin.openConteudo    = openConteudo;
-  Admin.modalEditCurso  = modalEditCurso;
-  Admin.delCurso        = delCurso;
-  Admin.modalNovoModulo = modalNovoModulo;
-  Admin.modalEditModulo = modalEditModulo;
-  Admin.delModulo       = delModulo;
-  Admin.modalNovaAula   = modalNovaAula;
-  Admin.modalEditAula   = modalEditAula;
-  Admin.delAula         = delAula;
-
-  return Admin;
+  return {
+    boot,
+    openConteudo,
+    modalEditCurso, delCurso,
+    modalNovoModulo, modalEditModulo, delModulo,
+    modalNovaAula, modalEditAula, delAula,
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
