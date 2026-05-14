@@ -52,24 +52,56 @@ input,select,textarea { font-family:var(--font) }
   position:fixed; top:0; left:0; bottom:0; z-index:100;
   display:flex; flex-direction:column; overflow-y:auto;
 }
-.sb-brand { padding:20px 18px 16px; border-bottom:1px solid var(--border) }
-.sb-brand-name { font-size:15px; font-weight:600; letter-spacing:-.3px; color:var(--blue) }
-.sb-brand-name small { font-size:11px; color:var(--text4); font-weight:400; display:block; margin-top:2px }
-.sb-nav { padding:10px 10px; flex:1 }
-.sb-label { font-size:10px; font-weight:600; color:var(--text4); text-transform:uppercase; letter-spacing:.08em; padding:10px 8px 4px }
-.sb-item {
-  display:flex; align-items:center; gap:9px; padding:8px 10px;
-  border-radius:var(--r); color:var(--text4); font-size:13px;
-  font-weight:500; margin-bottom:1px; border:none; background:none;
-  width:100%; text-align:left; cursor:default;
+.sb-brand {
+  padding:18px 18px 14px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
 }
-.sb-item .ico { font-size:14px; width:18px; text-align:center; flex-shrink:0 }
+.sb-brand-abbr {
+  width:28px; height:28px; background:var(--blue); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:700; font-size:12px; flex-shrink:0;
+}
+.sb-brand-name { font-size:14px; font-weight:700; letter-spacing:-.3px; color:var(--blue); line-height:1.2 }
+.sb-brand-name small { font-size:10px; color:var(--text4); font-weight:400; display:block; margin-top:1px }
+.sb-nav { padding:8px 8px; flex:1; overflow-y:auto; overflow-x:hidden }
+.sb-label { display:flex; align-items:center; gap:6px; padding:12px 8px 4px; margin-top:2px }
+.sb-label:first-child { padding-top:6px; margin-top:0 }
+.sb-label-text { font-size:9.5px; font-weight:700; color:var(--text4); text-transform:uppercase; letter-spacing:.1em; white-space:nowrap }
+.sb-label-line { flex:1; height:1px; background:var(--border); opacity:.6 }
+.sb-item {
+  display:flex; align-items:center; gap:9px; padding:7px 10px;
+  border-radius:var(--r); color:var(--text4); font-size:13px; font-weight:500;
+  margin-bottom:1px; border:none; background:none; width:100%;
+  text-align:left; transition:background .12s, color .12s; position:relative;
+}
+.sb-item .ico { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center }
+.sb-item-label { flex:1; font-size:13px; line-height:1 }
+.sb-item:hover { background:var(--blue-l); color:var(--blue) }
 .sb-item.active { background:var(--blue-l); color:var(--blue); font-weight:600 }
-.sb-foot { padding:12px; border-top:1px solid var(--border) }
-.sb-user { display:flex; align-items:center; gap:9px; padding:8px 10px; background:var(--bg); border-radius:var(--r); margin-bottom:8px }
-.sb-av { width:28px; height:28px; border-radius:50%; background:var(--blue-l); color:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; border:1px solid var(--border); flex-shrink:0 }
+.sb-item.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px; background:var(--blue); border-radius:0 3px 3px 0 }
+/* Grupos */
+.sb-group { margin-bottom:1px }
+.sb-group-head {
+  display:flex; align-items:center; gap:9px; padding:7px 10px;
+  border-radius:var(--r); cursor:pointer; font-size:13px; color:var(--text4);
+  border:none; background:none; width:100%; font-family:var(--font); text-align:left;
+  transition:background .12s, color .12s; user-select:none;
+}
+.sb-group-head .ico { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center }
+.sb-group-label { flex:1; font-size:13px }
+.sb-group-arrow { width:14px; height:14px; color:var(--text4); transition:transform .2s; flex-shrink:0 }
+.sb-group-head:hover { background:var(--blue-l); color:var(--blue) }
+.sb-group.open .sb-group-arrow { transform:rotate(90deg) }
+.sb-group.open .sb-group-head { color:var(--blue) }
+.sb-group-children { overflow:hidden; max-height:0; transition:max-height .22s ease; padding-left:16px }
+.sb-group.open .sb-group-children { max-height:300px }
+.sb-group-children .sb-item { font-size:12.5px; padding:6px 10px }
+/* Footer */
+.sb-foot { padding:12px 10px; border-top:1px solid var(--border); flex-shrink:0 }
+.sb-user { display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:var(--r); background:var(--blue-l); margin-bottom:8px }
+.sb-av { width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0 }
 .sb-user-name { font-size:12px; font-weight:600; color:var(--text) }
-.sb-user-role { font-size:11px; color:var(--text4) }
+.sb-user-role { font-size:10px; color:var(--text3) }
 
 /* ══════════════ MAIN ══════════════ */
 .main { margin-left:var(--sb-w); min-height:100vh; display:flex; flex-direction:column }
@@ -406,36 +438,98 @@ input,select,textarea { font-family:var(--font) }
 <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
 <aside class="sidebar">
   <div class="sb-brand">
+    <div class="sb-brand-abbr">R</div>
     <div class="sb-brand-name">Radar Internet <small>Plataforma EAD</small></div>
   </div>
   <nav class="sb-nav">
-    <div class="sb-label">Principal</div>
-    <div class="sb-item">
+
+    <div class="sb-label">
+      <span class="sb-label-text">Geral</span>
+      <span class="sb-label-line"></span>
+    </div>
+    <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
       <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
-      Dashboard
+      <span class="sb-item-label">Dashboard</span>
     </div>
-    <div class="sb-label">Treinamentos</div>
-    <div class="sb-item active">
+
+    <div class="sb-label">
+      <span class="sb-label-text">Ensino</span>
+      <span class="sb-label-line"></span>
+    </div>
+    <div class="sb-group open">
+      <button class="sb-group-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+        <span class="sb-group-label">Cursos</span>
+        <span class="sb-group-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sb-group-children">
+            <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
       <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-      Cursos
+      <span class="sb-item-label">Gestão de Cursos</span>
     </div>
-    <div class="sb-item">
-      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
-      Materiais
-    </div>
-    <div class="sb-item">
-      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg></span>
-      Publicação
-    </div>
-    <div class="sb-label">Organização</div>
-    <div class="sb-item">
+    <div class="sb-item"  style="cursor:default">
       <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-      Colaboradores
+      <span class="sb-item-label">Turmas</span>
     </div>
-    <div class="sb-item">
+    <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="sb-item-label">Materiais</span>
+    </div>
+    <div class="sb-item"  style="cursor:default">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+      <span class="sb-item-label">Avaliações</span>
+    </div>
+      </div>
+    </div>
+    <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg></span>
+      <span class="sb-item-label">Publicação</span>
+    </div>
+
+    <div class="sb-label">
+      <span class="sb-label-text">Usuários</span>
+      <span class="sb-label-line"></span>
+    </div>
+    <div class="sb-group open">
+      <button class="sb-group-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <span class="sb-group-label">Usuários</span>
+        <span class="sb-group-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sb-group-children">
+            <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <span class="sb-item-label">Alunos</span>
+    </div>
+    <div class="sb-item" onclick="window.location.href='admin.html'" style="cursor:pointer">
       <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      Acessos
+      <span class="sb-item-label">Controle de Acessos</span>
     </div>
+      </div>
+    </div>
+
+    <div class="sb-label">
+      <span class="sb-label-text">Acompanhamento</span>
+      <span class="sb-label-line"></span>
+    </div>
+    <div class="sb-item"  style="cursor:default">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      <span class="sb-item-label">Relatórios</span>
+    </div>
+    <div class="sb-item"  style="cursor:default">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+      <span class="sb-item-label">Certificados</span>
+    </div>
+
+    <div class="sb-label">
+      <span class="sb-label-text">Sistema</span>
+      <span class="sb-label-line"></span>
+    </div>
+    <div class="sb-item"  style="cursor:default">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M20 12h1M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 20v1M12 3V2M4.93 4.93l1.41 1.41M3 12H2"/></svg></span>
+      <span class="sb-item-label">Configurações</span>
+    </div>
+
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
@@ -445,9 +539,8 @@ input,select,textarea { font-family:var(--font) }
         <div class="sb-user-role">admin@radar.com</div>
       </div>
     </div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px" onclick="history.back()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sair
+    <button class="btn btn-ghost" onclick="window.location.href='admin.html'" style="width:100%;justify-content:center;font-size:12px;padding:6px 10px;display:flex;align-items:center;gap:6px;color:var(--text3)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair
     </button>
   </div>
 </aside>
@@ -1348,12 +1441,20 @@ var Wizard = (() => {
     try {
       const d = JSON.parse(localStorage.getItem('ead_draft_curso'));
       if (!d) return;
-      if (!confirm('Existe um rascunho salvo. Deseja continuar de onde parou?')) return;
-      state = d.state;
-      currentStep = d.currentStep;
-      // Restaura campos
-      restoreFields();
-      updateStepperUI();
+      // Mostra banner não-bloqueante em vez de confirm()
+      const banner = document.createElement('div');
+      banner.id = 'draft-banner';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;background:var(--blue-l);border:1.5px solid var(--blue-m);border-radius:var(--rl);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span style="flex:1"><strong>Rascunho encontrado</strong> — você tem um cadastro não finalizado.</span>
+          <button onclick="Wizard._applyDraft()" style="background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Continuar</button>
+          <button onclick="Wizard._discardDraft()" style="background:none;border:none;font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;font-family:var(--font)">Descartar</button>
+        </div>`;
+      const content = document.querySelector('.content');
+      if (content) content.insertBefore(banner, content.firstChild);
+      // Salva o draft para uso posterior
+      Wizard._pendingDraft = d;
     } catch(e) {}
   }
 
@@ -1422,6 +1523,27 @@ var Wizard = (() => {
       setTimeout(() => { status.textContent = ''; }, 2000);
     }, 30000);
   }
+
+  Wizard._pendingDraft = null;
+
+  Wizard._applyDraft = function() {
+    const d = Wizard._pendingDraft;
+    if (!d) return;
+    state = d.state;
+    currentStep = d.currentStep;
+    restoreFields();
+    updateStepperUI();
+    const b = document.getElementById('draft-banner');
+    if (b) b.remove();
+    Wizard._pendingDraft = null;
+  };
+
+  Wizard._discardDraft = function() {
+    localStorage.removeItem('ead_draft_curso');
+    Wizard._pendingDraft = null;
+    const b = document.getElementById('draft-banner');
+    if (b) b.remove();
+  };
 
   return {
     next, prev, jumpTo, saveDraft,
