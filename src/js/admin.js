@@ -27,6 +27,7 @@ var Admin = (() => {
     q('#loginWrap').classList.remove('active');
     q('#appWrap').classList.add('active');
     bindNav(); bindModals(); go('dashboard');
+    if (typeof SidebarNav !== 'undefined') SidebarNav.restorePrefs();
   }
 
   function bindNav() {
@@ -38,12 +39,57 @@ var Admin = (() => {
     pg = p;
     document.querySelectorAll('[data-pg]').forEach(el => el.classList.toggle('active', el.dataset.pg === p));
     document.querySelectorAll('.pg').forEach(el => el.classList.toggle('active', el.id === 'pg-' + p));
-    const titles = { dashboard:'Dashboard', cursos:'Gestão de Cursos', materiais:'Materiais de Apoio', acessos:'Controle de Acessos', colaboradores:'Colaboradores', publicacao:'Publicação' };
+    const titles = {
+      dashboard:      'Dashboard',
+      cursos:         'Gestão de Cursos',
+      turmas:         'Turmas',
+      materiais:      'Materiais de Apoio',
+      avaliacoes:     'Avaliações',
+      colaboradores:  'Alunos',
+      acessos:        'Controle de Acessos',
+      relatorios:     'Relatórios',
+      certificados:   'Certificados',
+      configuracoes:  'Configurações',
+      publicacao:     'Publicação',
+    };
     q('#topTitle').textContent = titles[p] || p;
     renders[p]?.();
   }
 
-  const renders = { dashboard, cursos, materiais, acessos, colaboradores, publicacao };
+  const renders = {
+    dashboard, cursos, materiais, acessos, colaboradores, publicacao,
+    // Módulos futuros — stub que mostra "em breve"
+    turmas:         () => emBreve('Turmas'),
+    avaliacoes:     () => emBreve('Avaliações'),
+    relatorios:     () => emBreve('Relatórios'),
+    certificados:   () => emBreve('Certificados'),
+    configuracoes:  () => emBreve('Configurações'),
+  };
+
+  function emBreve(nome) {
+    const pg = document.getElementById('pg-dashboard');
+    // Reutiliza a área de conteúdo genérica
+    document.querySelectorAll('.pg').forEach(el => el.classList.remove('active'));
+    let holder = document.getElementById('pg-em-breve');
+    if (!holder) {
+      holder = document.createElement('div');
+      holder.id = 'pg-em-breve';
+      holder.className = 'pg active';
+      document.querySelector('.content').appendChild(holder);
+    }
+    holder.classList.add('active');
+    holder.innerHTML = `
+      <div class="ph"><div><h2>${nome}</h2><p>Módulo em desenvolvimento</p></div></div>
+      <div style="text-align:center;padding:60px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)">
+        <div style="width:56px;height:56px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px">${nome}</div>
+        <div style="font-size:13px;color:var(--text3);max-width:320px;margin:0 auto;line-height:1.6">
+          Este módulo está em desenvolvimento e estará disponível em breve.
+        </div>
+      </div>`;
+  }
 
 
   /* ── Dashboard ── */
