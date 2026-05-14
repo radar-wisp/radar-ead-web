@@ -395,6 +395,8 @@ input,select,textarea { font-family:var(--font) }
 .btn-primary:disabled { opacity:.45; cursor:not-allowed }
 .btn-soft { background:var(--blue-light); color:var(--blue); border-color:var(--blue-mid) }
 .btn-soft:hover { background:var(--blue-mid) }
+.btn-outline { background:transparent; color:var(--blue); border-color:var(--blue-mid) }
+.btn-outline:hover { background:var(--blue-light) }
 .btn-ghost { background:transparent; color:var(--text3); border-color:var(--border) }
 .btn-ghost:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
 .btn-danger { color:var(--red); border-color:#fca5a5; background:transparent }
@@ -722,6 +724,101 @@ body.sb-collapsed .main { margin-left:56px }
 .sidebar.collapsed .sb-collapse-btn svg { transform:rotate(180deg) }
 .sidebar.collapsed .sb-collapse-btn span { display:none }
 
+
+/* ═══════════ GESTÃO DE CURSOS ═══════════ */
+
+/* Célula de curso com miniatura */
+.gc-curso-cell { display:flex; align-items:center; gap:10px }
+.gc-thumb {
+  width:36px; height:36px; border-radius:var(--radius-sm);
+  background:var(--blue-light); color:var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:.8rem; font-weight:700;
+}
+.gc-thumb img { width:100%; height:100%; object-fit:cover; border-radius:var(--radius-sm) }
+.gc-titulo { font-weight:600; font-size:13px; color:var(--text); margin-bottom:2px }
+.gc-desc { font-size:11px; color:var(--text4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:240px }
+
+/* Progress bar inline */
+.gc-prog-wrap { display:flex; align-items:center; gap:7px }
+.gc-prog-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; min-width:50px }
+.gc-prog-fill { height:100%; border-radius:3px; background:var(--blue); transition:width .3s }
+.gc-prog-lbl { font-size:11px; color:var(--text4); min-width:28px; text-align:right }
+
+/* Validade badge */
+.gc-validade { font-size:11px; color:var(--text4); display:flex; align-items:center; gap:3px }
+.gc-validade.vencendo { color:var(--amber) }
+.gc-validade.expirado-txt { color:var(--red) }
+
+/* Row selecionada */
+tbody tr.selected td { background:#f0f4ff }
+
+/* Checkbox na tabela */
+.row-check { width:14px; height:14px; accent-color:var(--blue); cursor:pointer }
+
+/* Modal de edição de curso */
+.mc-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:18px; gap:0 }
+.mc-tab {
+  padding:8px 14px; font-size:12px; font-weight:600; color:var(--text3);
+  border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+  font-family:var(--font); transition:color .12s; margin-bottom:-1px;
+}
+.mc-tab.active { color:var(--blue); border-bottom-color:var(--blue) }
+.mc-tab.done { color:var(--green-dark) }
+.mc-pane { display:none }
+.mc-pane.active { display:block }
+
+/* Dropdown action menu melhorado */
+.gc-actions { position:relative; display:inline-block }
+.gc-actions-btn {
+  display:flex; align-items:center; gap:4px; padding:5px 8px;
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  font-size:11px; color:var(--text3); background:none; cursor:pointer;
+  font-family:var(--font); transition:all .12s;
+}
+.gc-actions-btn:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
+.gc-menu {
+  display:none; position:absolute; right:0; top:calc(100% + 3px);
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
+  z-index:300; min-width:180px; padding:4px; animation:popIn .12s ease;
+}
+.gc-menu.open { display:block }
+.gc-menu button {
+  display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
+  border-radius:5px; font-size:12px; color:var(--text2); background:none;
+  border:none; cursor:pointer; text-align:left; transition:background .1s;
+  font-family:var(--font);
+}
+.gc-menu button:hover { background:var(--blue-light); color:var(--blue) }
+.gc-menu button.danger { color:var(--red) }
+.gc-menu button.danger:hover { background:var(--red-light) }
+.gc-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
+
+/* Stats cards do módulo */
+#gc-stats .stat-val { font-size:22px }
+
+
+/* ── Toggle switch ── */
+.toggle { position:relative; width:40px; height:22px; background:var(--border2); border-radius:11px; cursor:pointer; transition:background .2s; flex-shrink:0 }
+.toggle.on { background:var(--blue) }
+.toggle span { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:all .2s; box-shadow:0 1px 3px rgba(0,0,0,.2) }
+.toggle.on span { left:21px }
+/* Grid helpers */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+.fg { display:flex; flex-direction:column; gap:5px }
+.fg label { font-size:12px; font-weight:600; color:var(--text2) }
+.fg input,.fg select,.fg textarea {
+  padding:8px 11px; border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm); font-size:13px; font-family:var(--font);
+  color:var(--text); background:var(--surface); outline:none;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus {
+  border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08);
+}
+.fg textarea { resize:vertical; min-height:70px }
+.fg select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px }
+
 </style>
 </head>
 <body>
@@ -975,13 +1072,137 @@ body.sb-collapsed .main { margin-left:56px }
       </div>
 
 <!-- ═══ GESTÃO DE CURSOS ══════════════════ -->
+<!-- ═══ GESTÃO DE CURSOS ══════════════════════════════════════ -->
       <div class="pg" id="pg-cursos">
+
+        <!-- Page header -->
         <div class="ph">
-          <div><h2>Gestão de Cursos</h2><p>Crie, edite e organize os treinamentos</p></div>
-          <button class="btn btn-primary" onclick="window.location.href='novo-curso.html'">+ Novo Curso</button>
+          <div>
+            <h2>Gestão de Cursos</h2>
+            <p>Administre, publique e monitore todos os treinamentos</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost" onclick="Cursos.exportar()" title="Exportar lista">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exportar
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='novo-curso.html'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo Curso
+            </button>
+          </div>
         </div>
-        <div id="cursos-list"></div>
+
+        <!-- Stat cards -->
+        <div class="stats" id="gc-stats" style="grid-template-columns:repeat(5,1fr)"></div>
+
+        <!-- Barra de ferramentas -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-body" style="padding:12px 16px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <!-- Busca -->
+              <div style="position:relative;flex:1;min-width:200px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text4)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="gc-search" placeholder="Buscar cursos..." oninput="Cursos.renderTabela()"
+                  style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
+              </div>
+              <!-- Filtros -->
+              <select id="gc-filtro-status" onchange="Cursos.renderTabela()"
+                style="padding:7px 28px 7px 10px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--surface);outline:none;font-family:var(--font);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:140px">
+                <option value="">Todos os status</option>
+                <option value="publicado">Publicado</option>
+                <option value="rascunho">Rascunho</option>
+                <option value="revisao">Em Revisão</option>
+                <option value="arquivado">Arquivado</option>
+                <option value="expirado">Expirado</option>
+              </select>
+              <select id="gc-filtro-cat" onchange="Cursos.renderTabela()"
+                style="padding:7px 28px 7px 10px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--surface);outline:none;font-family:var(--font);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:140px">
+                <option value="">Todas as categorias</option>
+              </select>
+              <select id="gc-order" onchange="Cursos.renderTabela()"
+                style="padding:7px 28px 7px 10px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--surface);outline:none;font-family:var(--font);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:160px">
+                <option value="recente">Mais recentes</option>
+                <option value="antigo">Mais antigos</option>
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+                <option value="carga-desc">Maior carga</option>
+              </select>
+              <!-- Ações em lote -->
+              <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+                <span id="gc-sel-count" style="font-size:12px;color:var(--text3);display:none"></span>
+                <button class="btn btn-ghost btn-sm" id="gc-pub-lote" onclick="Cursos.publicarLote()" style="display:none">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Publicar selecionados
+                </button>
+                <button class="btn btn-ghost btn-sm" id="gc-arq-lote" onclick="Cursos.arquivarLote()" style="display:none">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  Arquivar selecionados
+                </button>
+                <button class="btn btn-danger btn-sm" id="gc-del-lote" onclick="Cursos.excluirLote()" style="display:none">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                  Excluir selecionados
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela principal -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px">
+            <div class="card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              Cursos cadastrados
+            </div>
+            <span id="gc-result-count" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table id="gc-tabela">
+              <thead>
+                <tr>
+                  <th style="width:32px;padding:8px 10px">
+                    <input type="checkbox" id="gc-sel-all" onchange="Cursos.toggleSelAll(this)"
+                      style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer">
+                  </th>
+                  <th>Curso</th>
+                  <th>Categoria</th>
+                  <th style="text-align:center">Carga</th>
+                  <th style="text-align:center">Aulas</th>
+                  <th style="text-align:center">Colaboradores</th>
+                  <th style="text-align:center">Progresso</th>
+                  <th>Status</th>
+                  <th>Publicado</th>
+                  <th>Atualizado</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="gc-tbody"></tbody>
+            </table>
+          </div>
+          <div id="gc-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum curso encontrado</div>
+            <div style="font-size:12px">Tente ajustar os filtros ou crie um novo curso</div>
+          </div>
+        </div>
+
+        <!-- Atividades recentes -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Atividades recentes
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="Cursos.renderAtividades()">Atualizar</button>
+          </div>
+          <div class="card-body" id="gc-atividades">
+            <div style="color:var(--text4);font-size:13px">Carregando...</div>
+          </div>
+        </div>
+
       </div>
+      <!-- ═══ FIM GESTÃO DE CURSOS ══════════════════════════════════ -->
 
 
       <!-- ═══ MATERIAIS DE APOIO ════════════════ -->
@@ -1151,6 +1372,143 @@ body.sb-collapsed .main { margin-left:56px }
 </div>
 
 
+<!-- ═══ MODAL: EDITAR CURSO (tabs) ═══════════════════════════ -->
+<div class="modal-bg" id="modal-edit-curso">
+  <div class="modal" style="max-width:660px">
+    <div class="modal-head">
+      <div>
+        <h3 id="mec-titulo">Editar Curso</h3>
+        <div id="mec-subtitulo" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <button class="modal-close">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mc-tabs">
+      <button class="mc-tab active" onclick="CursoEdit.tab(0,this)">Dados Gerais</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(1,this)">Público</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(2,this)">Materiais</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(3,this)">Configurações</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(4,this)">Revisão</button>
+    </div>
+
+    <!-- Tab 0: Dados Gerais -->
+    <div class="mc-pane active" id="mec-pane-0">
+      <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="fg" style="grid-column:1/-1">
+          <label>Nome do curso *</label>
+          <input type="text" id="mec-nome" placeholder="Nome do treinamento">
+        </div>
+        <div class="fg">
+          <label>Categoria</label>
+          <select id="mec-categoria">
+            <option value="">Selecione...</option>
+            <option>Segurança do Trabalho</option><option>Elétrica</option>
+            <option>Telecomunicações</option><option>Gestão e Liderança</option>
+            <option>Atendimento ao Cliente</option><option>Tecnologia da Informação</option>
+            <option>Administrativo</option><option>Operações</option>
+            <option>Compliance</option><option>Outros</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Formato</label>
+          <select id="mec-formato">
+            <option value="ead">EAD (Online)</option>
+            <option value="hibrido">Híbrido</option>
+            <option value="presencial">Presencial</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Carga horária (h)</label>
+          <input type="number" id="mec-carga" min="1">
+        </div>
+        <div class="fg">
+          <label>Nível</label>
+          <select id="mec-nivel">
+            <option value="basico">Básico</option>
+            <option value="intermediario">Intermediário</option>
+            <option value="avancado">Avançado</option>
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Descrição</label>
+          <textarea id="mec-descricao" rows="3" placeholder="Objetivo e conteúdo..."></textarea>
+        </div>
+        <div class="fg">
+          <label>Status</label>
+          <select id="mec-status">
+            <option value="rascunho">Rascunho</option>
+            <option value="revisao">Em Revisão</option>
+            <option value="publicado">Publicado</option>
+            <option value="arquivado">Arquivado</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Validade (vazio = sem validade)</label>
+          <input type="date" id="mec-validade">
+        </div>
+        <div class="fg">
+          <label>Prazo de conclusão (dias)</label>
+          <input type="number" id="mec-prazo" placeholder="Ex: 30">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Público -->
+    <div class="mc-pane" id="mec-pane-1">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Perfis de acesso</div>
+      <div id="mec-publico-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+      <div class="fg">
+        <label>Visibilidade</label>
+        <select id="mec-visib">
+          <option value="todos">Todos os colaboradores</option>
+          <option value="restrito">Acesso restrito (por setor/equipe)</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label>Observação sobre o público</label>
+        <textarea id="mec-publico-obs" rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- Tab 2: Materiais -->
+    <div class="mc-pane" id="mec-pane-2">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">
+        Materiais do curso <span id="mec-mat-count" style="background:var(--blue-light);color:var(--blue);padding:1px 7px;border-radius:99px;font-size:10px;margin-left:6px">0</span>
+      </div>
+      <div id="mec-materiais-lista" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+        <div style="color:var(--text4);font-size:12px;text-align:center;padding:20px">Nenhum material</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('mec-file-input').click()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload arquivo
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="CursoEdit.addLinkMat()">+ Link externo</button>
+        <input type="file" id="mec-file-input" style="display:none" multiple onchange="CursoEdit.uploadMat(this)">
+      </div>
+    </div>
+
+    <!-- Tab 3: Configurações -->
+    <div class="mc-pane" id="mec-pane-3">
+      <div id="mec-config-body"></div>
+    </div>
+
+    <!-- Tab 4: Revisão -->
+    <div class="mc-pane" id="mec-pane-4">
+      <div id="mec-review-body" style="font-size:13px"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost modal-close">Cancelar</button>
+      <button class="btn btn-primary" onclick="CursoEdit.salvar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 0-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- TOASTS -->
 <div class="toast-stack" id="toasts"></div>
 
@@ -1233,6 +1591,729 @@ var SidebarNav = (() => {
 
   return { toggleGroup, toggleCollapse, toggleMobile, closeMobile, restorePrefs };
 })();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   Módulo: Gestão de Cursos (Cursos)
+   Totalmente integrado com Storage — sem lógica duplicada
+   Funcionalidades: stats, tabela, filtros, busca, ações em
+   lote, modal de edição com tabs, atividades recentes
+════════════════════════════════════════════════════════════ */
+
+var Cursos = (() => {
+
+  let selecionados = new Set();
+  let cursoEditId  = null;
+  let matEdit      = [];
+
+  /* ── SVG helpers ───────────────────────────────────────── */
+  const ico = (d, s=14) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">${d}</svg>`;
+
+  const SVGS = {
+    eye:   ico('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'),
+    edit:  ico('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
+    copy:  ico('<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+    folder:ico('<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>'),
+    lock:  ico('<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+    play:  ico('<polygon points="5 3 19 12 5 21 5 3"/>'),
+    pause: ico('<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'),
+    arc:   ico('<path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/>'),
+    trash: ico('<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>'),
+    chev:  ico('<polyline points="6 9 12 15 18 9"/>'),
+    save:  ico('<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 0-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>'),
+    clock: ico('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+    book:  ico('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+    down:  ico('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'),
+  };
+
+  /* ── Ponto de entrada (chamado pelo Admin.go) ─────────────── */
+  function init() {
+    renderStats();
+    renderTabela();
+    renderAtividades();
+    popularFiltroCategoria();
+    selecionados.clear();
+    atualizarBotoesLote();
+  }
+
+  /* ── Utils ────────────────────────────────────────────────── */
+  function q(sel) { return document.querySelector(sel); }
+  function x(s)   { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
+  function fmtBytes(b) {
+    if (!b || isNaN(b)) return '—';
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
+  }
+
+  function resolveStatus(c) {
+    const agora = new Date();
+    if (c.status === 'publicado' && c.validadeAte && new Date(c.validadeAte) < agora)
+      return 'expirado';
+    return c.status || 'rascunho';
+  }
+
+  const STATUS_CFG = {
+    publicado: { cls:'badge-green', label:'● Publicado'  },
+    rascunho:  { cls:'badge-gray',  label:'✎ Rascunho'   },
+    revisao:   { cls:'badge-blue',  label:'◎ Revisão'     },
+    arquivado: { cls:'badge-amber', label:'▣ Arquivado'  },
+    expirado:  { cls:'badge-red',   label:'✕ Expirado'   },
+  };
+
+  function statusBadge(status) {
+    const s = STATUS_CFG[status] || STATUS_CFG.rascunho;
+    return `<span class="badge ${s.cls}" style="white-space:nowrap">${s.label}</span>`;
+  }
+
+  /* ── Stats cards ──────────────────────────────────────────── */
+  function renderStats() {
+    const lista = Storage.Cursos.listar();
+    const agora = new Date();
+
+    const total     = lista.length;
+    const publicados = lista.filter(c => c.status === 'publicado' && !(c.validadeAte && new Date(c.validadeAte) < agora)).length;
+    const rascunhos = lista.filter(c => (c.status || 'rascunho') === 'rascunho').length;
+    const arquivados= lista.filter(c => c.status === 'arquivado').length;
+    const expirados = lista.filter(c => c.status === 'publicado' && c.validadeAte && new Date(c.validadeAte) < agora).length;
+
+    const statCard = (label, val, sub, valClass='') => `
+      <div class="stat">
+        <div class="stat-top">
+          <div>
+            <div class="stat-lbl">${label}</div>
+            <div class="stat-val ${valClass}">${val}</div>
+          </div>
+          <div class="stat-ico">${SVGS.book}</div>
+        </div>
+        <div class="stat-sub">${sub}</div>
+      </div>`;
+
+    const wrap = document.getElementById('gc-stats');
+    if (wrap) wrap.innerHTML =
+      statCard('Total de Cursos', total, 'cadastrados', '') +
+      statCard('Publicados', publicados, 'disponíveis', 'blue') +
+      statCard('Rascunho', rascunhos, 'em edição', '') +
+      statCard('Arquivados', arquivados, 'desativados', '') +
+      statCard('Expirados', expirados, 'fora do prazo', expirados > 0 ? 'red' : '');
+  }
+
+  /* ── Filtro de categoria ──────────────────────────────────── */
+  function popularFiltroCategoria() {
+    const sel = q('#gc-filtro-cat');
+    if (!sel) return;
+    const cats = [...new Set(Storage.Cursos.listar().map(c => c.categoria).filter(Boolean))].sort();
+    const base = '<option value="">Todas as categorias</option>';
+    sel.innerHTML = base + cats.map(c => `<option value="${x(c)}">${x(c)}</option>`).join('');
+  }
+
+  /* ── Tabela principal ─────────────────────────────────────── */
+  function renderTabela() {
+    const agora   = new Date();
+    const busca   = (q('#gc-search')?.value || '').toLowerCase().trim();
+    const fStatus = q('#gc-filtro-status')?.value || '';
+    const fCat    = q('#gc-filtro-cat')?.value || '';
+    const ordem   = q('#gc-order')?.value || 'recente';
+
+    let lista = Storage.Cursos.listar();
+
+    /* Filtra */
+    if (busca) lista = lista.filter(c =>
+      c.titulo?.toLowerCase().includes(busca) ||
+      c.categoria?.toLowerCase().includes(busca) ||
+      c.descricao?.toLowerCase().includes(busca)
+    );
+    if (fCat)    lista = lista.filter(c => c.categoria === fCat);
+    if (fStatus) {
+      lista = lista.filter(c => {
+        const st = resolveStatus(c);
+        return st === fStatus;
+      });
+    }
+
+    /* Ordena */
+    lista.sort((a, b) => {
+      if (ordem === 'az')         return (a.titulo||'').localeCompare(b.titulo||'');
+      if (ordem === 'za')         return (b.titulo||'').localeCompare(a.titulo||'');
+      if (ordem === 'antigo')     return new Date(a.criadoEm) - new Date(b.criadoEm);
+      if (ordem === 'carga-desc') return (b.carga||0) - (a.carga||0);
+      return new Date(b.criadoEm||0) - new Date(a.criadoEm||0); // recente
+    });
+
+    const tbody   = q('#gc-tbody');
+    const empty   = q('#gc-empty');
+    const counter = q('#gc-result-count');
+
+    if (counter) counter.textContent = `${lista.length} ${lista.length === 1 ? 'curso' : 'cursos'}`;
+
+    if (!lista.length) {
+      if (tbody) tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    tbody.innerHTML = lista.map(c => {
+      const status  = resolveStatus(c);
+      const aulas   = Storage.Aulas.totalPorCurso(c.id);
+      const mods    = Storage.Modulos.listarPorCurso(c.id).length;
+      const mats    = Storage.Materiais.listarPorCurso(c.id).length;
+      const rest    = Storage.Restricoes.porCurso(c.id);
+      const libStr  = rest.length ? `${rest.length} restrição(ões)` : 'Todos';
+      const prog    = calcProgresso(c.id);
+      const sel     = selecionados.has(c.id);
+      const thumbStyle = c.capa
+        ? `background:url('${c.capa}') center/cover no-repeat`
+        : 'background:var(--blue-light)';
+      const thumbContent = c.capa ? '' : (c.titulo?.[0]?.toUpperCase() || '?');
+
+      const valHtml = c.validadeAte
+        ? (() => {
+            const d = new Date(c.validadeAte);
+            const diff = Math.ceil((d - agora) / 86400000);
+            const cls = diff < 0 ? 'expirado-txt' : diff < 15 ? 'vencendo' : '';
+            const txt = diff < 0 ? `Expirou ${fmtDate(c.validadeAte)}` : diff < 15 ? `Vence em ${diff}d` : fmtDate(c.validadeAte);
+            return `<div class="gc-validade ${cls}">${txt}</div>`;
+          })()
+        : `<div class="gc-validade">Sem validade</div>`;
+
+      const progHtml = `
+        <div class="gc-prog-wrap">
+          <div class="gc-prog-bar"><div class="gc-prog-fill" style="width:${prog}%"></div></div>
+          <span class="gc-prog-lbl">${prog}%</span>
+        </div>`;
+
+      return `<tr class="${sel ? 'selected' : ''}" id="row-${c.id}">
+        <td style="padding:8px 10px">
+          <input type="checkbox" class="row-check" ${sel ? 'checked' : ''}
+            onchange="Cursos.toggleSel('${c.id}',this.checked)">
+        </td>
+        <td>
+          <div class="gc-curso-cell">
+            <div class="gc-thumb" style="${thumbStyle}">${thumbContent}</div>
+            <div style="min-width:0">
+              <div class="gc-titulo">${x(c.titulo)}</div>
+              <div class="gc-desc">${x(c.descricao) || '—'}</div>
+              ${valHtml}
+            </div>
+          </div>
+        </td>
+        <td style="font-size:12px;color:var(--text3)">${x(c.categoria || '—')}</td>
+        <td style="text-align:center;font-size:12px">${c.carga ? c.carga + 'h' : '—'}</td>
+        <td style="text-align:center">
+          <span style="font-size:12px;font-weight:600">${aulas}</span>
+          <div style="font-size:10px;color:var(--text4)">${mods} mód.</div>
+        </td>
+        <td style="text-align:center;font-size:12px;color:var(--text3)">${libStr}</td>
+        <td style="min-width:90px">${progHtml}</td>
+        <td>${statusBadge(status)}</td>
+        <td style="font-size:11px;color:var(--text4)">${fmtDate(c.publicadoEm)}</td>
+        <td style="font-size:11px;color:var(--text4)">${fmtDate(c.criadoEm)}</td>
+        <td>
+          <div class="gc-actions">
+            <button class="gc-actions-btn" onclick="Cursos.toggleMenu(this)" title="Ações">
+              Ações ${SVGS.chev}
+            </button>
+            <div class="gc-menu">
+              <button onclick="Cursos.visualizar('${c.id}');Cursos.closeMenus()">${SVGS.eye} Visualizar</button>
+              <button onclick="Cursos.abrirEdit('${c.id}');Cursos.closeMenus()">${SVGS.edit} Editar</button>
+              <button onclick="Cursos.duplicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.copy} Duplicar</button>
+              <hr class="sep">
+              <button onclick="Admin.go('materiais');Cursos.closeMenus()">${SVGS.folder} Gerenciar materiais</button>
+              <button onclick="Admin.goAcessos('${c.id}');Cursos.closeMenus()">${SVGS.lock} Gerenciar acessos</button>
+              <hr class="sep">
+              ${status !== 'publicado'
+                ? `<button onclick="Cursos.publicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.play} Publicar</button>`
+                : `<button onclick="Cursos.despublicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.pause} Despublicar</button>`}
+              <button onclick="Cursos.arquivarCurso('${c.id}');Cursos.closeMenus()">${SVGS.arc} Arquivar</button>
+              <hr class="sep">
+              <button class="danger" onclick="Cursos.excluirCurso('${c.id}');Cursos.closeMenus()">${SVGS.trash} Excluir</button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function calcProgresso(cursoId) {
+    const mids = Storage.Modulos.listarPorCurso(cursoId).map(m => m.id);
+    const aids = Storage.Aulas.listar().filter(a => mids.includes(a.moduloId)).map(a => a.id);
+    if (!aids.length) return 0;
+    const alunos = Storage.Alunos.listar().filter(a => a.ativo);
+    if (!alunos.length) return 0;
+    let total = 0;
+    alunos.forEach(al => {
+      const done = Storage.Progresso.concluidas(al.id).filter(id => aids.includes(id)).length;
+      total += Math.round((done / aids.length) * 100);
+    });
+    return Math.round(total / alunos.length);
+  }
+
+  /* ── Menus dropdown ────────────────────────────────────────── */
+  function toggleMenu(btn) {
+    const menu = btn.nextElementSibling;
+    const isOpen = menu.classList.contains('open');
+    closeMenus();
+    if (!isOpen) {
+      menu.classList.add('open');
+      setTimeout(() => document.addEventListener('click', closeMenus, { once: true }), 10);
+    }
+  }
+  function closeMenus() {
+    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
+  }
+
+  /* ── Seleção em lote ─────────────────────────────────────── */
+  function toggleSel(id, checked) {
+    checked ? selecionados.add(id) : selecionados.delete(id);
+    const row = document.getElementById('row-' + id);
+    if (row) row.classList.toggle('selected', checked);
+    atualizarBotoesLote();
+  }
+
+  function toggleSelAll(checkbox) {
+    const lista = Storage.Cursos.listar();
+    lista.forEach(c => {
+      if (checkbox.checked) selecionados.add(c.id);
+      else selecionados.delete(c.id);
+    });
+    document.querySelectorAll('.row-check').forEach(ch => ch.checked = checkbox.checked);
+    document.querySelectorAll('#gc-tbody tr').forEach(r =>
+      r.classList.toggle('selected', checkbox.checked)
+    );
+    atualizarBotoesLote();
+  }
+
+  function atualizarBotoesLote() {
+    const n = selecionados.size;
+    const show = n > 0;
+    const count = q('#gc-sel-count');
+    const btnP  = q('#gc-pub-lote');
+    const btnA  = q('#gc-arq-lote');
+    const btnD  = q('#gc-del-lote');
+    if (count) { count.textContent = `${n} selecionado(s)`; count.style.display = show ? 'inline' : 'none'; }
+    if (btnP)  btnP.style.display  = show ? 'inline-flex' : 'none';
+    if (btnA)  btnA.style.display  = show ? 'inline-flex' : 'none';
+    if (btnD)  btnD.style.display  = show ? 'inline-flex' : 'none';
+  }
+
+  /* ── Ações em lote ───────────────────────────────────────── */
+  function publicarLote() {
+    if (!selecionados.size || !confirm(`Publicar ${selecionados.size} curso(s)?`)) return;
+    selecionados.forEach(id => Storage.Cursos.publicar(id));
+    toast(`${selecionados.size} curso(s) publicado(s)!`, 's');
+    selecionados.clear(); refresh();
+  }
+  function arquivarLote() {
+    if (!selecionados.size || !confirm(`Arquivar ${selecionados.size} curso(s)?`)) return;
+    selecionados.forEach(id => Storage.Cursos.arquivar(id));
+    toast(`${selecionados.size} curso(s) arquivado(s).`, 'i');
+    selecionados.clear(); refresh();
+  }
+  function excluirLote() {
+    if (!selecionados.size || !confirm(`Excluir permanentemente ${selecionados.size} curso(s)?`)) return;
+    selecionados.forEach(id => Storage.Cursos.excluir(id));
+    toast(`${selecionados.size} curso(s) excluído(s).`, 'i');
+    selecionados.clear(); refresh();
+  }
+
+  /* ── Ações individuais ───────────────────────────────────── */
+  function visualizar(id) {
+    const c = Storage.Cursos.obter(id);
+    if (!c) return;
+    const aulas = Storage.Aulas.totalPorCurso(id);
+    const mods  = Storage.Modulos.listarPorCurso(id).length;
+    const mats  = Storage.Materiais.listarPorCurso(id).length;
+    const info  = [
+      `Categoria: ${c.categoria || '—'}`,
+      `Formato: ${c.formato || '—'}`,
+      `Carga: ${c.carga || 0}h`,
+      `Módulos: ${mods} | Aulas: ${aulas}`,
+      `Materiais: ${mats}`,
+      `Status: ${resolveStatus(c)}`,
+      `Criado em: ${fmtDate(c.criadoEm)}`,
+    ].join('\n');
+    alert(`📚 ${c.titulo}\n\n${info}`);
+  }
+
+  function publicarCurso(id) {
+    Storage.Cursos.publicar(id);
+    toast('Curso publicado!', 's');
+    logAtividade({ tipo:'publicou', cursoId:id });
+    refresh();
+  }
+  function despublicarCurso(id) {
+    Storage.Cursos.atualizar(id, { status:'rascunho', publicadoEm:null });
+    toast('Curso despublicado.', 'i');
+    refresh();
+  }
+  function arquivarCurso(id) {
+    if (!confirm('Arquivar este curso?')) return;
+    Storage.Cursos.arquivar(id);
+    toast('Curso arquivado.', 'i');
+    logAtividade({ tipo:'arquivou', cursoId:id });
+    refresh();
+  }
+  function excluirCurso(id) {
+    if (!confirm('Excluir permanentemente?')) return;
+    Storage.Cursos.excluir(id);
+    toast('Curso excluído.', 'i');
+    refresh();
+  }
+  function duplicarCurso(id) {
+    const novo = Storage.Cursos.duplicar(id);
+    if (novo) {
+      toast('Curso duplicado!', 's');
+      logAtividade({ tipo:'duplicou', cursoId:novo.id });
+      refresh();
+    }
+  }
+
+  /* ── Exportar CSV ────────────────────────────────────────── */
+  function exportar() {
+    const lista = Storage.Cursos.listar();
+    const rows = [['ID','Título','Categoria','Carga','Status','Publicado','Criado']];
+    lista.forEach(c => rows.push([
+      c.id, c.titulo, c.categoria||'', c.carga||0,
+      resolveStatus(c), c.publicadoEm||'', c.criadoEm||''
+    ]));
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type:'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `cursos_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  /* ── Atividades recentes ─────────────────────────────────── */
+  function logAtividade(ev) {
+    try {
+      const lista = JSON.parse(localStorage.getItem('ead_atividades') || '[]');
+      lista.unshift({ ...ev, ts: new Date().toISOString() });
+      localStorage.setItem('ead_atividades', JSON.stringify(lista.slice(0, 50)));
+    } catch(e) {}
+  }
+
+  function renderAtividades() {
+    const wrap = document.getElementById('gc-atividades');
+    if (!wrap) return;
+
+    // Combina atividades manuais + progresso dos alunos + criação de cursos
+    const ativ = [];
+
+    // Atividades manuais salvas
+    try {
+      const saved = JSON.parse(localStorage.getItem('ead_atividades') || '[]');
+      saved.forEach(a => ativ.push(a));
+    } catch(e) {}
+
+    // Cursos criados recentemente (últimos 30d)
+    Storage.Cursos.listar().forEach(c => {
+      if (c.criadoEm) ativ.push({ tipo:'criou', cursoId:c.id, ts:c.criadoEm });
+      if (c.publicadoEm) ativ.push({ tipo:'publicou', cursoId:c.id, ts:c.publicadoEm });
+    });
+    // Materiais
+    Storage.Materiais.listar().forEach(m => {
+      if (m.criadoEm) ativ.push({ tipo:'material', cursoId:m.cursoId, materialNome:m.nome, ts:m.criadoEm });
+    });
+
+    // Ordena por data desc e remove dups aproximados
+    ativ.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    const top = ativ.slice(0, 10);
+
+    if (!top.length) {
+      wrap.innerHTML = '<div style="color:var(--text4);font-size:13px">Nenhuma atividade registrada.</div>';
+      return;
+    }
+
+    const tipoLabel = {
+      criou:     { label:'Curso criado',        cls:'badge-blue'  },
+      publicou:  { label:'Curso publicado',     cls:'badge-green' },
+      arquivou:  { label:'Curso arquivado',     cls:'badge-amber' },
+      duplicou:  { label:'Curso duplicado',     cls:'badge-gray'  },
+      material:  { label:'Material adicionado', cls:'badge-blue'  },
+    };
+
+    wrap.innerHTML = top.map(a => {
+      const curso = a.cursoId ? Storage.Cursos.obter(a.cursoId) : null;
+      const cfg   = tipoLabel[a.tipo] || { label: a.tipo, cls:'badge-gray' };
+      const nome  = a.materialNome
+        ? `${curso ? x(curso.titulo) + ' — ' : ''}${x(a.materialNome)}`
+        : (curso ? x(curso.titulo) : '—');
+      const diff  = Math.floor((Date.now() - new Date(a.ts)) / 60000);
+      const tempo = diff < 1 ? 'Agora' : diff < 60 ? `${diff}min` : diff < 1440 ? `${Math.floor(diff/60)}h` : fmtDate(a.ts);
+
+      return `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+          <span class="badge ${cfg.cls}" style="white-space:nowrap;flex-shrink:0">${cfg.label}</span>
+          <span style="flex:1;font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nome}</span>
+          <span style="font-size:11px;color:var(--text4);flex-shrink:0">${tempo}</span>
+        </div>`;
+    }).join('') + '<div style="padding-top:2px"></div>';
+  }
+
+  /* ── Modal de edição ─────────────────────────────────────── */
+  function abrirEdit(id) {
+    cursoEditId = id;
+    const c = Storage.Cursos.obter(id);
+    if (!c) return;
+
+    matEdit = [...(Storage.Materiais.listarPorCurso(id) || [])];
+
+    // Preenche campos — tab 0
+    setVal('mec-nome', c.titulo);
+    setVal('mec-categoria', c.categoria);
+    setVal('mec-formato', c.formato || 'ead');
+    setVal('mec-carga', c.carga);
+    setVal('mec-nivel', c.nivel || 'basico');
+    setVal('mec-descricao', c.descricao);
+    setVal('mec-status', c.status || 'rascunho');
+    setVal('mec-validade', c.validadeAte ? c.validadeAte.split('T')[0] : '');
+    setVal('mec-prazo', c.prazo || '');
+
+    // tab 1 — público
+    const publico = c.publico || [];
+    document.getElementById('mec-publico-chips').innerHTML = [
+      'tecnicos','eletricistas','administrativo','operacional',
+      'gestores','liderança','novos-colaboradores','todos','outros'
+    ].map(v => {
+      const sel = publico.includes(v);
+      return `<span class="tag-chip ${sel?'selected':''}" data-val="${v}"
+        onclick="this.classList.toggle('selected')"
+        style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid ${sel?'var(--blue)':'var(--border)'};border-radius:99px;font-size:12px;font-weight:500;color:${sel?'#fff':'var(--text3)'};cursor:pointer;background:${sel?'var(--blue)':'var(--surface)'};transition:all .12s">
+        ${v.charAt(0).toUpperCase() + v.slice(1).replace('-',' ')}
+      </span>`;
+    }).join('');
+    setVal('mec-visib', c.visib || 'todos');
+    setVal('mec-publico-obs', c.publicoObs || '');
+
+    // tab 2 — materiais
+    renderMatEdit();
+
+    // tab 3 — config
+    renderConfigEdit(c.config || {});
+
+    // Título do modal
+    document.getElementById('mec-titulo').textContent = `Editar: ${c.titulo}`;
+    document.getElementById('mec-subtitulo').textContent =
+      `ID: ${id.slice(0,8)}… · Criado em ${fmtDate(c.criadoEm)}`;
+
+    // Vai para tab 0
+    CursoEdit.tab(0, document.querySelector('.mc-tab'));
+
+    document.getElementById('modal-edit-curso').classList.add('open');
+  }
+
+  function setVal(id, v) {
+    const el = document.getElementById(id);
+    if (el) el.value = v ?? '';
+  }
+
+  function renderMatEdit() {
+    const lista = document.getElementById('mec-materiais-lista');
+    const count = document.getElementById('mec-mat-count');
+    if (count) count.textContent = matEdit.length;
+    if (!lista) return;
+    if (!matEdit.length) {
+      lista.innerHTML = '<div style="color:var(--text4);font-size:12px;text-align:center;padding:20px">Nenhum material</div>';
+      return;
+    }
+    lista.innerHTML = matEdit.map((m, i) => {
+      const ext = m.ext || (m.nome?.split('.').pop() || 'doc').toLowerCase();
+      const labels = { pdf:'PDF', mp4:'VID', webm:'VID', xlsx:'XLS', xls:'XLS', doc:'DOC', docx:'DOC', link:'URL', quiz:'QUIZ' };
+      const lbl = labels[ext] || ext.toUpperCase();
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <div style="width:28px;height:28px;border-radius:5px;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${lbl}</div>
+        <div style="flex:1;font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(m.nome)}</div>
+        <div style="font-size:11px;color:var(--text4)">${m.tamanho || '—'}</div>
+        <button onclick="Cursos._remMatEdit(${i})" style="background:none;border:none;cursor:pointer;color:var(--text4);padding:2px 4px" title="Remover">
+          ${SVGS.trash}
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  function _remMatEdit(i) {
+    matEdit.splice(i, 1);
+    renderMatEdit();
+  }
+
+  function renderConfigEdit(cfg) {
+    const wrap = document.getElementById('mec-config-body');
+    if (!wrap) return;
+
+    const row = (id, label, desc, val) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${label}</div>
+          <div style="font-size:11px;color:var(--text4)">${desc}</div>
+        </div>
+        <div id="${id}" class="toggle ${val?'on':''}" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:${val?'var(--blue)':'var(--border2)'};border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+          <span style="position:absolute;top:3px;left:${val?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+        </div>
+      </div>`;
+
+    wrap.innerHTML =
+      row('cfg-obrigatorio',  'Curso Obrigatório',      'Notifica colaboradores e cobra conclusão', cfg.obrigatorio) +
+      row('cfg-certificado',  'Certificado Automático', 'Emitir ao concluir 100%',                  cfg.certificado !== false) +
+      row('cfg-avaliacao',    'Avaliação Obrigatória',  'Nota mínima para concluir',                cfg.avaliacao) +
+      row('cfg-progresso',    'Controle de Progresso',  'Registrar aulas concluídas',               cfg.progresso !== false) +
+      row('cfg-ocultar',      'Ocultar pós-conclusão',  'Não exibe para quem já concluiu',          cfg.ocultar) +
+      row('cfg-sequencial',   'Acesso Sequencial',      'Deve concluir aulas na ordem',             cfg.sequencial);
+  }
+
+  /* ── CursoEdit (API pública para o modal) ─────────────────── */
+  window.CursoEdit = {
+    tab(idx, btn) {
+      document.querySelectorAll('.mc-tab').forEach((t,i) => {
+        t.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.mc-pane').forEach((p,i) => {
+        p.classList.toggle('active', i === idx);
+      });
+      // Revisão
+      if (idx === 4) renderReviewEdit();
+    },
+
+    uploadMat(input) {
+      Array.from(input.files).forEach(f => {
+        const ext = f.name.split('.').pop().toLowerCase();
+        matEdit.push({ id:'new_'+Date.now(), nome:f.name, ext, tipo:'file', tamanho:fmtBytes(f.size) });
+      });
+      renderMatEdit();
+      input.value = '';
+    },
+
+    addLinkMat() {
+      const url  = prompt('URL do link:');
+      if (!url) return;
+      const nome = prompt('Título do link:', url);
+      matEdit.push({ id:'new_'+Date.now(), nome:nome||url, ext:'link', tipo:'link', tamanho:'' });
+      renderMatEdit();
+    },
+
+    salvar() {
+      if (!cursoEditId) return;
+      const nome = document.getElementById('mec-nome')?.value.trim();
+      if (!nome) { alert('Informe o nome do curso.'); return; }
+
+      const publico = [...document.querySelectorAll('#mec-publico-chips .tag-chip.selected')]
+        .map(el => el.dataset.val);
+
+      const getToggle = id => document.getElementById(id)?.classList.contains('on') ?? false;
+
+      const dados = {
+        titulo:     nome,
+        categoria:  document.getElementById('mec-categoria')?.value || '',
+        formato:    document.getElementById('mec-formato')?.value || 'ead',
+        carga:      parseInt(document.getElementById('mec-carga')?.value) || 0,
+        nivel:      document.getElementById('mec-nivel')?.value || 'basico',
+        descricao:  document.getElementById('mec-descricao')?.value.trim() || '',
+        status:     document.getElementById('mec-status')?.value || 'rascunho',
+        validadeAte:document.getElementById('mec-validade')?.value ? new Date(document.getElementById('mec-validade').value).toISOString() : null,
+        prazo:      document.getElementById('mec-prazo')?.value || null,
+        publico,
+        publicoObs: document.getElementById('mec-publico-obs')?.value || '',
+        visib:      document.getElementById('mec-visib')?.value || 'todos',
+        config: {
+          obrigatorio: getToggle('cfg-obrigatorio'),
+          certificado: getToggle('cfg-certificado'),
+          avaliacao:   getToggle('cfg-avaliacao'),
+          progresso:   getToggle('cfg-progresso'),
+          ocultar:     getToggle('cfg-ocultar'),
+          sequencial:  getToggle('cfg-sequencial'),
+        },
+      };
+
+      Storage.Cursos.atualizar(cursoEditId, dados);
+
+      // Sincroniza materiais
+      const antigos = Storage.Materiais.listarPorCurso(cursoEditId);
+      const novosIds = new Set(matEdit.filter(m => !m.id?.toString().startsWith('new_')).map(m => m.id));
+      antigos.forEach(m => { if (!novosIds.has(m.id)) Storage.Materiais.excluir(m.id); });
+      matEdit.filter(m => m.id?.toString().startsWith('new_')).forEach(m => {
+        Storage.Materiais.criar({ cursoId:cursoEditId, nome:m.nome, tipo:m.tipo||'doc', tamanho:m.tamanho||'', url:m.url||'#' });
+      });
+
+      logAtividade({ tipo:'editou', cursoId:cursoEditId });
+      toast('Curso atualizado com sucesso!', 's');
+      document.getElementById('modal-edit-curso').classList.remove('open');
+      cursoEditId = null;
+      refresh();
+    },
+  };
+
+  function renderReviewEdit() {
+    const wrap = document.getElementById('mec-review-body');
+    if (!wrap) return;
+    const c = Storage.Cursos.obter(cursoEditId);
+    if (!c) return;
+    const aulas = Storage.Aulas.totalPorCurso(cursoEditId);
+    const mods  = Storage.Modulos.listarPorCurso(cursoEditId).length;
+
+    const rv = (label, val) =>
+      `<div style="display:flex;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div style="width:150px;flex-shrink:0;color:var(--text3);font-weight:500">${label}</div>
+        <div style="flex:1;color:var(--text)">${val}</div>
+      </div>`;
+
+    wrap.innerHTML =
+      rv('Nome', x(document.getElementById('mec-nome')?.value || c.titulo)) +
+      rv('Categoria', x(document.getElementById('mec-categoria')?.value || c.categoria || '—')) +
+      rv('Formato', document.getElementById('mec-formato')?.value || c.formato || '—') +
+      rv('Carga', (document.getElementById('mec-carga')?.value || c.carga || 0) + 'h') +
+      rv('Status', statusBadge(document.getElementById('mec-status')?.value || c.status)) +
+      rv('Módulos / Aulas', `${mods} módulos · ${aulas} aulas`) +
+      rv('Materiais', matEdit.length + ' arquivo(s)') +
+      rv('Validade', document.getElementById('mec-validade')?.value ? new Date(document.getElementById('mec-validade').value).toLocaleDateString('pt-BR') : 'Sem validade');
+  }
+
+  /* ── Refresh completo ─────────────────────────────────────── */
+  function refresh() {
+    renderStats();
+    renderTabela();
+    renderAtividades();
+    popularFiltroCategoria();
+    // Sincroniza com o dashboard
+    if (typeof Admin !== 'undefined') {
+      const el = document.getElementById('ds-cursos');
+      if (el) el.textContent = Storage.Cursos.listar().length;
+      const ep = document.getElementById('ds-publicados');
+      if (ep) ep.textContent = Storage.Cursos.listar().filter(c=>c.status==='publicado').length;
+    }
+  }
+
+  /* ── Toast (reutiliza o global) ──────────────────────────── */
+  function toast(msg, tipo='i') {
+    const s = document.getElementById('toasts');
+    if (!s) return;
+    const el = document.createElement('div');
+    el.className = `toast ${tipo}`;
+    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]||'ℹ️'}</span><span>${msg}</span>`;
+    s.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  return {
+    init, refresh,
+    renderTabela, renderStats, renderAtividades,
+    toggleSel, toggleSelAll,
+    publicarLote, arquivarLote, excluirLote,
+    publicarCurso, despublicarCurso, arquivarCurso,
+    excluirCurso, duplicarCurso, visualizar,
+    abrirEdit, _remMatEdit,
+    toggleMenu, closeMenus,
+    exportar,
+  };
+})();
+
 </script>
 <script src="src/js/storage.js"></script>
 <script src="src/js/admin.js"></script>
