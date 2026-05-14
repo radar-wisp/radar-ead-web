@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Novo Curso — Radar Internet EAD</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+/* ── Tokens ── */
+:root {
+  --bg:          #f4f5fb;
+  --surface:     #ffffff;
+  --border:      #c8caee;
+  --border2:     #a0a3e0;
+  --text:        #00007a;
+  --text2:       #2a2d9a;
+  --text3:       #6668c0;
+  --text4:       #94a3b8;
+  --blue:        #0002da;
+  --blue-d:      #0001b0;
+  --blue-l:      #e6e6ff;
+  --blue-m:      #b3b3f7;
+  --green:       #08c49c;
+  --green-l:     #e0fff9;
+  --green-d:     #0a9e80;
+  --amber:       #f59e0b;
+  --amber-l:     #fef3c7;
+  --red:         #e02424;
+  --red-l:       #fee2e2;
+  --sb-w:        230px;
+  --hh:          56px;
+  --r:           8px;
+  --rl:          12px;
+  --sh:          0 2px 8px rgba(0,2,218,.08);
+  --shm:         0 8px 28px rgba(0,2,218,.12);
+  --font:        'DM Sans', system-ui, sans-serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { font-size:14px }
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased }
+button { cursor:pointer; font-family:var(--font); border:none; background:none }
+input,select,textarea { font-family:var(--font) }
+::-webkit-scrollbar { width:5px }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px }
+
+/* ══════════════ SIDEBAR ══════════════ */
+.sidebar {
+  width:var(--sb-w); background:var(--surface);
+  border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; bottom:0; z-index:100;
+  display:flex; flex-direction:column; overflow-y:auto;
+}
+.sb-brand { padding:20px 18px 16px; border-bottom:1px solid var(--border) }
+.sb-brand-name { font-size:15px; font-weight:600; letter-spacing:-.3px; color:var(--blue) }
+.sb-brand-name small { font-size:11px; color:var(--text4); font-weight:400; display:block; margin-top:2px }
+.sb-nav { padding:10px 10px; flex:1 }
+.sb-label { font-size:10px; font-weight:600; color:var(--text4); text-transform:uppercase; letter-spacing:.08em; padding:10px 8px 4px }
+.sb-item {
+  display:flex; align-items:center; gap:9px; padding:8px 10px;
+  border-radius:var(--r); color:var(--text4); font-size:13px;
+  font-weight:500; margin-bottom:1px; border:none; background:none;
+  width:100%; text-align:left; cursor:default;
+}
+.sb-item .ico { font-size:14px; width:18px; text-align:center; flex-shrink:0 }
+.sb-item.active { background:var(--blue-l); color:var(--blue); font-weight:600 }
+.sb-foot { padding:12px; border-top:1px solid var(--border) }
+.sb-user { display:flex; align-items:center; gap:9px; padding:8px 10px; background:var(--bg); border-radius:var(--r); margin-bottom:8px }
+.sb-av { width:28px; height:28px; border-radius:50%; background:var(--blue-l); color:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; border:1px solid var(--border); flex-shrink:0 }
+.sb-user-name { font-size:12px; font-weight:600; color:var(--text) }
+.sb-user-role { font-size:11px; color:var(--text4) }
+
+/* ══════════════ MAIN ══════════════ */
+.main { margin-left:var(--sb-w); min-height:100vh; display:flex; flex-direction:column }
+
+/* Topbar */
+.topbar {
+  height:var(--hh); background:var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 24px; gap:12px;
+  position:sticky; top:0; z-index:50;
+}
+.topbar-crumb { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text4); flex:1 }
+.topbar-crumb a { color:var(--text4); text-decoration:none; transition:color .12s }
+.topbar-crumb a:hover { color:var(--blue) }
+.topbar-crumb .sep { color:var(--border2) }
+.topbar-crumb .cur { color:var(--text); font-weight:600; font-size:14px }
+
+/* Content */
+.content { padding:24px; flex:1 }
+.page-head { margin-bottom:24px }
+.page-head h1 { font-size:20px; font-weight:700; letter-spacing:-.4px; margin-bottom:3px }
+.page-head p { font-size:13px; color:var(--text3) }
+
+/* ══════════════ STEPPER ══════════════ */
+.stepper {
+  display:flex; align-items:flex-start; gap:0;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--rl); padding:20px 24px; margin-bottom:24px;
+  box-shadow:var(--sh); overflow-x:auto;
+}
+.step {
+  display:flex; flex-direction:column; align-items:center;
+  flex:1; min-width:80px; position:relative; cursor:pointer;
+}
+/* Connector line */
+.step:not(:last-child)::after {
+  content:''; position:absolute;
+  top:14px; left:calc(50% + 14px);
+  right:calc(-50% + 14px);
+  height:1.5px; background:var(--border);
+  transition:background .3s;
+}
+.step.done:not(:last-child)::after { background:var(--blue) }
+
+.step-circle {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700;
+  border:2px solid var(--border); color:var(--text4);
+  background:var(--surface); transition:all .25s; z-index:1;
+  flex-shrink:0;
+}
+.step.active .step-circle { border-color:var(--blue); color:var(--blue); background:var(--blue-l) }
+.step.done   .step-circle { border-color:var(--blue); background:var(--blue); color:#fff }
+.step-label {
+  margin-top:7px; font-size:11px; font-weight:500;
+  color:var(--text4); text-align:center; line-height:1.3;
+  white-space:nowrap;
+}
+.step.active .step-label { color:var(--blue); font-weight:600 }
+.step.done   .step-label { color:var(--text3) }
+
+/* ══════════════ FORM CARD ══════════════ */
+.form-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--rl); box-shadow:var(--sh);
+  overflow:hidden; margin-bottom:16px;
+}
+.form-card-head {
+  padding:16px 20px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+}
+.form-card-head h2 { font-size:15px; font-weight:600; letter-spacing:-.2px }
+.form-card-head p { font-size:12px; color:var(--text3); margin-top:2px }
+.step-icon {
+  width:36px; height:36px; border-radius:var(--r);
+  background:var(--blue-l); color:var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.form-card-body { padding:20px }
+.step-pane { display:none }
+.step-pane.active { display:block }
+
+/* ══════════════ FORM FIELDS ══════════════ */
+.field { margin-bottom:16px }
+.field:last-child { margin-bottom:0 }
+.field label {
+  display:block; font-size:12px; font-weight:600;
+  color:var(--text2); margin-bottom:6px;
+}
+.field label .req { color:var(--red); margin-left:2px }
+.field input,.field select,.field textarea {
+  width:100%; padding:9px 12px;
+  border:1.5px solid var(--border2); border-radius:var(--r);
+  font-size:13px; color:var(--text); background:var(--surface);
+  outline:none; transition:border-color .15s, box-shadow .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus {
+  border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08);
+}
+.field textarea { resize:vertical; min-height:90px; line-height:1.5 }
+.field select {
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;
+}
+.field .hint { font-size:11px; color:var(--text4); margin-top:4px }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px }
+
+/* ══════════════ CHECKBOX / RADIO GROUPS ══════════════ */
+.check-group { display:flex; flex-direction:column; gap:8px }
+.check-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border:1.5px solid var(--border);
+  border-radius:var(--r); cursor:pointer; transition:all .12s;
+  user-select:none;
+}
+.check-row:hover { border-color:var(--blue-m); background:var(--blue-l) }
+.check-row.checked { border-color:var(--blue); background:var(--blue-l) }
+.check-row input[type=checkbox],.check-row input[type=radio] { display:none }
+.check-box {
+  width:18px; height:18px; border-radius:4px;
+  border:2px solid var(--border2); background:var(--surface);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .12s;
+}
+.check-row.checked .check-box { background:var(--blue); border-color:var(--blue) }
+.radio-box {
+  width:18px; height:18px; border-radius:50%;
+  border:2px solid var(--border2); background:var(--surface);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .12s;
+}
+.check-row.checked .radio-box { border-color:var(--blue) }
+.radio-inner { width:8px; height:8px; border-radius:50%; background:var(--blue); display:none }
+.check-row.checked .radio-inner { display:block }
+.check-ico { font-size:16px; width:20px; text-align:center }
+.check-label { font-size:13px; font-weight:500; color:var(--text); flex:1 }
+.check-sub { font-size:11px; color:var(--text4) }
+
+/* Tag chips para público */
+.tag-grid { display:flex; flex-wrap:wrap; gap:8px }
+.tag-chip {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 14px; border:1.5px solid var(--border);
+  border-radius:99px; font-size:12px; font-weight:500;
+  color:var(--text3); cursor:pointer; transition:all .12s;
+  background:var(--surface); user-select:none;
+}
+.tag-chip:hover { border-color:var(--blue-m); color:var(--blue) }
+.tag-chip.selected { background:var(--blue); border-color:var(--blue); color:#fff }
+.tag-chip svg { width:14px; height:14px; flex-shrink:0 }
+
+/* ══════════════ ACESSO ══════════════ */
+.access-section { margin-bottom:20px }
+.access-section h3 { font-size:12px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px }
+.access-add-row { display:flex; gap:8px; margin-top:8px }
+.access-add-row select { flex:1; padding:8px 28px 8px 10px; font-size:13px; border:1.5px solid var(--border2); border-radius:var(--r); color:var(--text); outline:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236668c0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+.access-add-row select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08) }
+.tags-list { display:flex; flex-wrap:wrap; gap:6px; min-height:32px }
+.access-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600;
+}
+.access-tag.setor { background:var(--blue-l); color:var(--blue) }
+.access-tag.equipe { background:var(--green-l); color:var(--green-d) }
+.access-tag.cargo { background:var(--amber-l); color:var(--amber) }
+.access-tag.colab { background:#ede9fe; color:#7c3aed }
+.access-tag button { background:none; border:none; cursor:pointer; color:inherit; font-size:13px; line-height:1; padding:0 2px; opacity:.7 }
+.access-tag button:hover { opacity:1 }
+
+/* ══════════════ UPLOAD ══════════════ */
+.upload-zone {
+  border:2px dashed var(--border2); border-radius:var(--rl);
+  padding:32px 20px; text-align:center; cursor:pointer;
+  transition:all .15s; background:var(--bg); margin-bottom:14px;
+}
+.upload-zone:hover { border-color:var(--blue); background:var(--blue-l) }
+.upload-zone svg { color:var(--text4); margin-bottom:10px }
+.upload-zone .uz-title { font-size:14px; font-weight:600; color:var(--text2); margin-bottom:4px }
+.upload-zone .uz-sub { font-size:12px; color:var(--text4) }
+.upload-zone input { display:none }
+
+.file-list { display:flex; flex-direction:column; gap:6px }
+.file-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:var(--bg);
+  border:1px solid var(--border); border-radius:var(--r);
+}
+.file-icon {
+  width:32px; height:32px; border-radius:var(--r);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; flex-shrink:0; font-weight:700; font-size:10px;
+}
+.file-icon.pdf { background:#fee2e2; color:var(--red) }
+.file-icon.mp4,.file-icon.webm { background:var(--amber-l); color:var(--amber) }
+.file-icon.xlsx,.file-icon.xls { background:var(--green-l); color:var(--green-d) }
+.file-icon.doc,.file-icon.docx { background:var(--blue-l); color:var(--blue) }
+.file-icon.link { background:#ede9fe; color:#7c3aed }
+.file-icon.quiz { background:#fef3c7; color:#b45309 }
+.file-name { flex:1; font-size:13px; font-weight:500; color:var(--text) }
+.file-size { font-size:11px; color:var(--text4) }
+.file-del { color:var(--text4); transition:color .12s; background:none; border:none; cursor:pointer; padding:2px 4px }
+.file-del:hover { color:var(--red) }
+
+/* Link externo input */
+.link-row { display:flex; gap:8px; margin-bottom:8px }
+.link-row input { flex:1 }
+
+/* ══════════════ TOGGLE SWITCH ══════════════ */
+.toggle-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0; border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom:none }
+.toggle-info { flex:1 }
+.toggle-label { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px }
+.toggle-desc { font-size:11px; color:var(--text4) }
+.toggle {
+  position:relative; width:40px; height:22px;
+  background:var(--border2); border-radius:11px;
+  cursor:pointer; transition:background .2s; flex-shrink:0;
+}
+.toggle.on { background:var(--blue) }
+.toggle::after {
+  content:''; position:absolute;
+  top:3px; left:3px;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle.on::after { transform:translateX(18px) }
+
+/* ══════════════ REVIEW ══════════════ */
+.review-section { margin-bottom:18px }
+.review-section h3 {
+  font-size:11px; font-weight:700; color:var(--text4);
+  text-transform:uppercase; letter-spacing:.06em;
+  margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border);
+}
+.review-row { display:flex; padding:6px 0; font-size:13px }
+.review-row .rv-label { width:160px; flex-shrink:0; color:var(--text3); font-weight:500 }
+.review-row .rv-val { color:var(--text); flex:1 }
+.review-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:2px }
+
+/* ══════════════ NAV BUTTONS ══════════════ */
+.nav-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; background:var(--surface);
+  border-top:1px solid var(--border);
+}
+.nav-bar-left { display:flex; gap:8px }
+.nav-bar-right { display:flex; gap:8px }
+
+/* ══════════════ BUTTONS ══════════════ */
+.btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 16px; border-radius:var(--r);
+  font-size:13px; font-weight:600; cursor:pointer;
+  font-family:var(--font); border:1.5px solid transparent;
+  transition:all .12s; white-space:nowrap;
+}
+.btn:active { transform:scale(.97) }
+.btn-primary { background:var(--blue); color:#fff; border-color:var(--blue) }
+.btn-primary:hover { background:var(--blue-d) }
+.btn-ghost { background:transparent; color:var(--text3); border-color:var(--border) }
+.btn-ghost:hover { background:var(--bg); color:var(--text) }
+.btn-outline { background:transparent; color:var(--blue); border-color:var(--blue-m) }
+.btn-outline:hover { background:var(--blue-l) }
+.btn-danger { color:var(--red); border-color:var(--border) }
+.btn-danger:hover { background:var(--red-l) }
+.btn-sm { padding:5px 11px; font-size:12px }
+.btn-lg { padding:10px 22px; font-size:14px }
+.btn svg { width:15px; height:15px; flex-shrink:0 }
+
+/* ══════════════ BADGE ══════════════ */
+.badge {
+  display:inline-flex; align-items:center; padding:2px 9px;
+  border-radius:99px; font-size:10px; font-weight:700;
+}
+.badge-blue  { background:var(--blue-l);  color:var(--blue) }
+.badge-green { background:var(--green-l); color:var(--green-d) }
+.badge-amber { background:var(--amber-l); color:var(--amber) }
+
+/* ══════════════ MODAL SUCESSO ══════════════ */
+.modal-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,20,.45); z-index:999;
+  align-items:center; justify-content:center; padding:20px;
+}
+.modal-bg.open { display:flex }
+.modal {
+  background:var(--surface); border-radius:16px;
+  padding:36px 32px; width:100%; max-width:420px;
+  text-align:center; box-shadow:var(--shm);
+  animation:popIn .3s cubic-bezier(.34,1.3,.64,1);
+}
+@keyframes popIn { from { opacity:0; transform:scale(.9) translateY(16px) } to { opacity:1; transform:none } }
+.modal-icon {
+  width:64px; height:64px; border-radius:50%;
+  background:var(--green-l); margin:0 auto 18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.modal h2 { font-size:18px; font-weight:700; letter-spacing:-.3px; margin-bottom:6px }
+.modal p { font-size:13px; color:var(--text3); margin-bottom:24px; line-height:1.5 }
+.modal-actions { display:flex; gap:10px; justify-content:center }
+
+/* ══════════════ MISC ══════════════ */
+.divider { border:none; border-top:1px solid var(--border); margin:16px 0 }
+.section-title {
+  font-size:12px; font-weight:700; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;
+}
+.empty-state {
+  text-align:center; padding:24px; color:var(--text4);
+  font-size:12px; background:var(--bg); border-radius:var(--r);
+  border:1px dashed var(--border);
+}
+.validade-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px }
+.capa-preview {
+  width:100%; max-height:140px; object-fit:cover;
+  border-radius:var(--r); border:1px solid var(--border);
+  display:none; margin-top:10px;
+}
+
+/* Progress bar para revisão */
+.prog-bar { height:6px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden }
+.prog-fill { height:100%; background:var(--blue); border-radius:3px; transition:width .3s }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-name">Radar Internet <small>Plataforma EAD</small></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-label">Principal</div>
+    <div class="sb-item">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+      Dashboard
+    </div>
+    <div class="sb-label">Treinamentos</div>
+    <div class="sb-item active">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+      Cursos
+    </div>
+    <div class="sb-item">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+      Materiais
+    </div>
+    <div class="sb-item">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg></span>
+      Publicação
+    </div>
+    <div class="sb-label">Organização</div>
+    <div class="sb-item">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      Colaboradores
+    </div>
+    <div class="sb-item">
+      <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      Acessos
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av">A</div>
+      <div>
+        <div class="sb-user-name">Administrador</div>
+        <div class="sb-user-role">admin@radar.com</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px" onclick="history.back()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </button>
+  </div>
+</aside>
+
+<!-- ══════════════════════ MAIN ══════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-crumb">
+      <a href="admin.html">Radar Internet</a>
+      <span class="sep">›</span>
+      <a href="admin.html">Cursos</a>
+      <span class="sep">›</span>
+      <span class="cur">Novo Curso</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="autosave-status" style="font-size:11px;color:var(--text4)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="history.back()">Cancelar</button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <div class="page-head">
+      <h1>Novo Curso</h1>
+      <p>Preencha as etapas abaixo para cadastrar um novo curso na plataforma.</p>
+    </div>
+
+    <!-- STEPPER -->
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="0" onclick="Wizard.jumpTo(0)">
+        <div class="step-circle"><span class="step-num">1</span></div>
+        <div class="step-label">Dados Gerais</div>
+      </div>
+      <div class="step" data-step="1" onclick="Wizard.jumpTo(1)">
+        <div class="step-circle"><span class="step-num">2</span></div>
+        <div class="step-label">Público-alvo</div>
+      </div>
+      <div class="step" data-step="2" onclick="Wizard.jumpTo(2)">
+        <div class="step-circle"><span class="step-num">3</span></div>
+        <div class="step-label">Acesso</div>
+      </div>
+      <div class="step" data-step="3" onclick="Wizard.jumpTo(3)">
+        <div class="step-circle"><span class="step-num">4</span></div>
+        <div class="step-label">Materiais</div>
+      </div>
+      <div class="step" data-step="4" onclick="Wizard.jumpTo(4)">
+        <div class="step-circle"><span class="step-num">5</span></div>
+        <div class="step-label">Configurações</div>
+      </div>
+      <div class="step" data-step="5" onclick="Wizard.jumpTo(5)">
+        <div class="step-circle"><span class="step-num">6</span></div>
+        <div class="step-label">Revisão</div>
+      </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+
+      <!-- ══ ETAPA 1: Dados Gerais ══ -->
+      <div class="step-pane active" id="pane-0">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div>
+            <h2>Dados Gerais</h2>
+            <p>Informações básicas do curso</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="grid-2">
+            <div class="field" style="grid-column:1/-1">
+              <label>Nome do Curso <span class="req">*</span></label>
+              <input type="text" id="f-nome" placeholder="Ex: Segurança no Trabalho — NR10">
+            </div>
+            <div class="field">
+              <label>Categoria <span class="req">*</span></label>
+              <select id="f-categoria">
+                <option value="">Selecione...</option>
+                <option>Segurança do Trabalho</option>
+                <option>Elétrica</option>
+                <option>Telecomunicações</option>
+                <option>Gestão e Liderança</option>
+                <option>Atendimento ao Cliente</option>
+                <option>Tecnologia da Informação</option>
+                <option>Administrativo</option>
+                <option>Operações</option>
+                <option>Compliance</option>
+                <option>Outros</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Formato</label>
+              <select id="f-formato">
+                <option value="ead">EAD (Online)</option>
+                <option value="hibrido">Híbrido</option>
+                <option value="presencial">Presencial</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Carga Horária (horas) <span class="req">*</span></label>
+              <input type="number" id="f-carga" placeholder="Ex: 8" min="1">
+            </div>
+            <div class="field">
+              <label>Nível</label>
+              <select id="f-nivel">
+                <option value="basico">Básico</option>
+                <option value="intermediario">Intermediário</option>
+                <option value="avancado">Avançado</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Descrição</label>
+              <textarea id="f-desc" placeholder="Descreva o objetivo, conteúdo e benefícios do curso..."></textarea>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Imagem / Capa do Curso</label>
+              <div class="upload-zone" onclick="document.getElementById('f-capa-input').click()">
+                <input type="file" id="f-capa-input" accept="image/*" onchange="Wizard.previewCapa(this)">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block;color:var(--text4)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div class="uz-title">Clique para selecionar a capa</div>
+                <div class="uz-sub">PNG, JPG ou WEBP — recomendado 1280×720px</div>
+              </div>
+              <img id="f-capa-preview" class="capa-preview" alt="Preview da capa">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ETAPA 2: Público-alvo ══ -->
+      <div class="step-pane" id="pane-1">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h2>Público-alvo</h2>
+            <p>Para quem este curso é destinado</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="section-title">Perfis profissionais</div>
+          <div class="tag-grid" id="publico-tags">
+            <div class="tag-chip" data-val="tecnicos" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Técnicos
+            </div>
+            <div class="tag-chip" data-val="eletricistas" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Eletricistas
+            </div>
+            <div class="tag-chip" data-val="administrativo" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Administrativo
+            </div>
+            <div class="tag-chip" data-val="operacional" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M20 12h1M3 12H2M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 20v1M12 3V2M4.93 4.93l1.41 1.41"/></svg>
+              Operacional
+            </div>
+            <div class="tag-chip" data-val="gestores" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Gestores
+            </div>
+            <div class="tag-chip" data-val="liderança" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Liderança
+            </div>
+            <div class="tag-chip" data-val="novos-colaboradores" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              Novos Colaboradores
+            </div>
+            <div class="tag-chip" data-val="todos" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              Todos
+            </div>
+            <div class="tag-chip" data-val="outros" onclick="Wizard.toggleTag(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              Outros
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="field">
+            <label>Observação sobre o público-alvo</label>
+            <textarea id="f-publico-obs" placeholder="Descreva pré-requisitos, perfil esperado ou outros detalhes..." style="min-height:70px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ETAPA 3: Controle de Acesso ══ -->
+      <div class="step-pane" id="pane-2">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h2>Controle de Acesso</h2>
+            <p>Defina quem pode acessar este curso</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+
+          <!-- Tipo de liberação -->
+          <div class="section-title">Visibilidade</div>
+          <div class="check-group" style="margin-bottom:20px">
+            <label class="check-row checked" id="vis-todos" onclick="Wizard.setVisib('todos')">
+              <div class="radio-box"><div class="radio-inner"></div></div>
+              <span class="check-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
+              <div>
+                <div class="check-label">Liberar para todos os colaboradores</div>
+                <div class="check-sub">Qualquer colaborador ativo poderá acessar</div>
+              </div>
+            </label>
+            <label class="check-row" id="vis-restrito" onclick="Wizard.setVisib('restrito')">
+              <div class="radio-box"><div class="radio-inner"></div></div>
+              <span class="check-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+              <div>
+                <div class="check-label">Acesso restrito</div>
+                <div class="check-sub">Definir setores, equipes, cargos ou colaboradores específicos</div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Restrições (mostra quando restrito) -->
+          <div id="restricoes-panel" style="display:none">
+            <div class="access-section">
+              <h3>Por Setor</h3>
+              <div class="tags-list" id="tags-setor"></div>
+              <div class="access-add-row">
+                <select id="sel-setor">
+                  <option value="">Selecione um setor...</option>
+                  <option>Tecnologia</option>
+                  <option>Comercial</option>
+                  <option>Operações</option>
+                  <option>Financeiro</option>
+                  <option>RH</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('setor')">+ Adicionar</button>
+              </div>
+            </div>
+            <div class="access-section">
+              <h3>Por Equipe</h3>
+              <div class="tags-list" id="tags-equipe"></div>
+              <div class="access-add-row">
+                <select id="sel-equipe">
+                  <option value="">Selecione uma equipe...</option>
+                  <option>Dev Frontend</option>
+                  <option>Dev Backend</option>
+                  <option>Infraestrutura</option>
+                  <option>Vendas SP</option>
+                  <option>Suporte Técnico</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('equipe')">+ Adicionar</button>
+              </div>
+            </div>
+            <div class="access-section">
+              <h3>Por Cargo</h3>
+              <div class="tags-list" id="tags-cargo"></div>
+              <div class="access-add-row">
+                <select id="sel-cargo">
+                  <option value="">Selecione um cargo...</option>
+                  <option>Técnico de Campo</option>
+                  <option>Eletricista</option>
+                  <option>Analista</option>
+                  <option>Coordenador</option>
+                  <option>Gerente</option>
+                  <option>Assistente Administrativo</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('cargo')">+ Adicionar</button>
+              </div>
+            </div>
+            <div class="access-section">
+              <h3>Colaborador Específico</h3>
+              <div class="tags-list" id="tags-colab"></div>
+              <div class="access-add-row">
+                <select id="sel-colab">
+                  <option value="">Selecione um colaborador...</option>
+                  <option>Ana Beatriz Costa</option>
+                  <option>Carlos Eduardo Lima</option>
+                  <option>Mariana Souza</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('colab')">+ Adicionar</button>
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider">
+          <div class="section-title">Validade e Prazo</div>
+          <div class="check-group">
+            <label class="check-row" onclick="Wizard.toggleCheck(this)">
+              <input type="checkbox" id="chk-validade">
+              <div class="check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div>
+                <div class="check-label">Definir data de validade do curso</div>
+                <div class="check-sub">O curso expira automaticamente na data informada</div>
+              </div>
+            </label>
+          </div>
+          <div class="validade-row" id="validade-fields" style="display:none">
+            <div class="field" style="margin:0">
+              <label>Válido até</label>
+              <input type="date" id="f-validade">
+            </div>
+            <div class="field" style="margin:0">
+              <label>Prazo de conclusão (dias)</label>
+              <input type="number" id="f-prazo" placeholder="Ex: 30">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ETAPA 4: Materiais ══ -->
+      <div class="step-pane" id="pane-3">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <h2>Materiais do Curso</h2>
+            <p>Adicione PDFs, vídeos, planilhas, documentos e links</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+
+          <!-- Upload -->
+          <div class="upload-zone" onclick="document.getElementById('f-material-input').click()" id="upload-zone-mat">
+            <input type="file" id="f-material-input" multiple
+              accept=".pdf,.mp4,.webm,.xlsx,.xls,.doc,.docx,.pptx,.zip"
+              onchange="Wizard.addFiles(this)">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-title">Arraste arquivos ou clique para selecionar</div>
+            <div class="uz-sub">PDF · MP4 · XLSX · DOC · PPTX · ZIP — máx. 100MB por arquivo</div>
+          </div>
+
+          <!-- Link externo -->
+          <div class="section-title" style="margin-top:16px">Link Externo</div>
+          <div class="link-row">
+            <input type="text" id="f-link-url" placeholder="https://...">
+            <input type="text" id="f-link-nome" placeholder="Título do link" style="max-width:200px">
+            <button class="btn btn-outline btn-sm" onclick="Wizard.addLink()" style="white-space:nowrap">+ Adicionar</button>
+          </div>
+
+          <!-- Avaliação -->
+          <div class="section-title" style="margin-top:16px">Avaliação</div>
+          <button class="btn btn-outline btn-sm" onclick="Wizard.addQuiz()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Adicionar Avaliação
+          </button>
+
+          <!-- Lista de materiais -->
+          <div class="section-title" style="margin-top:20px">Materiais adicionados <span id="mat-count" class="badge badge-blue" style="margin-left:6px;font-size:10px">0</span></div>
+          <div class="file-list" id="file-list">
+            <div class="empty-state" id="file-empty">Nenhum material adicionado ainda.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ETAPA 5: Configurações ══ -->
+      <div class="step-pane" id="pane-4">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M20 12h1M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 20v1M12 3V2M4.93 4.93l1.41 1.41M3 12H2"/></svg>
+          </div>
+          <div>
+            <h2>Configurações</h2>
+            <p>Ajustes de comportamento e obrigatoriedade</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Curso Obrigatório</div>
+              <div class="toggle-desc">Colaboradores serão notificados e deverão concluir dentro do prazo</div>
+            </div>
+            <div class="toggle" id="tog-obrigatorio" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Certificado Automático</div>
+              <div class="toggle-desc">Emitir certificado ao concluir 100% do curso</div>
+            </div>
+            <div class="toggle on" id="tog-certificado" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Avaliação Obrigatória</div>
+              <div class="toggle-desc">O aluno deve atingir a nota mínima para concluir</div>
+            </div>
+            <div class="toggle" id="tog-avaliacao" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row" id="nota-min-row" style="display:none;padding-left:20px">
+            <div class="toggle-info">
+              <div class="toggle-label" style="font-size:12px;font-weight:500">Nota mínima de aprovação</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="number" id="f-nota-min" value="70" min="0" max="100"
+                style="width:70px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:13px;text-align:center;outline:none">
+              <span style="font-size:12px;color:var(--text4)">%</span>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Controle de Progresso</div>
+              <div class="toggle-desc">Registrar e exibir o progresso de cada colaborador</div>
+            </div>
+            <div class="toggle on" id="tog-progresso" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Ocultar após Conclusão</div>
+              <div class="toggle-desc">O curso não aparece para quem já concluiu</div>
+            </div>
+            <div class="toggle" id="tog-ocultar" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Acesso Sequencial</div>
+              <div class="toggle-desc">O aluno deve concluir cada aula antes de avançar</div>
+            </div>
+            <div class="toggle" id="tog-sequencial" onclick="Wizard.toggleSwitch(this)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ETAPA 6: Revisão ══ -->
+      <div class="step-pane" id="pane-5">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <h2>Revisão Final</h2>
+            <p>Confirme as informações antes de publicar</p>
+          </div>
+        </div>
+        <div class="form-card-body" id="review-body">
+          <!-- Preenchido via JS -->
+        </div>
+      </div>
+
+      <!-- Nav Buttons -->
+      <div class="nav-bar">
+        <div class="nav-bar-left">
+          <button class="btn btn-ghost" id="btn-prev" onclick="Wizard.prev()" style="display:none">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Anterior
+          </button>
+        </div>
+        <div style="font-size:12px;color:var(--text4)" id="step-indicator">Etapa 1 de 6</div>
+        <div class="nav-bar-right">
+          <button class="btn btn-ghost btn-sm" onclick="Wizard.saveDraft()">Salvar rascunho</button>
+          <button class="btn btn-primary" id="btn-next" onclick="Wizard.next()">
+            Próximo
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══════════════════════ MODAL SUCESSO ══════════════════════ -->
+<div class="modal-bg" id="modal-sucesso">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green-d)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Curso criado com sucesso!</h2>
+    <p id="modal-nome-curso">O curso foi publicado e já está disponível para os colaboradores.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="Wizard.fecharModal()">Fechar</button>
+      <button class="btn btn-primary" onclick="Wizard.irParaCurso()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Ir para o curso
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// WIZARD — Controlador completo do fluxo de cadastro
+// ══════════════════════════════════════════════════════════════
+var Wizard = (() => {
+
+  let currentStep = 0;
+  const TOTAL = 6;
+
+  // Estado do formulário
+  let state = {
+    nome: '', categoria: '', formato: 'ead', carga: '', nivel: 'basico',
+    descricao: '', capa: null, capaName: '',
+    publico: [], publicoObs: '',
+    visib: 'todos',
+    acessos: { setor: [], equipe: [], cargo: [], colab: [] },
+    validade: '', prazo: '',
+    materiais: [],
+    config: {
+      obrigatorio: false, certificado: true, avaliacao: false,
+      notaMin: 70, progresso: true, ocultar: false, sequencial: false,
+    },
+    status: 'rascunho',
+  };
+
+  // ── Navegação ──────────────────────────────────────────────
+  function updateStepperUI() {
+    document.querySelectorAll('.step').forEach((el, i) => {
+      el.classList.remove('active', 'done');
+      if (i < currentStep) el.classList.add('done');
+      else if (i === currentStep) el.classList.add('active');
+
+      // Ícone check nas etapas concluídas
+      const circle = el.querySelector('.step-circle');
+      const num = el.querySelector('.step-num');
+      if (i < currentStep) {
+        circle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      } else {
+        circle.innerHTML = `<span class="step-num">${i+1}</span>`;
+      }
+    });
+
+    // Atualiza panes
+    document.querySelectorAll('.step-pane').forEach((p, i) => {
+      p.classList.toggle('active', i === currentStep);
+    });
+
+    // Botão anterior
+    const btnPrev = document.getElementById('btn-prev');
+    btnPrev.style.display = currentStep > 0 ? 'inline-flex' : 'none';
+
+    // Botão próximo
+    const btnNext = document.getElementById('btn-next');
+    if (currentStep === TOTAL - 1) {
+      btnNext.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg> Publicar Curso`;
+      btnNext.classList.add('btn-primary');
+    } else {
+      btnNext.innerHTML = `Próximo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`;
+    }
+
+    document.getElementById('step-indicator').textContent = `Etapa ${currentStep + 1} de ${TOTAL}`;
+
+    // Se chegou na revisão, renderiza
+    if (currentStep === 5) renderReview();
+  }
+
+  function next() {
+    if (!validate(currentStep)) return;
+    collectStep(currentStep);
+    if (currentStep === TOTAL - 1) {
+      publicar();
+      return;
+    }
+    currentStep = Math.min(currentStep + 1, TOTAL - 1);
+    updateStepperUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prev() {
+    collectStep(currentStep);
+    currentStep = Math.max(currentStep - 1, 0);
+    updateStepperUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function jumpTo(i) {
+    if (i > currentStep) return; // só volta
+    collectStep(currentStep);
+    currentStep = i;
+    updateStepperUI();
+  }
+
+  // ── Coleta de dados ────────────────────────────────────────
+  function collectStep(step) {
+    if (step === 0) {
+      state.nome      = val('f-nome');
+      state.categoria = val('f-categoria');
+      state.formato   = val('f-formato');
+      state.carga     = val('f-carga');
+      state.nivel     = val('f-nivel');
+      state.descricao = val('f-desc');
+    }
+    if (step === 1) {
+      state.publico = [...document.querySelectorAll('#publico-tags .tag-chip.selected')]
+        .map(el => el.dataset.val);
+      state.publicoObs = val('f-publico-obs');
+    }
+    if (step === 2) {
+      state.validade = val('f-validade');
+      state.prazo    = val('f-prazo');
+    }
+    if (step === 4) {
+      state.config.obrigatorio = document.getElementById('tog-obrigatorio').classList.contains('on');
+      state.config.certificado = document.getElementById('tog-certificado').classList.contains('on');
+      state.config.avaliacao   = document.getElementById('tog-avaliacao').classList.contains('on');
+      state.config.notaMin     = parseInt(val('f-nota-min')) || 70;
+      state.config.progresso   = document.getElementById('tog-progresso').classList.contains('on');
+      state.config.ocultar     = document.getElementById('tog-ocultar').classList.contains('on');
+      state.config.sequencial  = document.getElementById('tog-sequencial').classList.contains('on');
+    }
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  // ── Validação por etapa ────────────────────────────────────
+  function validate(step) {
+    if (step === 0) {
+      const nome = val('f-nome');
+      const cat  = val('f-categoria');
+      const carga = val('f-carga');
+      if (!nome) { alert('Informe o nome do curso.'); return false; }
+      if (!cat)  { alert('Selecione uma categoria.'); return false; }
+      if (!carga || isNaN(carga) || +carga < 1) { alert('Informe a carga horária.'); return false; }
+    }
+    return true;
+  }
+
+  // ── Público-alvo: tags ─────────────────────────────────────
+  function toggleTag(el) {
+    el.classList.toggle('selected');
+  }
+
+  // ── Acesso: visibilidade ───────────────────────────────────
+  function setVisib(tipo) {
+    state.visib = tipo;
+    const isRestrito = tipo === 'restrito';
+    const rowTodos   = document.getElementById('vis-todos');
+    const rowRestrito = document.getElementById('vis-restrito');
+    rowTodos.classList.toggle('checked', !isRestrito);
+    rowRestrito.classList.toggle('checked', isRestrito);
+    document.getElementById('restricoes-panel').style.display = isRestrito ? 'block' : 'none';
+  }
+
+  function addAccess(tipo) {
+    const selId = { setor:'sel-setor', equipe:'sel-equipe', cargo:'sel-cargo', colab:'sel-colab' }[tipo];
+    const tagId = { setor:'tags-setor', equipe:'tags-equipe', cargo:'tags-cargo', colab:'tags-colab' }[tipo];
+    const sel = document.getElementById(selId);
+    const nome = sel.value;
+    if (!nome) return;
+
+    // Evita duplicata
+    if (state.acessos[tipo].includes(nome)) return;
+    state.acessos[tipo].push(nome);
+    renderAccessTags(tipo, tagId);
+    sel.value = '';
+  }
+
+  function removeAccess(tipo, nome) {
+    const tagId = { setor:'tags-setor', equipe:'tags-equipe', cargo:'tags-cargo', colab:'tags-colab' }[tipo];
+    state.acessos[tipo] = state.acessos[tipo].filter(n => n !== nome);
+    renderAccessTags(tipo, tagId);
+  }
+
+  function renderAccessTags(tipo, containerId) {
+    const c = document.getElementById(containerId);
+    if (!state.acessos[tipo].length) {
+      c.innerHTML = '';
+      return;
+    }
+    c.innerHTML = state.acessos[tipo].map(nome =>
+      `<span class="access-tag ${tipo}">
+        ${nome}
+        <button onclick="Wizard.removeAccess('${tipo}','${nome}')">×</button>
+      </span>`
+    ).join('');
+  }
+
+  // ── Checkbox / validade ────────────────────────────────────
+  function toggleCheck(label) {
+    label.classList.toggle('checked');
+    const chk = label.querySelector('input[type=checkbox]');
+    if (chk && chk.id === 'chk-validade') {
+      const show = label.classList.contains('checked');
+      document.getElementById('validade-fields').style.display = show ? 'grid' : 'none';
+    }
+  }
+
+  // ── Toggles ────────────────────────────────────────────────
+  function toggleSwitch(el) {
+    el.classList.toggle('on');
+    // Mostra nota mínima se avaliação obrigatória ativada
+    if (el.id === 'tog-avaliacao') {
+      document.getElementById('nota-min-row').style.display =
+        el.classList.contains('on') ? 'flex' : 'none';
+    }
+  }
+
+  // ── Preview de capa ────────────────────────────────────────
+  function previewCapa(input) {
+    const file = input.files[0];
+    if (!file) return;
+    state.capaName = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('f-capa-preview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      state.capa = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Materiais ──────────────────────────────────────────────
+  function addFiles(input) {
+    Array.from(input.files).forEach(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      state.materiais.push({
+        id: Date.now() + Math.random(),
+        tipo: 'file',
+        nome: file.name,
+        ext,
+        tamanho: formatBytes(file.size),
+      });
+    });
+    renderMateriais();
+    input.value = '';
+  }
+
+  function addLink() {
+    const url  = document.getElementById('f-link-url').value.trim();
+    const nome = document.getElementById('f-link-nome').value.trim();
+    if (!url) { alert('Informe a URL do link.'); return; }
+    state.materiais.push({ id: Date.now(), tipo: 'link', nome: nome || url, ext: 'link', tamanho: '' });
+    document.getElementById('f-link-url').value = '';
+    document.getElementById('f-link-nome').value = '';
+    renderMateriais();
+  }
+
+  function addQuiz() {
+    state.materiais.push({
+      id: Date.now(), tipo: 'quiz', nome: 'Avaliação do Curso', ext: 'quiz', tamanho: ''
+    });
+    renderMateriais();
+  }
+
+  function removeMaterial(id) {
+    state.materiais = state.materiais.filter(m => m.id !== id);
+    renderMateriais();
+  }
+
+  function renderMateriais() {
+    const list  = document.getElementById('file-list');
+    const empty = document.getElementById('file-empty');
+    const count = document.getElementById('mat-count');
+    count.textContent = state.materiais.length;
+
+    if (!state.materiais.length) {
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    list.innerHTML = state.materiais.map(m => {
+      const label = { pdf:'PDF', mp4:'VID', webm:'VID', xlsx:'XLS', xls:'XLS',
+                      doc:'DOC', docx:'DOC', pptx:'PPT', zip:'ZIP',
+                      link:'URL', quiz:'QUIZ' }[m.ext] || m.ext.toUpperCase();
+      return `
+      <div class="file-item">
+        <div class="file-icon ${m.ext}">${label}</div>
+        <div class="file-name">${escHtml(m.nome)}</div>
+        <div class="file-size">${m.tamanho}</div>
+        <button class="file-del" onclick="Wizard.removeMaterial(${m.id})" title="Remover">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Revisão ────────────────────────────────────────────────
+  function renderReview() {
+    collectStep(currentStep);
+
+    const cfg = state.config;
+    const pub = state.publico.length ? state.publico.join(', ') : 'Não definido';
+
+    const acessoItems = Object.entries(state.acessos)
+      .flatMap(([tipo, lista]) => lista.map(n =>
+        `<span class="access-tag ${tipo}" style="margin:2px">${n}</span>`
+      )).join('') || '<span style="color:var(--text4);font-size:12px">Todos os colaboradores</span>';
+
+    const matHtml = state.materiais.length
+      ? state.materiais.map(m =>
+          `<span style="font-size:12px;background:var(--bg);padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--text2);margin:2px;display:inline-block">${escHtml(m.nome)}</span>`
+        ).join('')
+      : '<span style="color:var(--text4);font-size:12px">Nenhum material</span>';
+
+    const togStr = (v) => v
+      ? '<span class="badge badge-green">Sim</span>'
+      : '<span style="color:var(--text4);font-size:12px">Não</span>';
+
+    document.getElementById('review-body').innerHTML = `
+
+      <div class="review-section">
+        <h3>Dados do Curso</h3>
+        <div class="review-row"><div class="rv-label">Nome</div><div class="rv-val"><strong>${escHtml(state.nome) || '—'}</strong></div></div>
+        <div class="review-row"><div class="rv-label">Categoria</div><div class="rv-val">${escHtml(state.categoria) || '—'}</div></div>
+        <div class="review-row"><div class="rv-label">Formato</div><div class="rv-val">${{ead:'EAD (Online)',hibrido:'Híbrido',presencial:'Presencial'}[state.formato]||state.formato}</div></div>
+        <div class="review-row"><div class="rv-label">Carga horária</div><div class="rv-val">${state.carga ? state.carga + 'h' : '—'}</div></div>
+        <div class="review-row"><div class="rv-label">Nível</div><div class="rv-val">${{basico:'Básico',intermediario:'Intermediário',avancado:'Avançado'}[state.nivel]}</div></div>
+        <div class="review-row"><div class="rv-label">Descrição</div><div class="rv-val" style="color:var(--text3)">${escHtml(state.descricao) || '—'}</div></div>
+        <div class="review-row"><div class="rv-label">Capa</div><div class="rv-val">${state.capaName ? `<span class="badge badge-green">${escHtml(state.capaName)}</span>` : '<span style="color:var(--text4);font-size:12px">Não definida</span>'}</div></div>
+      </div>
+
+      <div class="review-section">
+        <h3>Público-alvo</h3>
+        <div class="review-row"><div class="rv-label">Perfis</div><div class="rv-val"><div class="review-tags">${pub}</div></div></div>
+        <div class="review-row"><div class="rv-label">Observação</div><div class="rv-val" style="color:var(--text3)">${escHtml(state.publicoObs)||'—'}</div></div>
+      </div>
+
+      <div class="review-section">
+        <h3>Controle de Acesso</h3>
+        <div class="review-row"><div class="rv-label">Visibilidade</div><div class="rv-val">${state.visib==='todos'?'Todos os colaboradores':'Acesso restrito'}</div></div>
+        <div class="review-row"><div class="rv-label">Restrições</div><div class="rv-val"><div class="review-tags">${acessoItems}</div></div></div>
+        <div class="review-row"><div class="rv-label">Validade</div><div class="rv-val">${state.validade ? new Date(state.validade).toLocaleDateString('pt-BR') : 'Sem validade'}</div></div>
+        <div class="review-row"><div class="rv-label">Prazo de conclusão</div><div class="rv-val">${state.prazo ? state.prazo + ' dias' : 'Sem prazo'}</div></div>
+      </div>
+
+      <div class="review-section">
+        <h3>Materiais (${state.materiais.length})</h3>
+        <div style="margin-top:6px">${matHtml}</div>
+      </div>
+
+      <div class="review-section">
+        <h3>Configurações</h3>
+        <div class="review-row"><div class="rv-label">Obrigatório</div><div class="rv-val">${togStr(cfg.obrigatorio)}</div></div>
+        <div class="review-row"><div class="rv-label">Certificado</div><div class="rv-val">${togStr(cfg.certificado)}</div></div>
+        <div class="review-row"><div class="rv-label">Avaliação</div><div class="rv-val">${togStr(cfg.avaliacao)}${cfg.avaliacao?' — nota mínima: '+cfg.notaMin+'%':''}</div></div>
+        <div class="review-row"><div class="rv-label">Progresso</div><div class="rv-val">${togStr(cfg.progresso)}</div></div>
+        <div class="review-row"><div class="rv-label">Ocultar pós-conclusão</div><div class="rv-val">${togStr(cfg.ocultar)}</div></div>
+        <div class="review-row"><div class="rv-label">Acesso sequencial</div><div class="rv-val">${togStr(cfg.sequencial)}</div></div>
+      </div>`;
+  }
+
+  // ── Publicar ───────────────────────────────────────────────
+  function publicar() {
+    collectStep(currentStep);
+
+    // Monta objeto do curso para o localStorage
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const curso = {
+      id:          uid(),
+      titulo:      state.nome,
+      descricao:   state.descricao,
+      categoria:   state.categoria,
+      formato:     state.formato,
+      carga:       parseInt(state.carga) || 0,
+      nivel:       state.nivel,
+      capa:        state.capa,
+      capaName:    state.capaName,
+      publico:     state.publico,
+      publicoObs:  state.publicoObs,
+      visib:       state.visib,
+      acessos:     state.acessos,
+      validade:    state.validade || null,
+      prazo:       state.prazo || null,
+      materiais:   state.materiais,
+      config:      state.config,
+      status:      'publicado',
+      publicadoEm: new Date().toISOString(),
+      criadoEm:    new Date().toISOString(),
+    };
+
+    // Salva no localStorage (mesmo formato do Storage.Cursos)
+    try {
+      const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+      lista.push(curso);
+      localStorage.setItem('ead_cursos', JSON.stringify(lista));
+      // Remove flag de seed para não sobreescrever
+    } catch(e) { console.warn('localStorage indisponível:', e); }
+
+    // Remove rascunho se existia
+    localStorage.removeItem('ead_draft_curso');
+
+    // Exibe modal de sucesso
+    document.getElementById('modal-nome-curso').textContent =
+      `"${state.nome}" foi publicado e já está disponível para os colaboradores.`;
+    document.getElementById('modal-sucesso').classList.add('open');
+  }
+
+  // ── Rascunho ───────────────────────────────────────────────
+  function saveDraft() {
+    collectStep(currentStep);
+    try {
+      localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep }));
+    } catch(e) {}
+    const status = document.getElementById('autosave-status');
+    status.textContent = 'Rascunho salvo';
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  }
+
+  function loadDraft() {
+    try {
+      const d = JSON.parse(localStorage.getItem('ead_draft_curso'));
+      if (!d) return;
+      if (!confirm('Existe um rascunho salvo. Deseja continuar de onde parou?')) return;
+      state = d.state;
+      currentStep = d.currentStep;
+      // Restaura campos
+      restoreFields();
+      updateStepperUI();
+    } catch(e) {}
+  }
+
+  function restoreFields() {
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setVal('f-nome', state.nome);
+    setVal('f-categoria', state.categoria);
+    setVal('f-formato', state.formato);
+    setVal('f-carga', state.carga);
+    setVal('f-nivel', state.nivel);
+    setVal('f-desc', state.descricao);
+    setVal('f-publico-obs', state.publicoObs);
+    setVal('f-validade', state.validade);
+    setVal('f-prazo', state.prazo);
+
+    // Tags de público
+    document.querySelectorAll('#publico-tags .tag-chip').forEach(el => {
+      el.classList.toggle('selected', state.publico.includes(el.dataset.val));
+    });
+    // Acessos
+    ['setor','equipe','cargo','colab'].forEach(tipo => {
+      renderAccessTags(tipo, `tags-${tipo}`);
+    });
+    // Materiais
+    renderMateriais();
+    // Capa
+    if (state.capa) {
+      const img = document.getElementById('f-capa-preview');
+      img.src = state.capa; img.style.display = 'block';
+    }
+  }
+
+  // ── Modal ──────────────────────────────────────────────────
+  function fecharModal() {
+    document.getElementById('modal-sucesso').classList.remove('open');
+    window.location.href = 'admin.html';
+  }
+
+  function irParaCurso() {
+    window.location.href = 'admin.html';
+  }
+
+  // ── Utils ──────────────────────────────────────────────────
+  function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
+  }
+
+  // ── Init ───────────────────────────────────────────────────
+  function init() {
+    updateStepperUI();
+    loadDraft();
+
+    // Autosave a cada 30s
+    setInterval(() => {
+      collectStep(currentStep);
+      try { localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep })); } catch(e) {}
+      const status = document.getElementById('autosave-status');
+      status.textContent = 'Salvo automaticamente';
+      setTimeout(() => { status.textContent = ''; }, 2000);
+    }, 30000);
+  }
+
+  return {
+    next, prev, jumpTo, saveDraft,
+    toggleTag, setVisib, addAccess, removeAccess,
+    toggleCheck, toggleSwitch, previewCapa,
+    addFiles, addLink, addQuiz, removeMaterial,
+    fecharModal, irParaCurso, init,
+  };
+
+})();
+
+document.addEventListener('DOMContentLoaded', () => Wizard.init());
+</script>
+</body>
+</html>
