@@ -642,14 +642,7 @@ tbody tr:hover td { background:#fafbff }
         <span class="crumb-sep">›</span>
         <span class="crumb-cur" id="topTitle">Dashboard</span>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="search-wrap">
-          <span class="search-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-          <input type="text" id="globalSearch" placeholder="Buscar cursos, colaboradores..." autocomplete="off">
-          <div class="search-results" id="searchResults"></div>
-        </div>
-        <button class="btn btn-primary" onclick="Admin.openModalCurso(null)" style="white-space:nowrap">+ Novo Curso</button>
-      </div>
+
     </header>
 
     <div class="content">
@@ -692,45 +685,26 @@ tbody tr:hover td { background:#fafbff }
           </div>
         </div>
 
-        <!-- Grid: Cursos + Atividades -->
+        <!-- Grid: Pendências + Atividades -->
         <div class="ds-grid">
 
-          <!-- Coluna esquerda -->
-          <div>
-            <!-- Pendências -->
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-head">
-                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Pendências</div>
-              </div>
-              <div class="card-body" id="ds-pendencias">
-                <div class="pend-ok"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg></span> Nenhuma pendência.</div>
-              </div>
+          <!-- Pendências -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Pendências</div>
             </div>
-
-            <!-- Tabela de cursos -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Cursos</div>
-                <button class="btn btn-sm btn-soft" data-pg="cursos">Ver todos →</button>
-              </div>
-              <div class="tbl-wrap">
-                <table>
-                  <thead>
-                    <tr><th>Curso</th><th>Status</th><th>Criado</th><th>Ações</th></tr>
-                  </thead>
-                  <tbody id="ds-cursos-body"></tbody>
-                </table>
-              </div>
+            <div class="card-body" id="ds-pendencias">
+              <div class="pend-ok"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg></span> Nenhuma pendência.</div>
             </div>
           </div>
 
-          <!-- Coluna direita: Atividades -->
+          <!-- Últimas atividades -->
           <div class="card">
             <div class="card-head">
               <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Últimas atividades</div>
             </div>
             <div class="card-body" id="ds-atividades">
-              <div style="color:var(--t3);font-size:.82rem">Nenhuma atividade ainda.</div>
+              <div style="color:var(--text3);font-size:.82rem">Nenhuma atividade ainda.</div>
             </div>
           </div>
 
