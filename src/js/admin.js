@@ -26,7 +26,7 @@ var Admin = (() => {
   function showApp() {
     q('#loginWrap').classList.remove('active');
     q('#appWrap').classList.add('active');
-    bindNav(); bindSearch(); bindModals(); go('dashboard');
+    bindNav(); bindModals(); go('dashboard');
   }
 
   function bindNav() {
@@ -45,32 +45,6 @@ var Admin = (() => {
 
   const renders = { dashboard, cursos, materiais, acessos, colaboradores, publicacao };
 
-  /* ── Busca global ── */
-  function bindSearch() {
-    const inp = q('#globalSearch'), res = q('#searchResults');
-    if (!inp) return;
-    inp.addEventListener('input', () => {
-      const term = inp.value.trim().toLowerCase();
-      if (!term) { res.classList.remove('open'); return; }
-      const cs = Storage.Cursos.listar().filter(c => c.titulo.toLowerCase().includes(term));
-      const as = Storage.Alunos.listar().filter(a => a.nome.toLowerCase().includes(term) || a.email.toLowerCase().includes(term));
-      if (!cs.length && !as.length) { res.innerHTML = '<div class="sr-empty">Nenhum resultado</div>'; res.classList.add('open'); return; }
-      res.innerHTML = [
-        cs.length ? `<div class="sr-group">Cursos</div>` + cs.slice(0,4).map(c =>
-          `<div class="sr-item" onclick="Admin._searchGo('cursos','${c.id}')"><span>${c.emoji||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'}</span><div><div class="sr-title">${x(c.titulo)}</div><div class="sr-sub">${statusBadge(c.status||'rascunho')}</div></div></div>`).join('') : '',
-        as.length ? `<div class="sr-group">Colaboradores</div>` + as.slice(0,3).map(a =>
-          `<div class="sr-item" onclick="Admin._searchGo('colaboradores')"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><div class="sr-title">${x(a.nome)}</div><div class="sr-sub" style="color:var(--t3);font-size:.75rem">${x(a.email)}</div></div></div>`).join('') : '',
-      ].join('');
-      res.classList.add('open');
-    });
-    document.addEventListener('click', e => { if (!inp.contains(e.target) && !res.contains(e.target)) { res.classList.remove('open'); inp.value = ''; } });
-  }
-
-  function _searchGo(pg_target, cursoId) {
-    q('#searchResults').classList.remove('open'); q('#globalSearch').value = '';
-    go(pg_target);
-    if (cursoId) setTimeout(() => openModalCurso(cursoId), 150);
-  }
 
   /* ── Dashboard ── */
   function dashboard() {
@@ -98,28 +72,6 @@ var Admin = (() => {
       ? pends.map(p => `<div class="pend-item pend-${p.tipo}"><div class="pend-left"><span class="pend-dot"></span><div><div class="pend-titulo">${x(p.curso.titulo)}</div><div class="pend-label">${p.label}</div></div></div><button class="btn btn-sm btn-ghost" onclick="${p.fn}">${p.acao}</button></div>`).join('')
       : `<div class="pend-ok"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg></span> Tudo em ordem! Nenhuma pendência.</div>`;
 
-    /* tabela de cursos */
-    const tbody = q('#ds-cursos-body');
-    if (!allCursos.length) { tbody.innerHTML = tdEmpty(4,'Nenhum curso cadastrado'); }
-    else tbody.innerHTML = allCursos.slice(0,8).map(c => {
-      const aulas = Storage.Aulas.totalPorCurso(c.id);
-      const mods  = Storage.Modulos.listarPorCurso(c.id).length;
-      const status= c.status || 'rascunho';
-      const exp   = c.validadeAte && new Date(c.validadeAte) < agora;
-      return `<tr>
-        <td><div style="display:flex;align-items:center;gap:10px"><div class="curso-mini-icon">${c.emoji||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'}</div><div><div style="font-weight:600;font-size:.86rem">${x(c.titulo)}</div><div style="color:var(--t3);font-size:.75rem">${mods} módulos · ${aulas} aulas${c.carga?' · '+c.carga+'h':''}</div></div></div></td>
-        <td>${statusBadge(status)}${exp?` <span class="badge badge-red" style="margin-left:4px">Expirado</span>`:''}</td>
-        <td style="color:var(--t3);font-size:.78rem">${fmtDate(c.criadoEm)}</td>
-        <td><div class="action-menu-wrap"><button class="btn btn-sm btn-ghost action-menu-btn" onclick="Admin._toggleMenu(this)">Ações <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button><div class="action-menu">
-          <button onclick="Admin.openModalCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
-          ${status!=='publicado'?`<button onclick="Admin.publicar('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg> Publicar</button>`:`<button onclick="Admin.arquivar('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Arquivar</button>`}
-          <button onclick="Admin.duplicarCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
-          <button onclick="Admin.go('materiais');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Materiais</button>
-          <button onclick="Admin.goAcessos('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Acessos</button>
-          <button class="danger" onclick="Admin.excluirCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>️ Excluir</button>
-        </div></div></td>
-      </tr>`;
-    }).join('');
 
     /* atividades */
     const wrap   = q('#ds-atividades');
@@ -297,7 +249,7 @@ var Admin = (() => {
   function tdEmpty(cols,msg){ return`<tr><td colspan="${cols}" style="text-align:center;padding:28px;color:var(--t3)">${msg}</td></tr>`; }
   function toast(msg,tipo='i'){ const s=document.getElementById('toasts'),el=document.createElement('div');el.className=`toast ${tipo}`;el.innerHTML=`<span>${{s:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>',e:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',i:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}[tipo]||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}</span><span>${msg}</span>`;s.appendChild(el);setTimeout(()=>el.remove(),3000); }
 
-  return { boot, go, goEdit, goAcessos, _toggleMenu, _closeMenus, _searchGo, openModalCurso, addModulo, addAula, delModulo, delAula, duplicarCurso, excluirCurso, delMaterial, addRestricao, remRestricao, toggleColab, delSetor, delEquipe, publicar, arquivar, openValidade };
+  return { boot, go, goEdit, goAcessos, _toggleMenu, _closeMenus, openModalCurso, addModulo, addAula, delModulo, delAula, duplicarCurso, excluirCurso, delMaterial, addRestricao, remRestricao, toggleColab, delSetor, delEquipe, publicar, arquivar, openValidade };
 })();
 
 document.addEventListener('DOMContentLoaded', () => { Storage.seed(); Admin.boot(); });
