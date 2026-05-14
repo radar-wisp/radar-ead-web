@@ -24,6 +24,3 @@ ead-platform/
 - Persistência via `localStorage`
 - Fontes: Plus Jakarta Sans + Inter (Google Fonts CDN)
 
-## Licença
-
-MIT — uso livre para projetos pessoais e comerciais.
