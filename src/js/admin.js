@@ -145,31 +145,11 @@ var Admin = (() => {
   function goEdit(cursoId)    { go('cursos'); setTimeout(() => openModalCurso(cursoId), 100); }
 
   /* ── Gestão de Cursos ── */
-  function cursos() { renderCursosList(); }
-
-  function renderCursosList() {
-    const lista = Storage.Cursos.listar(), wrap = q('#cursos-list'), agora = new Date();
-    if (!lista.length) { wrap.innerHTML = `<div class="empty"><div class="ei"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M16 19h6"/><path d="M19 16v6"/></svg></div><p>Nenhum curso. Crie o primeiro!</p></div>`; return; }
-    wrap.innerHTML = lista.map(c => {
-      const mods=Storage.Modulos.listarPorCurso(c.id).length, aulas=Storage.Aulas.totalPorCurso(c.id);
-      const mats=Storage.Materiais.listarPorCurso(c.id).length, rest=Storage.Restricoes.porCurso(c.id).length;
-      const status=c.status||'rascunho', exp=c.validadeAte&&new Date(c.validadeAte)<agora;
-      return `<div class="curso-card">
-        <div class="curso-card-left"><div class="curso-emoji">${c.emoji||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'}</div><div class="curso-info"><div class="curso-titulo">${x(c.titulo)}</div><div class="curso-meta">${mods} módulos · ${aulas} aulas · ${mats} materiais · ${c.carga||0}h${c.validadeAte?' · válido até '+fmtDate(c.validadeAte):''}</div></div></div>
-        <div class="curso-card-right">
-          ${statusBadge(status)}${exp?`<span class="badge badge-red">Expirado</span>`:''}${rest?`<span class="badge badge-blue">${rest} restrição(ões)</span>`:''}
-          <div class="action-menu-wrap"><button class="btn btn-sm btn-ghost action-menu-btn" onclick="Admin._toggleMenu(this)">Ações <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button><div class="action-menu">
-            <button onclick="Admin.openModalCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
-            ${status!=='publicado'?`<button onclick="Admin.publicar('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg> Publicar</button>`:`<button onclick="Admin.arquivar('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Arquivar</button>`}
-            <button onclick="Admin.duplicarCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
-            <button onclick="Admin.go('materiais');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Materiais</button>
-            <button onclick="Admin.goAcessos('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Acessos</button>
-            <button class="danger" onclick="Admin.excluirCurso('${c.id}');Admin._closeMenus()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>️ Excluir</button>
-          </div></div>
-        </div>
-      </div>`;
-    }).join('');
+  function cursos() {
+    // Delegado ao módulo Cursos
+    if (typeof Cursos !== 'undefined') Cursos.init();
   }
+
 
   function openModalCurso(id) {
     const c = id ? Storage.Cursos.obter(id) : null;
@@ -202,8 +182,8 @@ var Admin = (() => {
   function addAula(moduloId,cursoId) { const t=prompt('Título da aula:'); if(!t)return; const tipo=prompt('Tipo (video/texto/pdf/link):','video')||'video'; const url=prompt('URL:')||''; const dur=parseInt(prompt('Duração (min):','10'))||10; Storage.Aulas.criar({moduloId,titulo:t,tipo,conteudo:url,duracao:dur}); renderModulosEditor(cursoId); }
   function delModulo(mId,cId) { if(!confirm('Excluir módulo?'))return; Storage.Modulos.excluir(mId); renderModulosEditor(cId); }
   function delAula(aId,mId,cId) { Storage.Aulas.excluir(aId); renderModulosEditor(cId); }
-  function duplicarCurso(id) { const n=Storage.Cursos.duplicar(id); if(n){toast('Curso duplicado!','s');renders[pg]?.();} }
-  function excluirCurso(id) { if(!confirm('Excluir permanentemente?'))return; Storage.Cursos.excluir(id); toast('Excluído.','i'); renders[pg]?.(); }
+  function duplicarCurso(id) { if(typeof Cursos!=='undefined'){Cursos.duplicarCurso(id);} else {const n=Storage.Cursos.duplicar(id);if(n){toast('Curso duplicado!','s');renders[pg]?.();}} }
+  function excluirCurso(id) { if(typeof Cursos!=='undefined'){Cursos.excluirCurso(id);} else {if(!confirm('Excluir permanentemente?'))return;Storage.Cursos.excluir(id);toast('Excluído.','i');renders[pg]?.();} }
 
   /* ── Materiais ── */
   function materiais() {
