@@ -60,7 +60,7 @@ var Admin = (() => {
     dashboard, cursos, materiais, acessos, colaboradores, publicacao,
     // Módulos futuros — stub que mostra "em breve"
     turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
-    avaliacoes:     () => emBreve('Avaliações'),
+    avaliacoes:     () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
     relatorios:     () => emBreve('Relatórios'),
     certificados:   () => emBreve('Certificados'),
     configuracoes:  () => emBreve('Configurações'),
