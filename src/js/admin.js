@@ -200,23 +200,11 @@ var Admin = (() => {
 
   /* ── Acessos ── */
   function acessos() {
-    const cursos=Storage.Cursos.listar(), sel=q('#ac-curso-sel');
-    sel.innerHTML='<option value="">Selecione um curso</option>'+cursos.map(c=>`<option value="${c.id}">${x(c.titulo)}</option>`).join('');
-    sel.onchange=()=>renderAcessos(sel.value); renderAcessos('');
+    if (typeof AcessosMod !== 'undefined') AcessosMod.init();
   }
-  function renderAcessos(cursoId) {
-    const wrap=q('#ac-restricoes');
-    if(!cursoId){wrap.innerHTML='<p style="color:var(--text3);font-size:.85rem">Selecione um curso acima.</p>';return;}
-    const rest=Storage.Restricoes.porCurso(cursoId), set=Storage.Setores.listar(), eq=Storage.Equipes.listar(), al=Storage.Alunos.listar();
-    const getNome=(tipo,id)=>tipo==='setor'?set.find(s=>s.id===id)?.nome:tipo==='equipe'?eq.find(e=>e.id===id)?.nome:al.find(a=>a.id===id)?.nome||id;
-    wrap.innerHTML=`<div class="ac-header"><span style="font-size:.85rem;font-weight:600">Restrições ativas</span><div style="display:flex;gap:8px"><select id="ac-tipo" class="sel-sm"><option value="setor">Por Setor</option><option value="equipe">Por Equipe</option><option value="colaborador">Por Colaborador</option></select><select id="ac-ref" class="sel-sm"><option value="">Selecione</option></select><button class="btn btn-sm btn-primary" onclick="Admin.addRestricao('${cursoId}')">+ Adicionar</button></div></div>
-      ${rest.length?`<div class="restricoes-lista">${rest.map(r=>`<div class="restricao-tag"><span class="badge ${r.tipo==='setor'?'badge-blue':r.tipo==='equipe'?'badge-green':'badge-amber'}">${r.tipo}</span>${x(getNome(r.tipo,r.refId))}<button onclick="Admin.remRestricao('${cursoId}','${r.tipo}','${r.refId}')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:.9rem;padding:0 4px">×</button></div>`).join('')}</div>`:'<p style="color:var(--text3);font-size:.82rem;margin-top:8px">Sem restrições — curso visível para todos.</p>'}`;
-    const ts=q('#ac-tipo'), rs=q('#ac-ref');
-    const upd=()=>{ const opts=ts.value==='setor'?set:ts.value==='equipe'?eq:al; rs.innerHTML='<option value="">Selecione</option>'+opts.map(o=>`<option value="${o.id}">${x(o.nome)}</option>`).join(''); };
-    ts.onchange=upd; upd();
-  }
-  function addRestricao(cId){ const tipo=q('#ac-tipo').value, refId=q('#ac-ref').value; if(!refId){toast('Selecione um item','e');return;} Storage.Restricoes.adicionar({cursoId:cId,tipo,refId}); toast('Restrição adicionada!','s'); renderAcessos(cId); }
-  function remRestricao(cId,tipo,refId){ Storage.Restricoes.remover(cId,tipo,refId); renderAcessos(cId); }
+
+  function addRestricao(cId){ if(typeof AcessosMod!=='undefined') AcessosMod.addRestricao(cId); }
+  function remRestricao(cId,tipo,refId){ if(typeof AcessosMod!=='undefined') AcessosMod.remRestricao(cId,tipo,refId); }
 
   /* ── Colaboradores ── */
   function colaboradores() {
