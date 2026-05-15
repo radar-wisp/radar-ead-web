@@ -36,6 +36,9 @@ var Storage = (() => {
     MATERIAIS:  'ead_materiais',   // → tabela: materiais
     RESTRICOES: 'ead_restricoes',  // → tabela: restricoes (PK composta)
     TURMAS:     'ead_turmas',      // → tabela: turmas
+    AVALIACOES: 'ead_avaliacoes', // → tabela: avaliacoes
+    QUESTOES:   'ead_questoes',   // → tabela: questoes
+    RESPOSTAS:  'ead_respostas',  // → tabela: respostas_aluno
   };
 
   // ── Helpers internos (não expostos) ──────────────────────────────
@@ -713,6 +716,221 @@ var Storage = (() => {
     },
   };
 
+
+  // ════════════════════════════════════════════════════════════════
+  // AVALIAÇÕES — Módulo completo
+  // Tabelas: avaliacoes, questoes, respostas_aluno
+  // MIGRAÇÃO: GET/POST/PUT/DELETE /api/v1/avaliacoes
+  // ════════════════════════════════════════════════════════════════
+
+  /**
+   * @typedef {Object} Avaliacao
+   * @property {string}   id
+   * @property {string}   nome
+   * @property {string}   descricao
+   * @property {string}   cursoId        FK → Curso.id
+   * @property {string}   moduloId       FK → Modulo.id (opcional)
+   * @property {string}   turmaId        FK → Turma.id  (opcional)
+   * @property {number}   notaMinima     0-100
+   * @property {number}   tempoLimite    minutos (0 = sem limite)
+   * @property {number}   tentativas     0 = ilimitado
+   * @property {boolean}  resultadoImediato
+   * @property {boolean}  ordemAleatoria
+   * @property {boolean}  correcaoAutomatica
+   * @property {'rascunho'|'publicada'|'encerrada'|'arquivada'} status
+   * @property {string}   criadoEm
+   */
+
+  /**
+   * @typedef {Object} Questao
+   * @property {string}   id
+   * @property {string}   avaliacaoId    FK → Avaliacao.id
+   * @property {'multipla'|'vf'|'unica'|'descritiva'} tipo
+   * @property {string}   pergunta
+   * @property {string[]} alternativas   apenas para multipla/unica
+   * @property {string}   correta        índice (string) ou 'V'/'F'
+   * @property {number}   pontos
+   * @property {string}   feedback
+   * @property {string}   categoria
+   * @property {number}   ordem
+   */
+
+  /**
+   * @typedef {Object} RespostaAluno
+   * @property {string}   id
+   * @property {string}   avaliacaoId
+   * @property {string}   alunoId
+   * @property {Object}   respostas      { questaoId: resposta }
+   * @property {number}   nota           0-100
+   * @property {boolean}  aprovado
+   * @property {number}   tentativa      número da tentativa (1-based)
+   * @property {number}   tempoUsado     segundos
+   * @property {string}   iniciadoEm
+   * @property {string}   concluidoEm
+   */
+
+  const Avaliacoes = {
+    /** @returns {Avaliacao[]} */
+    listar: () => get(K.AVALIACOES),
+
+    /** @param {string} id @returns {Avaliacao|null} */
+    obter: id => get(K.AVALIACOES).find(a => a.id === id) || null,
+
+    /** @param {string} cursoId @returns {Avaliacao[]} */
+    porCurso: cursoId => get(K.AVALIACOES).filter(a => a.cursoId === cursoId),
+
+    /**
+     * @param {Omit<Avaliacao,'id'|'criadoEm'|'status'>} d
+     * @returns {Avaliacao}
+     */
+    criar: d => {
+      const lista = get(K.AVALIACOES);
+      const nova = {
+        id: uid(), criadoEm: now(), status: 'rascunho',
+        notaMinima: 70, tempoLimite: 0, tentativas: 1,
+        resultadoImediato: true, ordemAleatoria: false, correcaoAutomatica: true,
+        ...d,
+      };
+      lista.push(nova); set(K.AVALIACOES, lista); return nova;
+    },
+
+    /** @param {string} id @param {Partial<Avaliacao>} d */
+    atualizar: (id, d) =>
+      set(K.AVALIACOES, get(K.AVALIACOES).map(a => a.id === id ? { ...a, ...d } : a)),
+
+    /** @param {string} id */
+    excluir: id => {
+      set(K.AVALIACOES, get(K.AVALIACOES).filter(a => a.id !== id));
+      set(K.QUESTOES,   get(K.QUESTOES).filter(q => q.avaliacaoId !== id));
+      set(K.RESPOSTAS,  get(K.RESPOSTAS).filter(r => r.avaliacaoId !== id));
+    },
+
+    publicar:  id => set(K.AVALIACOES, get(K.AVALIACOES).map(a => a.id === id ? { ...a, status: 'publicada'  } : a)),
+    encerrar:  id => set(K.AVALIACOES, get(K.AVALIACOES).map(a => a.id === id ? { ...a, status: 'encerrada'  } : a)),
+    arquivar:  id => set(K.AVALIACOES, get(K.AVALIACOES).map(a => a.id === id ? { ...a, status: 'arquivada'  } : a)),
+
+    /**
+     * Duplica avaliação + questões. Nova fica como rascunho.
+     * @param {string} id @returns {Avaliacao}
+     */
+    duplicar: id => {
+      const orig = Avaliacoes.obter(id);
+      if (!orig) return null;
+      const nova = Avaliacoes.criar({ ...orig, id: undefined, nome: '[Cópia] ' + orig.nome, criadoEm: undefined });
+      Questoes.porAvaliacao(id).forEach(q =>
+        Questoes.criar({ ...q, id: undefined, avaliacaoId: nova.id })
+      );
+      return nova;
+    },
+
+    /** Stats globais @returns {Object} */
+    stats: () => {
+      const lista = get(K.AVALIACOES);
+      const respostas = get(K.RESPOSTAS);
+      const notas = respostas.map(r => r.nota).filter(n => n != null);
+      return {
+        total:      lista.length,
+        publicadas: lista.filter(a => a.status === 'publicada').length,
+        rascunhos:  lista.filter(a => a.status === 'rascunho').length,
+        encerradas: lista.filter(a => a.status === 'encerrada').length,
+        media:      notas.length ? Math.round(notas.reduce((s,n)=>s+n,0)/notas.length) : 0,
+        aprovados:  respostas.filter(r => r.aprovado).length,
+        total_resp: respostas.length,
+        taxa:       respostas.length ? Math.round(respostas.filter(r=>r.aprovado).length/respostas.length*100) : 0,
+      };
+    },
+  };
+
+  const Questoes = {
+    /** @returns {Questao[]} */
+    listar: () => get(K.QUESTOES),
+
+    /** @param {string} id @returns {Questao|null} */
+    obter: id => get(K.QUESTOES).find(q => q.id === id) || null,
+
+    /** @param {string} avaliacaoId @returns {Questao[]} ordenado por ordem */
+    porAvaliacao: avaliacaoId =>
+      get(K.QUESTOES).filter(q => q.avaliacaoId === avaliacaoId).sort((a,b) => a.ordem - b.ordem),
+
+    /** @param {Omit<Questao,'id'>} d @returns {Questao} */
+    criar: d => {
+      const lista = get(K.QUESTOES);
+      const ordem = lista.filter(q => q.avaliacaoId === d.avaliacaoId).length + 1;
+      const nova = { id: uid(), ordem, pontos: 10, feedback: '', categoria: '', alternativas: [], ...d };
+      lista.push(nova); set(K.QUESTOES, lista); return nova;
+    },
+
+    /** @param {string} id @param {Partial<Questao>} d */
+    atualizar: (id, d) =>
+      set(K.QUESTOES, get(K.QUESTOES).map(q => q.id === id ? { ...q, ...d } : q)),
+
+    /** @param {string} id */
+    excluir: id => set(K.QUESTOES, get(K.QUESTOES).filter(q => q.id !== id)),
+  };
+
+  const Respostas = {
+    /** @returns {RespostaAluno[]} */
+    listar: () => get(K.RESPOSTAS),
+
+    /** @param {string} avaliacaoId @returns {RespostaAluno[]} */
+    porAvaliacao: avaliacaoId => get(K.RESPOSTAS).filter(r => r.avaliacaoId === avaliacaoId),
+
+    /** @param {string} alunoId @param {string} avaliacaoId @returns {RespostaAluno[]} */
+    porAluno: (alunoId, avaliacaoId) =>
+      get(K.RESPOSTAS).filter(r => r.alunoId === alunoId && r.avaliacaoId === avaliacaoId),
+
+    /** Quantas tentativas o aluno já fez. @param {string} alunoId @param {string} avaliacaoId @returns {number} */
+    tentativas: (alunoId, avaliacaoId) =>
+      get(K.RESPOSTAS).filter(r => r.alunoId === alunoId && r.avaliacaoId === avaliacaoId).length,
+
+    /**
+     * Registra resposta e calcula nota automaticamente.
+     * @param {string} avaliacaoId @param {string} alunoId @param {Object} respostas
+     * @returns {RespostaAluno}
+     */
+    registrar: (avaliacaoId, alunoId, respostas, tempoUsado = 0) => {
+      const av      = Avaliacoes.obter(avaliacaoId);
+      const questoes = Questoes.porAvaliacao(avaliacaoId);
+      const tentativa = Respostas.tentativas(alunoId, avaliacaoId) + 1;
+
+      // Calcula nota
+      let pontos = 0, total = 0;
+      questoes.forEach(q => {
+        total += q.pontos;
+        if (q.tipo !== 'descritiva' && respostas[q.id] !== undefined) {
+          if (String(respostas[q.id]) === String(q.correta)) pontos += q.pontos;
+        }
+      });
+      const nota = total > 0 ? Math.round((pontos / total) * 100) : 0;
+
+      const resp = {
+        id: uid(), avaliacaoId, alunoId, respostas,
+        nota, aprovado: nota >= (av?.notaMinima || 70),
+        tentativa, tempoUsado,
+        iniciadoEm: now(), concluidoEm: now(),
+      };
+      const lista = get(K.RESPOSTAS);
+      lista.push(resp); set(K.RESPOSTAS, lista);
+      return resp;
+    },
+
+    /** Stats de uma avaliação @param {string} avaliacaoId */
+    statsAvaliacao: avaliacaoId => {
+      const lista = get(K.RESPOSTAS).filter(r => r.avaliacaoId === avaliacaoId);
+      const notas = lista.map(r => r.nota);
+      const av = Avaliacoes.obter(avaliacaoId);
+      const aprovados = lista.filter(r => r.aprovado).length;
+      return {
+        participantes: [...new Set(lista.map(r => r.alunoId))].length,
+        tentativas:    lista.length,
+        aprovados,
+        reprovados:    lista.length - aprovados,
+        media:         notas.length ? Math.round(notas.reduce((s,n)=>s+n,0)/notas.length) : 0,
+        taxa:          lista.length ? Math.round(aprovados/lista.length*100) : 0,
+      };
+    },
+  };
+
   // ── API PÚBLICA ───────────────────────────────────────────────────
   // Contrato imutável. admin.js e aluno.js dependem exatamente disto.
   // Qualquer implementação (localStorage, REST, GraphQL) deve
@@ -730,6 +948,9 @@ var Storage = (() => {
     Materiais,
     Restricoes,
     Turmas,
+    Avaliacoes,
+    Questoes,
+    Respostas,
     Progresso,
   };
 
