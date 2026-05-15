@@ -220,21 +220,11 @@ var Admin = (() => {
 
   /* ── Colaboradores ── */
   function colaboradores() {
-    renderColabList(); renderSetoresEquipes();
-    q('#btn-novo-colab').onclick=()=>openModal('modal-colab');
-    q('#btn-novo-setor').onclick=()=>{ const n=prompt('Nome do setor:'); if(!n)return; const cor=prompt('Cor hex:','#2F45FF')||'#2F45FF'; Storage.Setores.criar({nome:n,cor}); renderSetoresEquipes(); toast('Setor criado!','s'); };
-    q('#btn-nova-equipe').onclick=()=>{ const set=Storage.Setores.listar(); if(!set.length){toast('Crie um setor primeiro','e');return;} const n=prompt('Nome da equipe:'); if(!n)return; const sId=prompt('ID do setor:')||set[0].id; Storage.Equipes.criar({nome:n,setorId:sId}); renderSetoresEquipes(); toast('Equipe criada!','s'); };
+    if (typeof AlunosMod !== 'undefined') AlunosMod.init(); else { renderColabList(); renderSetoresEquipes(); q('#btn-novo-colab').onclick=()=>openModal('modal-colab'); }
   }
-  function renderColabList() {
-    const lista=Storage.Alunos.listar(), set=Storage.Setores.listar(), eq=Storage.Equipes.listar(), tbody=q('#colab-tbody');
-    if(!lista.length){tbody.innerHTML=tdEmpty(6,'Nenhum colaborador');return;}
-    tbody.innerHTML=lista.map(a=>{const s=set.find(s=>s.id===a.setorId),e=eq.find(e=>e.id===a.equipeId),p=Storage.Progresso.listar().filter(p=>p.alunoId===a.id).length;return`<tr><td><strong>${x(a.nome)}</strong><br><span style="color:var(--text3);font-size:.76rem">${x(a.email)}</span></td><td>${s?`<span class="badge badge-blue">${x(s.nome)}</span>`:'—'}</td><td>${e?`<span class="badge badge-green">${x(e.nome)}</span>`:'—'}</td><td>${badge(a.ativo?'Ativo':'Inativo',a.ativo?'badge-green':'badge-red')}</td><td>${p} aulas</td><td><button class="btn btn-sm btn-ghost" onclick="Admin.toggleColab('${a.id}',${!a.ativo})">${a.ativo?'Desativar':'Ativar'}</button></td></tr>`;}).join('');
-  }
-  function renderSetoresEquipes() {
-    const set=Storage.Setores.listar(), eq=Storage.Equipes.listar(), wrap=q('#setores-equipes');
-    wrap.innerHTML=set.length?set.map(s=>{const eqs=eq.filter(e=>e.setorId===s.id),c=Storage.Alunos.porSetor(s.id).length;return`<div class="setor-card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:50%;background:${s.cor||'#2F45FF'}"></div><strong style="font-size:.9rem">${x(s.nome)}</strong><span style="color:var(--text3);font-size:.78rem;margin-left:auto">${c} colaboradores</span><button class="btn btn-sm btn-danger" onclick="Admin.delSetor('${s.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>️</button></div>${eqs.map(e=>`<div class="equipe-row"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ${x(e.nome)}</span><span style="color:var(--text3);font-size:.76rem">${Storage.Alunos.porEquipe(e.id).length} membros</span><button class="btn btn-sm btn-danger" onclick="Admin.delEquipe('${e.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>️</button></div>`).join('')}${!eqs.length?'<p style="color:var(--text3);font-size:.78rem;padding:4px 0">Sem equipes</p>':''}</div>`;}).join(''):'<p style="color:var(--text3);font-size:.85rem">Nenhum setor cadastrado.</p>';
-  }
-  function toggleColab(id,ativo){ Storage.Alunos.atualizar(id,{ativo}); toast(ativo?'Ativado.':'Desativado.','i'); renderColabList(); }
+  function renderColabList() { if (typeof AlunosMod !== 'undefined') AlunosMod.renderColabList(); }
+  function renderSetoresEquipes() { if (typeof AlunosMod !== 'undefined') AlunosMod.renderSetoresEquipes(); }
+  function toggleColab(id,ativo){ if (typeof AlunosMod !== 'undefined') AlunosMod.toggleColab(id,ativo); else { Storage.Alunos.atualizar(id,{ativo}); toast(ativo?'Ativado.':'Desativado.','i'); } }
   function delSetor(id){ if(!confirm('Excluir setor?'))return; Storage.Setores.excluir(id); renderSetoresEquipes(); }
   function delEquipe(id){ if(!confirm('Excluir equipe?'))return; Storage.Equipes.excluir(id); renderSetoresEquipes(); }
 
