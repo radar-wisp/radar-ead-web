@@ -59,7 +59,7 @@ var Admin = (() => {
   const renders = {
     dashboard, cursos, materiais, acessos, colaboradores, publicacao,
     // Módulos futuros — stub que mostra "em breve"
-    turmas:         () => emBreve('Turmas'),
+    turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
     avaliacoes:     () => emBreve('Avaliações'),
     relatorios:     () => emBreve('Relatórios'),
     certificados:   () => emBreve('Certificados'),
