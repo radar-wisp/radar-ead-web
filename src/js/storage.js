@@ -36,6 +36,7 @@ var Storage = (() => {
     MATERIAIS:  'ead_materiais',   // → tabela: materiais
     RESTRICOES: 'ead_restricoes',  // → tabela: restricoes (PK composta)
     TURMAS:     'ead_turmas',      // → tabela: turmas
+    LOG_ACESSOS: 'ead_log_acessos', // → tabela: log_acessos
     AVALIACOES: 'ead_avaliacoes', // → tabela: avaliacoes
     QUESTOES:   'ead_questoes',   // → tabela: questoes
     RESPOSTAS:  'ead_respostas',  // → tabela: respostas_aluno
@@ -532,36 +533,125 @@ var Storage = (() => {
   //   DELETE /api/v1/restricoes?cursoId=&tipo=&refId=
   //   PK composta no banco: (curso_id, tipo, ref_id) → sem duplicatas
   // ════════════════════════════════════════════════════════════════
+  /**
+   * @typedef {Object} Restricao
+   * @property {string} cursoId
+   * @property {'setor'|'equipe'|'colaborador'} tipo
+   * @property {string} refId
+   * @property {string} dataInicio   ISO 8601 (opcional)
+   * @property {string} dataExpira   ISO 8601 (opcional)
+   * @property {number} prazo        dias para conclusão (0 = sem prazo)
+   * @property {boolean} obrigatorio
+   * @property {boolean} renovacaoAuto
+   * @property {'ativo'|'expirado'|'bloqueado'|'pendente'} statusAcesso
+   * @property {string} responsavel  nome de quem liberou
+   * @property {string} criadoEm
+   */
+
   const Restricoes = {
-    /** @returns {Array<Restricao>} */
+    /** @returns {Restricao[]} */
     listar: () => get(K.RESTRICOES),
 
-    /** @param {string} cursoId @returns {Array<Restricao>} */
+    /** @param {string} cursoId @returns {Restricao[]} */
     porCurso: cursoId => get(K.RESTRICOES).filter(r => r.cursoId === cursoId),
+
+    /** @param {string} refId @returns {Restricao[]} */
+    porRef: refId => get(K.RESTRICOES).filter(r => r.refId === refId),
 
     /**
      * Adiciona restrição. Idempotente — não duplica.
      * MIGRAÇÃO: INSERT OR IGNORE / ON CONFLICT DO NOTHING
-     * @param {{cursoId:string, tipo:string, refId:string}} d
+     * @param {{cursoId, tipo, refId, dataInicio?, dataExpira?, prazo?, obrigatorio?, renovacaoAuto?, responsavel?}} d
      */
     adicionar: d => {
-      const l = get(K.RESTRICOES);
-      if (!l.find(r => r.cursoId === d.cursoId && r.tipo === d.tipo && r.refId === d.refId)) {
-        l.push(d); set(K.RESTRICOES, l);
-      }
+      const lista = get(K.RESTRICOES);
+      const idx = lista.findIndex(r =>
+        r.cursoId === d.cursoId && r.tipo === d.tipo && r.refId === d.refId
+      );
+      const reg = {
+        cursoId: d.cursoId, tipo: d.tipo, refId: d.refId,
+        dataInicio:   d.dataInicio   || null,
+        dataExpira:   d.dataExpira   || null,
+        prazo:        d.prazo        || 0,
+        obrigatorio:  d.obrigatorio  || false,
+        renovacaoAuto:d.renovacaoAuto|| false,
+        statusAcesso: d.statusAcesso || 'ativo',
+        responsavel:  d.responsavel  || 'Admin',
+        criadoEm:     d.criadoEm     || now(),
+      };
+      if (idx === -1) lista.push(reg);
+      else lista[idx] = { ...lista[idx], ...reg };
+      set(K.RESTRICOES, lista);
     },
 
-    /**
-     * Remove restrição específica.
-     * @param {string} cursoId @param {string} tipo @param {string} refId
-     */
-    remover: (cursoId, tipo, refId) => set(K.RESTRICOES,
-      get(K.RESTRICOES).filter(r => !(r.cursoId === cursoId && r.tipo === tipo && r.refId === refId))
-    ),
+    /** Atualiza campos de uma restrição existente. */
+    atualizar: (cursoId, tipo, refId, dados) => {
+      const lista = get(K.RESTRICOES);
+      const idx = lista.findIndex(r => r.cursoId === cursoId && r.tipo === tipo && r.refId === refId);
+      if (idx !== -1) { lista[idx] = { ...lista[idx], ...dados }; set(K.RESTRICOES, lista); }
+    },
 
-    /** Remove TODAS as restrições de um curso. @param {string} cursoId */
-    limpar: cursoId => set(K.RESTRICOES, get(K.RESTRICOES).filter(r => r.cursoId !== cursoId)),
+    /** @param {string} cursoId @param {string} tipo @param {string} refId */
+    remover: (cursoId, tipo, refId) =>
+      set(K.RESTRICOES, get(K.RESTRICOES).filter(r =>
+        !(r.cursoId === cursoId && r.tipo === tipo && r.refId === refId)
+      )),
+
+    /** Remove TODAS as restrições de um curso. */
+    limpar: cursoId =>
+      set(K.RESTRICOES, get(K.RESTRICOES).filter(r => r.cursoId !== cursoId)),
+
+    /** Verifica e atualiza status expirados. */
+    sincronizarStatus: () => {
+      const agora = new Date();
+      const lista = get(K.RESTRICOES).map(r => {
+        if (r.dataExpira && new Date(r.dataExpira) < agora && r.statusAcesso === 'ativo') {
+          return { ...r, statusAcesso: 'expirado' };
+        }
+        return r;
+      });
+      set(K.RESTRICOES, lista);
+    },
+
+    /** Stats globais de acessos. */
+    stats: () => {
+      const lista = get(K.RESTRICOES);
+      const agora = new Date();
+      return {
+        total:    lista.length,
+        ativos:   lista.filter(r => r.statusAcesso === 'ativo' || !r.statusAcesso).length,
+        expirados:lista.filter(r => r.statusAcesso === 'expirado' ||
+          (r.dataExpira && new Date(r.dataExpira) < agora)).length,
+        bloqueados:lista.filter(r => r.statusAcesso === 'bloqueado').length,
+        pendentes: lista.filter(r => r.statusAcesso === 'pendente').length,
+        cursos:   [...new Set(lista.map(r => r.cursoId))].length,
+      };
+    },
   };
+
+  /* ── Log de Acessos ──────────────────────────────────────────
+     Histórico de liberações, revogações e bloqueios.
+     MIGRAÇÃO: tabela log_acessos (append-only, nunca editar)
+  ────────────────────────────────────────────────────────────── */
+  const LogAcessos = {
+    listar: () => get(K.LOG_ACESSOS),
+
+    /**
+     * @param {{ acao, cursoId?, alunoId?, tipo?, refId?, responsavel?, obs? }} d
+     */
+    registrar: d => {
+      const lista = get(K.LOG_ACESSOS);
+      lista.unshift({ id: uid(), ts: now(), ...d });
+      set(K.LOG_ACESSOS, lista.slice(0, 200)); // mantém últimos 200
+    },
+
+    /** @param {string} cursoId @returns {Object[]} */
+    porCurso: cursoId => get(K.LOG_ACESSOS).filter(l => l.cursoId === cursoId),
+
+    /** @param {string} alunoId @returns {Object[]} */
+    porAluno: alunoId => get(K.LOG_ACESSOS).filter(l => l.alunoId === alunoId),
+  };
+
 
   // ════════════════════════════════════════════════════════════════
   // PROGRESSO
@@ -1005,6 +1095,7 @@ var Storage = (() => {
     Alunos,
     Materiais,
     Restricoes,
+    LogAcessos,
     Turmas,
     Avaliacoes,
     Questoes,
