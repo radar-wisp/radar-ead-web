@@ -393,8 +393,27 @@ var Storage = (() => {
   //   POST   /api/v1/auth/login { email, senha, tipo:'aluno' }
   //          → bcrypt.compare() + retorna JWT
   // ════════════════════════════════════════════════════════════════
+  /**
+   * @typedef {Object} Colaborador
+   * @property {string}   id
+   * @property {string}   nome
+   * @property {string}   email         lowercase, UNIQUE
+   * @property {string}   senha         plain text → bcrypt na migração
+   * @property {string}   matricula
+   * @property {string}   telefone
+   * @property {string}   cargo
+   * @property {string}   unidade
+   * @property {string}   setorId       FK → Setor.id
+   * @property {string}   equipeId      FK → Equipe.id
+   * @property {boolean}  ativo
+   * @property {'ativo'|'bloqueado'|'inativo'|'pendente'} statusAcesso
+   * @property {boolean}  primeiroAcesso
+   * @property {string}   ultimoAcesso  ISO 8601
+   * @property {string}   criadoEm     ISO 8601
+   */
+
   const Alunos = {
-    /** @returns {Array<Colaborador>} */
+    /** @returns {Colaborador[]} */
     listar: () => get(K.ALUNOS),
 
     /** @param {string} id @returns {Colaborador|null} */
@@ -403,32 +422,71 @@ var Storage = (() => {
     /** @param {string} email @returns {Colaborador|null} */
     porEmail: email => get(K.ALUNOS).find(a => a.email === email.toLowerCase()) || null,
 
-    /** @param {string} setorId @returns {Array<Colaborador>} */
+    /** @param {string} setorId @returns {Colaborador[]} */
     porSetor: setorId => get(K.ALUNOS).filter(a => a.setorId === setorId),
 
-    /** @param {string} equipeId @returns {Array<Colaborador>} */
+    /** @param {string} equipeId @returns {Colaborador[]} */
     porEquipe: equipeId => get(K.ALUNOS).filter(a => a.equipeId === equipeId),
 
     /**
-     * Cria colaborador. Retorna null se email já existe (email é UNIQUE).
-     * MIGRAÇÃO: tratar erro 409 Conflict do banco.
-     * @param {{nome,email,senha,setorId?,equipeId?}} d
+     * Cria colaborador. Retorna null se email já existe.
+     * @param {{nome,email,senha,setorId?,equipeId?,matricula?,cargo?,telefone?,unidade?}} d
      * @returns {Colaborador|null}
      */
     criar: d => {
       if (Alunos.porEmail(d.email)) return null;
       const l = get(K.ALUNOS);
-      const n = { id: uid(), criadoEm: now(), ativo: true, ...d, email: d.email.toLowerCase() };
+      const n = {
+        id: uid(), criadoEm: now(),
+        ativo: true, statusAcesso: 'ativo',
+        primeiroAcesso: true, ultimoAcesso: null,
+        matricula: '', telefone: '', cargo: '', unidade: '',
+        ...d,
+        email: d.email.toLowerCase(),
+      };
       l.push(n); set(K.ALUNOS, l); return n;
     },
 
     /** @param {string} id @param {Partial<Colaborador>} d */
     atualizar: (id, d) => set(K.ALUNOS, get(K.ALUNOS).map(a => a.id === id ? { ...a, ...d } : a)),
 
+    /** Bloqueia aluno. @param {string} id */
+    bloquear: id => set(K.ALUNOS, get(K.ALUNOS).map(a =>
+      a.id === id ? { ...a, ativo: false, statusAcesso: 'bloqueado' } : a
+    )),
+
+    /** Ativa aluno. @param {string} id */
+    ativar: id => set(K.ALUNOS, get(K.ALUNOS).map(a =>
+      a.id === id ? { ...a, ativo: true, statusAcesso: 'ativo' } : a
+    )),
+
+    /** Reseta senha para '123456' (ambiente demo). @param {string} id */
+    resetarSenha: id => set(K.ALUNOS, get(K.ALUNOS).map(a =>
+      a.id === id ? { ...a, senha: '123456', primeiroAcesso: true } : a
+    )),
+
+    /** Registra último acesso. @param {string} id */
+    registrarAcesso: id => set(K.ALUNOS, get(K.ALUNOS).map(a =>
+      a.id === id ? { ...a, ultimoAcesso: now() } : a
+    )),
+
     /**
-     * Autentica colaborador. Null = credenciais inválidas ou conta inativa.
-     * MIGRAÇÃO: bcrypt.compare(senha, colaborador.senha_hash)
-     *           NUNCA comparar plain text em produção.
+     * Stats globais de alunos.
+     * @returns {{ total, ativos, bloqueados, inativos, pendentes, cursosAtivos, certificados }}
+     */
+    stats: () => {
+      const lista = get(K.ALUNOS);
+      return {
+        total:       lista.length,
+        ativos:      lista.filter(a => a.statusAcesso === 'ativo' || (a.ativo && !a.statusAcesso)).length,
+        bloqueados:  lista.filter(a => a.statusAcesso === 'bloqueado' || (!a.ativo && a.statusAcesso !== 'inativo')).length,
+        inativos:    lista.filter(a => a.statusAcesso === 'inativo').length,
+        pendentes:   lista.filter(a => a.statusAcesso === 'pendente').length,
+      };
+    },
+
+    /**
+     * Autentica. Null = inválido ou inativo.
      * @param {string} email @param {string} senha
      * @returns {Colaborador|null}
      */
