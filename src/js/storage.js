@@ -35,6 +35,7 @@ var Storage = (() => {
     SETORES:    'ead_setores',     // → tabela: setores
     MATERIAIS:  'ead_materiais',   // → tabela: materiais
     RESTRICOES: 'ead_restricoes',  // → tabela: restricoes (PK composta)
+    TURMAS:     'ead_turmas',      // → tabela: turmas
   };
 
   // ── Helpers internos (não expostos) ──────────────────────────────
@@ -104,7 +105,31 @@ var Storage = (() => {
       { alunoId: al1, aulaId: a1, concluidaEm: now() },
     ]);
 
-    localStorage.setItem('ead_seeded_v2', '1');
+
+    // Turmas de demonstração
+    const t1 = uid(), t2 = uid();
+    const c1list = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+    const c1id = c1list[0]?.id || '';
+    set('ead_turmas', [
+      {
+        id: t1, nome: 'Turma Janeiro 2025', cursoId: c1id, descricao: 'Turma de início do ano',
+        responsavel: 'Administrador', dataInicio: '2025-01-15T00:00:00.000Z',
+        dataFim: '2025-03-15T00:00:00.000Z', limiteAlunos: 20,
+        status: 'em_andamento', alunos: [],
+        config: { acessoAutomatico: true, prazoConclucaoDias: 60, bloquearAposEncerramento: true, permitirEntradaAposInicio: true },
+        criadoEm: now(),
+      },
+      {
+        id: t2, nome: 'Turma Fevereiro 2025', cursoId: c1id, descricao: 'Segunda turma do trimestre',
+        responsavel: 'Administrador', dataInicio: '2025-02-01T00:00:00.000Z',
+        dataFim: '2025-04-01T00:00:00.000Z', limiteAlunos: 0,
+        status: 'aberta', alunos: [],
+        config: { acessoAutomatico: false, prazoConclucaoDias: 0, bloquearAposEncerramento: true, permitirEntradaAposInicio: false },
+        criadoEm: now(),
+      },
+    ]);
+
+        localStorage.setItem('ead_seeded_v2', '1');
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -537,6 +562,157 @@ var Storage = (() => {
     cursoConcluido: (alunoId, cursoId) => Progresso.pctCurso(alunoId, cursoId) === 100,
   };
 
+
+  // ════════════════════════════════════════════════════════════════
+  // TURMAS
+  // Conceito: Turma = grupo de alunos realizando um curso em período definido
+  // MIGRAÇÃO:
+  //   GET    /api/v1/turmas?cursoId=&status=
+  //   POST   /api/v1/turmas
+  //   PUT    /api/v1/turmas/:id
+  //   DELETE /api/v1/turmas/:id
+  //   POST   /api/v1/turmas/:id/encerrar
+  //   POST   /api/v1/turmas/:id/alunos    { alunoId }
+  //   DELETE /api/v1/turmas/:id/alunos/:alunoId
+  // ════════════════════════════════════════════════════════════════
+
+  /**
+   * @typedef {Object} Turma
+   * @property {string}   id
+   * @property {string}   nome
+   * @property {string}   cursoId        FK → Curso.id
+   * @property {string}   descricao
+   * @property {string}   responsavel    nome livre ou colaboradorId futuro
+   * @property {string}   dataInicio     ISO 8601
+   * @property {string}   dataFim        ISO 8601
+   * @property {number}   limiteAlunos   0 = ilimitado
+   * @property {'aberta'|'em_andamento'|'encerrada'|'cancelada'} status
+   * @property {string[]} alunos         array de colaboradorIds
+   * @property {Object}   config
+   * @property {boolean}  config.acessoAutomatico
+   * @property {number}   config.prazoConclucaoDias  0 = sem prazo
+   * @property {boolean}  config.bloquearAposEncerramento
+   * @property {boolean}  config.permitirEntradaAposInicio
+   * @property {string}   criadoEm
+   */
+
+  const Turmas = {
+    /** @returns {Turma[]} */
+    listar: () => get(K.TURMAS),
+
+    /** @param {string} id @returns {Turma|null} */
+    obter: id => get(K.TURMAS).find(t => t.id === id) || null,
+
+    /** @param {string} cursoId @returns {Turma[]} */
+    porCurso: cursoId => get(K.TURMAS).filter(t => t.cursoId === cursoId),
+
+    /** @param {string} status @returns {Turma[]} */
+    porStatus: status => get(K.TURMAS).filter(t => t.status === status),
+
+    /**
+     * @param {Omit<Turma,'id'|'criadoEm'|'alunos'>} dados
+     * @returns {Turma}
+     */
+    criar: dados => {
+      const lista = get(K.TURMAS);
+      const nova = {
+        id: uid(), criadoEm: now(), alunos: [],
+        status: 'aberta', limiteAlunos: 0,
+        config: {
+          acessoAutomatico: true,
+          prazoConclucaoDias: 0,
+          bloquearAposEncerramento: true,
+          permitirEntradaAposInicio: true,
+        },
+        ...dados,
+      };
+      lista.push(nova);
+      set(K.TURMAS, lista);
+      return nova;
+    },
+
+    /** @param {string} id @param {Partial<Turma>} dados */
+    atualizar: (id, dados) =>
+      set(K.TURMAS, get(K.TURMAS).map(t => t.id === id ? { ...t, ...dados } : t)),
+
+    /** @param {string} id */
+    excluir: id => set(K.TURMAS, get(K.TURMAS).filter(t => t.id !== id)),
+
+    /** Muda status para 'encerrada'. @param {string} id */
+    encerrar: id =>
+      set(K.TURMAS, get(K.TURMAS).map(t =>
+        t.id === id ? { ...t, status: 'encerrada', dataFim: now() } : t
+      )),
+
+    /**
+     * Adiciona aluno à turma. Idempotente.
+     * @param {string} turmaId @param {string} alunoId
+     * @returns {boolean} false se limite atingido
+     */
+    adicionarAluno: (turmaId, alunoId) => {
+      const lista = get(K.TURMAS);
+      const t = lista.find(x => x.id === turmaId);
+      if (!t) return false;
+      if (t.limiteAlunos > 0 && t.alunos.length >= t.limiteAlunos) return false;
+      if (!t.alunos.includes(alunoId)) t.alunos.push(alunoId);
+      set(K.TURMAS, lista);
+      return true;
+    },
+
+    /** @param {string} turmaId @param {string} alunoId */
+    removerAluno: (turmaId, alunoId) => {
+      const lista = get(K.TURMAS);
+      const t = lista.find(x => x.id === turmaId);
+      if (t) { t.alunos = t.alunos.filter(id => id !== alunoId); set(K.TURMAS, lista); }
+    },
+
+    /** @param {string} turmaId @param {string[]} alunoIds */
+    adicionarAlunos: (turmaId, alunoIds) => {
+      const lista = get(K.TURMAS);
+      const t = lista.find(x => x.id === turmaId);
+      if (!t) return;
+      alunoIds.forEach(id => { if (!t.alunos.includes(id)) t.alunos.push(id); });
+      set(K.TURMAS, lista);
+    },
+
+    /** Limpa todos os alunos da turma. @param {string} turmaId */
+    limparAlunos: turmaId => {
+      const lista = get(K.TURMAS);
+      const t = lista.find(x => x.id === turmaId);
+      if (t) { t.alunos = []; set(K.TURMAS, lista); }
+    },
+
+    /**
+     * Calcula progresso médio da turma no curso vinculado.
+     * @param {string} turmaId @returns {number} 0-100
+     */
+    progresso: turmaId => {
+      const t = get(K.TURMAS).find(x => x.id === turmaId);
+      if (!t || !t.alunos.length) return 0;
+      const total = t.alunos.reduce((acc, alunoId) => {
+        return acc + Progresso.pctCurso(alunoId, t.cursoId);
+      }, 0);
+      return Math.round(total / t.alunos.length);
+    },
+
+    /**
+     * @param {string} turmaId
+     * @returns {{ concluidos: number, pendentes: number, pct: number }}
+     */
+    stats: turmaId => {
+      const t = get(K.TURMAS).find(x => x.id === turmaId);
+      if (!t) return { concluidos: 0, pendentes: 0, pct: 0 };
+      const concluidos = t.alunos.filter(id =>
+        Progresso.cursoConcluido(id, t.cursoId)
+      ).length;
+      return {
+        concluidos,
+        pendentes: t.alunos.length - concluidos,
+        pct: t.alunos.length ? Math.round((concluidos / t.alunos.length) * 100) : 0,
+      };
+    },
+  };
+
   // ── API PÚBLICA ───────────────────────────────────────────────────
   // Contrato imutável. admin.js e aluno.js dependem exatamente disto.
   // Qualquer implementação (localStorage, REST, GraphQL) deve
@@ -553,6 +729,7 @@ var Storage = (() => {
     Alunos,
     Materiais,
     Restricoes,
+    Turmas,
     Progresso,
   };
 
