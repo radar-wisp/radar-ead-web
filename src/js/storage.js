@@ -36,6 +36,8 @@ var Storage = (() => {
     MATERIAIS:  'ead_materiais',   // → tabela: materiais
     RESTRICOES: 'ead_restricoes',  // → tabela: restricoes (PK composta)
     TURMAS:     'ead_turmas',      // → tabela: turmas
+    CERTIFICADOS: 'ead_certificados', // → tabela: certificados
+    MODELOS_CERT: 'ead_modelos_cert',  // → tabela: modelos_certificado
     LOG_ACESSOS: 'ead_log_acessos', // → tabela: log_acessos
     AVALIACOES: 'ead_avaliacoes', // → tabela: avaliacoes
     QUESTOES:   'ead_questoes',   // → tabela: questoes
@@ -1079,6 +1081,225 @@ var Storage = (() => {
     },
   };
 
+
+  // ════════════════════════════════════════════════════════════════
+  // CERTIFICADOS
+  // MIGRAÇÃO: GET/POST/PUT/DELETE /api/v1/certificados
+  //           GET /api/v1/certificados/validar/:codigo
+  // ════════════════════════════════════════════════════════════════
+
+  /**
+   * @typedef {Object} Certificado
+   * @property {string}  id
+   * @property {string}  codigo          único, para validação pública
+   * @property {string}  alunoId         FK → Colaborador.id
+   * @property {string}  cursoId         FK → Curso.id
+   * @property {string}  turmaId         FK → Turma.id (opcional)
+   * @property {string}  modeloId        FK → ModeloCert.id
+   * @property {number}  cargaHoraria
+   * @property {number}  nota            0-100 (da avaliação, se houver)
+   * @property {string}  dataConclucao   ISO 8601
+   * @property {string}  dataEmissao     ISO 8601
+   * @property {string}  dataValidade    ISO 8601 (null = sem validade)
+   * @property {'emitido'|'pendente'|'expirado'|'cancelado'} status
+   * @property {string}  responsavel
+   * @property {string}  obs
+   * @property {string}  criadoEm
+   */
+
+  /**
+   * @typedef {Object} ModeloCert
+   * @property {string}  id
+   * @property {string}  nome
+   * @property {string}  corPrimaria     hex
+   * @property {string}  logoTexto       texto do logo (ex: "Radar Internet")
+   * @property {string}  subtitulo       ex: "Plataforma EAD"
+   * @property {string}  assinatura1     nome do assinante 1
+   * @property {string}  cargo1
+   * @property {string}  assinatura2     nome do assinante 2
+   * @property {string}  cargo2
+   * @property {string}  textoRodape
+   * @property {boolean} ativo
+   * @property {string}  criadoEm
+   */
+
+  const Certificados = {
+    /** @returns {Certificado[]} */
+    listar: () => get(K.CERTIFICADOS),
+
+    /** @param {string} id @returns {Certificado|null} */
+    obter: id => get(K.CERTIFICADOS).find(c => c.id === id) || null,
+
+    /** @param {string} codigo @returns {Certificado|null} */
+    porCodigo: codigo => get(K.CERTIFICADOS).find(c => c.codigo === codigo) || null,
+
+    /** @param {string} alunoId @returns {Certificado[]} */
+    porAluno: alunoId => get(K.CERTIFICADOS).filter(c => c.alunoId === alunoId),
+
+    /** @param {string} cursoId @returns {Certificado[]} */
+    porCurso: cursoId => get(K.CERTIFICADOS).filter(c => c.cursoId === cursoId),
+
+    /** Gera código único alfanumérico. */
+    _gerarCodigo: () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let cod = 'CERT-';
+      for (let i = 0; i < 12; i++) {
+        if (i === 4 || i === 8) cod += '-';
+        cod += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return cod;
+    },
+
+    /**
+     * Emite um certificado. Verifica se já existe (idempotente).
+     * @param {Omit<Certificado,'id'|'codigo'|'criadoEm'|'status'>} d
+     * @returns {Certificado}
+     */
+    emitir: d => {
+      // Verifica duplicata
+      const exist = get(K.CERTIFICADOS).find(c =>
+        c.alunoId === d.alunoId && c.cursoId === d.cursoId &&
+        c.status !== 'cancelado'
+      );
+      if (exist) return exist;
+
+      const lista = get(K.CERTIFICADOS);
+      const cert = {
+        id: uid(), codigo: Certificados._gerarCodigo(), criadoEm: now(),
+        status: 'emitido', dataEmissao: now(),
+        nota: 0, obs: '', responsavel: 'Admin',
+        modeloId: Certificados.modeloPadrao()?.id || '',
+        ...d,
+      };
+      lista.push(cert); set(K.CERTIFICADOS, lista); return cert;
+    },
+
+    /** Emite certificados em lote para todos os alunos elegíveis de um curso. */
+    emitirLote: (cursoId, config) => {
+      const curso  = Cursos.obter(cursoId); if (!curso) return [];
+      const alunos = Alunos.listar().filter(a => a.ativo);
+      const emitidos = [];
+      alunos.forEach(al => {
+        const pct = Progresso.pctCurso(al.id, cursoId);
+        if (pct < (config?.progressoMinimo || 100)) return;
+        // Verifica nota mínima se exigido
+        if (config?.notaMinima) {
+          const avs = Avaliacoes.porCurso(cursoId);
+          if (avs.length) {
+            const melhorNota = avs.reduce((max, av) => {
+              const resps = Respostas.porAluno(al.id, av.id);
+              const nota  = resps.length ? Math.max(...resps.map(r => r.nota)) : 0;
+              return Math.max(max, nota);
+            }, 0);
+            if (melhorNota < config.notaMinima) return;
+          }
+        }
+        const cert = Certificados.emitir({
+          alunoId: al.id, cursoId,
+          cargaHoraria: curso.carga || 0,
+          dataConclucao: now(),
+          dataValidade: config?.validadeDias
+            ? new Date(Date.now() + config.validadeDias * 86400000).toISOString()
+            : null,
+          responsavel: config?.responsavel || 'Admin',
+        });
+        emitidos.push(cert);
+      });
+      return emitidos;
+    },
+
+    /** @param {string} id @param {Partial<Certificado>} d */
+    atualizar: (id, d) =>
+      set(K.CERTIFICADOS, get(K.CERTIFICADOS).map(c => c.id === id ? { ...c, ...d } : c)),
+
+    /** Reemite: gera novo código, atualiza data. @param {string} id @returns {Certificado} */
+    reemitir: id => {
+      const lista = get(K.CERTIFICADOS);
+      const c = lista.find(x => x.id === id); if (!c) return null;
+      c.codigo = Certificados._gerarCodigo();
+      c.dataEmissao = now(); c.status = 'emitido';
+      set(K.CERTIFICADOS, lista); return c;
+    },
+
+    cancelar: id => set(K.CERTIFICADOS, get(K.CERTIFICADOS).map(c =>
+      c.id === id ? { ...c, status: 'cancelado' } : c
+    )),
+
+    excluir: id => set(K.CERTIFICADOS, get(K.CERTIFICADOS).filter(c => c.id !== id)),
+
+    /** Verifica expirados e atualiza status. */
+    sincronizar: () => {
+      const agora = new Date();
+      set(K.CERTIFICADOS, get(K.CERTIFICADOS).map(c => {
+        if (c.status === 'emitido' && c.dataValidade && new Date(c.dataValidade) < agora)
+          return { ...c, status: 'expirado' };
+        return c;
+      }));
+    },
+
+    /** Stats globais. */
+    stats: () => {
+      Certificados.sincronizar();
+      const lista = get(K.CERTIFICADOS);
+      const agora = new Date(); const em30 = new Date(); em30.setDate(em30.getDate()+30);
+      return {
+        total:     lista.length,
+        emitidos:  lista.filter(c => c.status === 'emitido').length,
+        pendentes: lista.filter(c => c.status === 'pendente').length,
+        expirados: lista.filter(c => c.status === 'expirado').length,
+        cancelados:lista.filter(c => c.status === 'cancelado').length,
+        vencendo:  lista.filter(c =>
+          c.status === 'emitido' && c.dataValidade &&
+          new Date(c.dataValidade) > agora && new Date(c.dataValidade) <= em30
+        ).length,
+      };
+    },
+
+    /** Conta certificados elegíveis ainda não emitidos. */
+    pendentesElegivel: () => {
+      const cursos  = Cursos.listar().filter(c => c.status === 'publicado');
+      const emitidos = new Set(
+        get(K.CERTIFICADOS).filter(c => c.status !== 'cancelado')
+          .map(c => `${c.alunoId}:${c.cursoId}`)
+      );
+      let pendentes = 0;
+      Alunos.listar().filter(a => a.ativo).forEach(al => {
+        cursos.forEach(cu => {
+          if (Progresso.pctCurso(al.id, cu.id) === 100 && !emitidos.has(`${al.id}:${cu.id}`))
+            pendentes++;
+        });
+      });
+      return pendentes;
+    },
+
+    /* ── Modelos de Certificado ── */
+    modeloPadrao: () => {
+      const lista = get(K.MODELOS_CERT);
+      return lista.find(m => m.ativo) || lista[0] || null;
+    },
+
+    listarModelos: () => get(K.MODELOS_CERT),
+
+    criarModelo: d => {
+      const lista = get(K.MODELOS_CERT);
+      const m = {
+        id: uid(), criadoEm: now(), ativo: true,
+        corPrimaria: '#0002da', logoTexto: 'Radar Internet', subtitulo: 'Plataforma EAD',
+        assinatura1: 'Diretor(a) de Operações', cargo1: 'Assinatura 1',
+        assinatura2: 'Coordenador(a) de T&D',  cargo2: 'Assinatura 2',
+        textoRodape: 'Este certificado atesta a conclusão do curso conforme registros da plataforma.',
+        ...d,
+      };
+      lista.push(m); set(K.MODELOS_CERT, lista); return m;
+    },
+
+    atualizarModelo: (id, d) =>
+      set(K.MODELOS_CERT, get(K.MODELOS_CERT).map(m => m.id === id ? { ...m, ...d } : m)),
+
+    excluirModelo: id =>
+      set(K.MODELOS_CERT, get(K.MODELOS_CERT).filter(m => m.id !== id)),
+  };
+
   // ── API PÚBLICA ───────────────────────────────────────────────────
   // Contrato imutável. admin.js e aluno.js dependem exatamente disto.
   // Qualquer implementação (localStorage, REST, GraphQL) deve
@@ -1096,6 +1317,7 @@ var Storage = (() => {
     Materiais,
     Restricoes,
     LogAcessos,
+    Certificados,
     Turmas,
     Avaliacoes,
     Questoes,
