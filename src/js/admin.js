@@ -62,7 +62,7 @@ var Admin = (() => {
     turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
     avaliacoes:     () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
     relatorios:     () => emBreve('Relatórios'),
-    certificados:   () => emBreve('Certificados'),
+    certificados:   () => { if (typeof CertMod !== 'undefined') CertMod.init(); else emBreve('Certificados'); },
     configuracoes:  () => emBreve('Configurações'),
   };
 
