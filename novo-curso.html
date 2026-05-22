@@ -349,23 +349,24 @@ input,select,textarea { font-family:var(--font) }
 .review-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:2px }
 
 /* ══ ACCORDION ACESSO ══════════════════════════════════════ */
-.acc-item { border:1px solid var(--border); border-radius:var(--r); margin-bottom:8px; overflow:hidden }
+.acc-item { border:1px solid var(--border); border-radius:var(--r); margin-bottom:8px }
 .acc-head {
   display:flex; align-items:center; gap:10px; padding:10px 14px;
   cursor:pointer; background:var(--surface); user-select:none;
-  transition:background .12s;
+  transition:background .12s; border-radius:var(--r);
 }
 .acc-head:hover { background:var(--bg) }
+.acc-item.open .acc-head { border-radius:var(--r) var(--r) 0 0 }
 .acc-head-ico { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px }
 .acc-head-title { flex:1; font-size:13px; font-weight:600; color:var(--text) }
 .acc-head-count { font-size:11px; font-weight:600; padding:1px 7px; border-radius:99px; min-width:20px; text-align:center }
 .acc-head-arrow { width:14px; height:14px; color:var(--text4); transition:transform .2s; flex-shrink:0 }
 .acc-item.open .acc-head-arrow { transform:rotate(90deg) }
-.acc-body { display:none; padding:12px 14px; border-top:1px solid var(--border); background:var(--bg) }
+.acc-body { display:none; padding:12px 14px; border-top:1px solid var(--border); background:var(--bg); border-radius:0 0 var(--r) var(--r); overflow:visible }
 .acc-item.open .acc-body { display:block }
 
 /* Autocomplete inline */
-.ac-wrap { position:relative }
+.ac-wrap { position:relative; overflow:visible }
 .ac-input {
   width:100%; padding:8px 12px; border:1.5px solid var(--border2); border-radius:var(--r);
   font-size:13px; color:var(--text); background:var(--surface); outline:none;
@@ -373,7 +374,7 @@ input,select,textarea { font-family:var(--font) }
 }
 .ac-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08) }
 .ac-dropdown {
-  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200;
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:500;
   background:var(--surface); border:1.5px solid var(--border2); border-radius:var(--r);
   box-shadow:var(--shm); max-height:160px; overflow-y:auto; display:none;
 }
