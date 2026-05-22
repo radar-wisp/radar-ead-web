@@ -1011,7 +1011,7 @@ input,select,textarea { font-family:var(--font) }
     <div class="modal-icon">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green-d)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h2>Curso criado com sucesso!</h2>
+    <h2 id="modal-sucesso-titulo">Curso criado com sucesso!</h2>
     <p id="modal-nome-curso">O curso foi publicado e já está disponível para os colaboradores.</p>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="Wizard.fecharModal()">Fechar</button>
@@ -1381,46 +1381,50 @@ var Wizard = (() => {
   }
 
   // ── Publicar ───────────────────────────────────────────────
-  function publicar() {
-    collectStep(currentStep);
-
-    // Monta objeto do curso para o localStorage
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-    const curso = {
-      id:          uid(),
+  // ── Persiste curso no localStorage (mesmo schema do Storage.Cursos) ──
+  function _buildCursoObj(statusOverride) {
+    const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const agora = new Date().toISOString();
+    const isPublicado = statusOverride === 'publicado';
+    return {
+      id:          genId(),
       titulo:      state.nome,
       descricao:   state.descricao,
       categoria:   state.categoria,
       formato:     state.formato,
       carga:       parseInt(state.carga) || 0,
       nivel:       state.nivel,
-      capa:        state.capa,
-      capaName:    state.capaName,
+      capa:        state.capa || null,
+      capaName:    state.capaName || null,
       publico:     state.publico,
       publicoObs:  state.publicoObs,
       visib:       state.visib,
       acessos:     state.acessos,
-      validade:    state.validade || null,
+      validadeAte: state.validade || null,   // ← campo correto (Storage usa validadeAte)
       prazo:       state.prazo || null,
       materiais:   state.materiais,
       config:      state.config,
-      status:      'publicado',
-      publicadoEm: new Date().toISOString(),
-      criadoEm:    new Date().toISOString(),
+      status:      statusOverride,
+      publicadoEm: isPublicado ? agora : null,
+      criadoEm:    agora,
     };
+  }
 
-    // Salva no localStorage (mesmo formato do Storage.Cursos)
+  function _persistirCurso(curso) {
     try {
       const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
       lista.push(curso);
       localStorage.setItem('ead_cursos', JSON.stringify(lista));
-      // Remove flag de seed para não sobreescrever
     } catch(e) { console.warn('localStorage indisponível:', e); }
-
-    // Remove rascunho se existia
     localStorage.removeItem('ead_draft_curso');
+  }
 
-    // Exibe modal de sucesso
+  function publicar() {
+    collectStep(currentStep);
+    const curso = _buildCursoObj('publicado');
+    _persistirCurso(curso);
+    const titulo = document.getElementById('modal-sucesso-titulo');
+    if (titulo) titulo.textContent = 'Curso publicado com sucesso!';
     document.getElementById('modal-nome-curso').textContent =
       `"${state.nome}" foi publicado e já está disponível para os colaboradores.`;
     document.getElementById('modal-sucesso').classList.add('open');
@@ -1429,12 +1433,22 @@ var Wizard = (() => {
   // ── Rascunho ───────────────────────────────────────────────
   function saveDraft() {
     collectStep(currentStep);
+    // Persiste estado do wizard para retomada posterior
     try {
       localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep }));
     } catch(e) {}
-    const status = document.getElementById('autosave-status');
-    status.textContent = 'Rascunho salvo';
-    setTimeout(() => { status.textContent = ''; }, 3000);
+    // Se o nome já foi preenchido, persiste como curso rascunho em ead_cursos
+    if (state.nome && state.nome.trim()) {
+      const curso = _buildCursoObj('rascunho');
+      _persistirCurso(curso);
+      // Recoloca o draft key (foi removido por _persistirCurso)
+      try {
+        localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep }));
+      } catch(e) {}
+    }
+    const statusEl = document.getElementById('autosave-status');
+    statusEl.textContent = state.nome ? 'Rascunho salvo em Gestão de Cursos' : 'Rascunho salvo';
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
   }
 
   function loadDraft() {
