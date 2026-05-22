@@ -1483,15 +1483,15 @@ tbody tr.selected td { background:#f0f4ff }
             <table>
               <thead>
                 <tr>
-                  <th>Turma</th>
-                  <th>Curso vinculado</th>
-                  <th style="text-align:center">Alunos</th>
-                  <th style="text-align:center">Progresso</th>
-                  <th>Responsável</th>
-                  <th>Início</th>
-                  <th>Encerramento</th>
-                  <th>Status</th>
-                  <th style="width:80px"></th>
+                  <th style="min-width:160px">Turma</th>
+                  <th style="min-width:140px">Curso vinculado</th>
+                  <th style="width:70px;text-align:center">Alunos</th>
+                  <th style="width:120px;text-align:center">Progresso</th>
+                  <th style="min-width:120px">Responsável</th>
+                  <th style="width:96px;white-space:nowrap">Início</th>
+                  <th style="width:110px;white-space:nowrap">Encerramento</th>
+                  <th style="width:110px">Status</th>
+                  <th style="width:88px"></th>
                 </tr>
               </thead>
               <tbody id="tm-tbody"></tbody>
@@ -2468,7 +2468,6 @@ tbody tr.selected td { background:#f0f4ff }
     <div class="mc-tabs">
       <button class="mc-tab active" onclick="Turmas.tabModal(0,this)">Dados</button>
       <button class="mc-tab" onclick="Turmas.tabModal(1,this)">Alunos</button>
-      <button class="mc-tab" onclick="Turmas.tabModal(2,this)">Acesso</button>
     </div>
 
     <!-- Tab 0: Dados da turma -->
@@ -2556,44 +2555,6 @@ tbody tr.selected td { background:#f0f4ff }
     </div>
 
     <!-- Tab 2: Controle de acesso -->
-    <div class="mc-pane" id="mt-pane-2">
-      <div id="mt-config-body">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Acesso automático ao criar</div>
-            <div style="font-size:11px;color:var(--text4)">Libera o curso para os alunos ao salvar a turma</div>
-          </div>
-          <div id="mt-cfg-auto" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Bloquear após encerramento</div>
-            <div style="font-size:11px;color:var(--text4)">Remove acesso dos alunos quando a turma encerrar</div>
-          </div>
-          <div id="mt-cfg-bloquear" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Permitir entrada após início</div>
-            <div style="font-size:11px;color:var(--text4)">Novos alunos podem entrar mesmo após a data de início</div>
-          </div>
-          <div id="mt-cfg-entrada" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="padding:11px 0">
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prazo de conclusão (dias)</div>
-          <div style="font-size:11px;color:var(--text4);margin-bottom:8px">0 = sem prazo definido</div>
-          <input type="number" id="mt-cfg-prazo" min="0" value="0"
-            style="width:120px;padding:7px 11px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font)">
-        </div>
-      </div>
-    </div>
-
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="Turmas.salvar()">
@@ -4969,10 +4930,6 @@ var Turmas = (() => {
     });
     document.getElementById('mt-limite').value = '0';
     document.getElementById('mt-status').value = 'aberta';
-    document.getElementById('mt-cfg-prazo').value = '0';
-    setToggle('mt-cfg-auto', true);
-    setToggle('mt-cfg-bloquear', true);
-    setToggle('mt-cfg-entrada', true);
 
     // Popula select de cursos
     _popularSelectCursos();
@@ -5001,12 +4958,6 @@ var Turmas = (() => {
     document.getElementById('mt-status').value     = t.status || 'aberta';
     document.getElementById('mt-inicio').value     = t.dataInicio ? t.dataInicio.slice(0,10) : '';
     document.getElementById('mt-fim').value        = t.dataFim    ? t.dataFim.slice(0,10)    : '';
-    document.getElementById('mt-cfg-prazo').value  = t.config?.prazoConclucaoDias || 0;
-
-    const cfg = t.config || {};
-    setToggle('mt-cfg-auto',     cfg.acessoAutomatico !== false);
-    setToggle('mt-cfg-bloquear', cfg.bloquearAposEncerramento !== false);
-    setToggle('mt-cfg-entrada',  cfg.permitirEntradaAposInicio !== false);
 
     _popularSelectCursos(t.cursoId);
     renderListaAlunos();
@@ -5159,12 +5110,6 @@ var Turmas = (() => {
       dataInicio:  document.getElementById('mt-inicio')?.value ? new Date(document.getElementById('mt-inicio').value).toISOString() : '',
       dataFim:     document.getElementById('mt-fim')?.value    ? new Date(document.getElementById('mt-fim').value).toISOString()    : '',
       alunos:      [...alunosSel],
-      config: {
-        acessoAutomatico:          getToggleOn('mt-cfg-auto'),
-        bloquearAposEncerramento:  getToggleOn('mt-cfg-bloquear'),
-        permitirEntradaAposInicio: getToggleOn('mt-cfg-entrada'),
-        prazoConclucaoDias:        parseInt(document.getElementById('mt-cfg-prazo')?.value) || 0,
-      },
     };
 
     if (editId) {
