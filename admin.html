@@ -94,6 +94,10 @@ input,select,textarea { font-family:var(--font) }
   animation:popIn .3s ease;
 }
 @keyframes popIn { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
+
+/* Drawer editor de curso */
+#curso-editor-drawer { animation: drawerIn .2s ease }
+@keyframes drawerIn { from { opacity:0; transform:translateX(12px) } to { opacity:1; transform:none } }
 .brand { display:flex; align-items:center; gap:10px; margin-bottom:22px }
 .brand-icon {
   width:34px; height:34px; background:var(--blue);
@@ -2416,141 +2420,38 @@ tbody tr.selected td { background:#f0f4ff }
 
 
 <!-- ═══ MODAL: EDITAR CURSO (tabs) ═══════════════════════════ -->
-<div class="modal-bg" id="modal-edit-curso">
-  <div class="modal" style="max-width:660px">
-    <div class="modal-head">
-      <div>
-        <h3 id="mec-titulo">Editar Curso</h3>
-        <div id="mec-subtitulo" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
-      </div>
-      <button class="modal-close">✕</button>
-    </div>
 
-    <!-- Tabs -->
-    <div class="mc-tabs">
-      <button class="mc-tab active" onclick="CursoEdit.tab(0,this)">Dados Gerais</button>
-      <button class="mc-tab" onclick="CursoEdit.tab(1,this)">Público</button>
-      <button class="mc-tab" onclick="CursoEdit.tab(2,this)">Materiais</button>
-      <button class="mc-tab" onclick="CursoEdit.tab(3,this)">Configurações</button>
-      <button class="mc-tab" onclick="CursoEdit.tab(4,this)">Revisão</button>
-    </div>
-
-    <!-- Tab 0: Dados Gerais -->
-    <div class="mc-pane active" id="mec-pane-0">
-      <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="fg" style="grid-column:1/-1">
-          <label>Nome do curso *</label>
-          <input type="text" id="mec-nome" placeholder="Nome do treinamento">
-        </div>
-        <div class="fg">
-          <label>Categoria</label>
-          <select id="mec-categoria">
-            <option value="">Selecione...</option>
-            <option>Segurança do Trabalho</option><option>Elétrica</option>
-            <option>Telecomunicações</option><option>Gestão e Liderança</option>
-            <option>Atendimento ao Cliente</option><option>Tecnologia da Informação</option>
-            <option>Administrativo</option><option>Operações</option>
-            <option>Compliance</option><option>Outros</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Formato</label>
-          <select id="mec-formato">
-            <option value="ead">EAD (Online)</option>
-            <option value="hibrido">Híbrido</option>
-            <option value="presencial">Presencial</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Carga horária (h)</label>
-          <input type="number" id="mec-carga" min="1">
-        </div>
-        <div class="fg">
-          <label>Nível</label>
-          <select id="mec-nivel">
-            <option value="basico">Básico</option>
-            <option value="intermediario">Intermediário</option>
-            <option value="avancado">Avançado</option>
-          </select>
-        </div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>Descrição</label>
-          <textarea id="mec-descricao" rows="3" placeholder="Objetivo e conteúdo..."></textarea>
-        </div>
-        <div class="fg">
-          <label>Status</label>
-          <select id="mec-status">
-            <option value="rascunho">Rascunho</option>
-            <option value="revisao">Em Revisão</option>
-            <option value="publicado">Publicado</option>
-            <option value="arquivado">Arquivado</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Validade (vazio = sem validade)</label>
-          <input type="date" id="mec-validade">
-        </div>
-        <div class="fg">
-          <label>Prazo de conclusão (dias)</label>
-          <input type="number" id="mec-prazo" placeholder="Ex: 30">
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 1: Público -->
-    <div class="mc-pane" id="mec-pane-1">
-      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Perfis de acesso</div>
-      <div id="mec-publico-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
-      <div class="fg">
-        <label>Visibilidade</label>
-        <select id="mec-visib">
-          <option value="todos">Todos os colaboradores</option>
-          <option value="restrito">Acesso restrito (por setor/equipe)</option>
-        </select>
-      </div>
-      <div class="fg" style="margin-top:12px">
-        <label>Observação sobre o público</label>
-        <textarea id="mec-publico-obs" rows="2"></textarea>
-      </div>
-    </div>
-
-    <!-- Tab 2: Materiais -->
-    <div class="mc-pane" id="mec-pane-2">
-      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">
-        Materiais do curso <span id="mec-mat-count" style="background:var(--blue-light);color:var(--blue);padding:1px 7px;border-radius:99px;font-size:10px;margin-left:6px">0</span>
-      </div>
-      <div id="mec-materiais-lista" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-        <div style="color:var(--text4);font-size:12px;text-align:center;padding:20px">Nenhum material</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-outline btn-sm" onclick="document.getElementById('mec-file-input').click()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload arquivo
-        </button>
-        <button class="btn btn-outline btn-sm" onclick="CursoEdit.addLinkMat()">+ Link externo</button>
-        <input type="file" id="mec-file-input" style="display:none" multiple onchange="CursoEdit.uploadMat(this)">
-      </div>
-    </div>
-
-    <!-- Tab 3: Configurações -->
-    <div class="mc-pane" id="mec-pane-3">
-      <div id="mec-config-body"></div>
-    </div>
-
-    <!-- Tab 4: Revisão -->
-    <div class="mc-pane" id="mec-pane-4">
-      <div id="mec-review-body" style="font-size:13px"></div>
-    </div>
-
-    <div class="modal-foot">
-      <button class="btn btn-ghost modal-close">Cancelar</button>
-      <button class="btn btn-primary" onclick="CursoEdit.salvar()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 0-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Salvar alterações
-      </button>
-    </div>
+<!-- ═══ DRAWER EDITOR DE CURSO (iframe → novo-curso.html) ══ -->
+<div id="curso-editor-drawer" style="
+  display:none; position:fixed; inset:0; z-index:8000;
+  background:var(--bg); flex-direction:column;
+">
+  <!-- Header do drawer -->
+  <div style="
+    display:flex; align-items:center; gap:12px;
+    padding:12px 20px; background:var(--surface);
+    border-bottom:1px solid var(--border); flex-shrink:0;
+  ">
+    <button onclick="CursoDrawer.fechar()" style="
+      display:flex; align-items:center; gap:6px;
+      padding:6px 12px; border:1.5px solid var(--border);
+      border-radius:var(--radius-sm); font-size:12px; font-weight:600;
+      color:var(--text3); background:none; cursor:pointer; font-family:var(--font);
+    ">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar para Gestão de Cursos
+    </button>
+    <span id="drawer-titulo" style="font-size:14px; font-weight:700; color:var(--text)">Editar Curso</span>
   </div>
+  <!-- iframe do wizard -->
+  <iframe
+    id="curso-editor-iframe"
+    src=""
+    style="flex:1; border:none; width:100%; height:100%;"
+    allow="same-origin"
+  ></iframe>
 </div>
+
 
 <!-- ═══ MODAL: TURMA (criar/editar) ════════════════════════════ -->
 <div class="modal-bg" id="modal-turma">
@@ -4504,7 +4405,7 @@ var Cursos = (() => {
 
   /* ── Modal de edição → abre wizard ──────────────────────── */
   function abrirEdit(id) {
-    window.location.href = 'novo-curso.html?edit=' + encodeURIComponent(id);
+    CursoDrawer.abrir(id);
   }
 
   function setVal(id, v) {
@@ -9004,6 +8905,51 @@ var PubMod = (() => {
 
 <script>
 /* ── Portal Menu — renderiza no body, nunca clipado ─────────── */
+/* ── CursoDrawer — abre novo-curso.html em iframe fullscreen ── */
+var CursoDrawer = (() => {
+  function abrir(id) {
+    const drawer = document.getElementById('curso-editor-drawer');
+    const iframe = document.getElementById('curso-editor-iframe');
+    const titulo = document.getElementById('drawer-titulo');
+    if (!drawer || !iframe) return;
+
+    const c = Storage.Cursos.obter(id);
+    if (titulo) titulo.textContent = c ? `Editar: ${c.titulo}` : 'Editar Curso';
+
+    iframe.src = 'novo-curso.html?edit=' + encodeURIComponent(id);
+    drawer.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Escutar mensagem do iframe quando o wizard finalizar
+    window._drawerEditId = id;
+  }
+
+  function fechar() {
+    const drawer = document.getElementById('curso-editor-drawer');
+    const iframe = document.getElementById('curso-editor-iframe');
+    if (!drawer) return;
+    drawer.style.display = 'none';
+    if (iframe) iframe.src = '';
+    document.body.style.overflow = '';
+    window._drawerEditId = null;
+    // Recarregar tabela de cursos
+    if (typeof Cursos !== 'undefined') Cursos.renderTabela?.();
+  }
+
+  // Fechar ao pressionar Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('curso-editor-drawer')?.style.display === 'flex')
+      fechar();
+  });
+
+  // Escutar evento do iframe (quando clicar "Ir para curso" ou fechar modal de sucesso)
+  window.addEventListener('message', e => {
+    if (e.data === 'wizard:concluido') fechar();
+  });
+
+  return { abrir, fechar };
+})();
+
 var PortalMenu = (() => {
   const MARGIN = 8; // px de margem das bordas da viewport
   let _closeListener = null;
