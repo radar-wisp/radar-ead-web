@@ -1819,32 +1819,69 @@ var Wizard = (() => {
 
   function restoreFields() {
     const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
-    setVal('f-nome', state.nome);
-    setVal('f-categoria', state.categoria);
-    setVal('f-formato', state.formato);
-    setVal('f-carga', state.carga);
-    setVal('f-nivel', state.nivel);
-    setVal('f-desc', state.descricao);
-    setVal('f-publico-obs', state.publicoObs);
-    setVal('f-data-inicio', state.dataInicio);
-    setVal('f-validade', state.validade);
-    setVal('f-prazo', state.prazo);
+    // Dados gerais
+    setVal('f-nome',       state.nome);
+    setVal('f-categoria',  state.categoria);
+    setVal('f-formato',    state.formato);
+    setVal('f-carga',      state.carga);
+    setVal('f-nivel',      state.nivel);
+    setVal('f-desc',       state.descricao);
+    setVal('f-publico-obs',state.publicoObs);
 
-    // Tags de público
-    document.querySelectorAll('#publico-tags .tag-chip').forEach(el => {
-      el.classList.toggle('selected', state.publico.includes(el.dataset.val));
-    });
-    // Acessos
-    ['setor','equipe','cargo','colab'].forEach(tipo => {
-      renderAccessTags(tipo, `tags-${tipo}`);
-    });
-    // Materiais
-    renderMateriais();
+    // Validade
+    setVal('f-data-inicio', state.dataInicio);
+    setVal('f-validade',    state.validade);
+    setVal('f-prazo',       state.prazo);
+    const temValidade = !!(state.dataInicio || state.validade || state.prazo);
+    const togVal   = document.getElementById('tog-validade');
+    const rowVal   = document.getElementById('val-toggle');
+    const fldVal   = document.getElementById('validade-fields');
+    if (temValidade) {
+      togVal?.classList.add('on');
+      rowVal?.classList.add('on');
+      if (fldVal) fldVal.style.display = 'grid';
+    }
+
     // Capa
     if (state.capa) {
       const img = document.getElementById('f-capa-preview');
-      img.src = state.capa; img.style.display = 'block';
+      if (img) { img.src = state.capa; img.style.display = 'block'; }
     }
+
+    // Visibilidade + chips de acesso (accordion)
+    setVisib(state.visib || 'todos');
+    ['setor','equipe','cargo','colab'].forEach(t => renderChips(t));
+
+    // Materiais — só renderiza se o elemento já existir no DOM
+    // (pane-4 pode estar oculto; renderMateriais verifica internamente)
+    renderMateriais();
+
+    // Módulos — Conteudo.render() checa se o elemento existe
+    if (typeof Conteudo !== 'undefined') Conteudo.render();
+
+    // Configurações
+    const tog = (id, val) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('on', !!val);
+    };
+    const cfg = state.config || {};
+    tog('tog-obrigatorio', cfg.obrigatorio);
+    tog('tog-certificado', cfg.certificado);
+    tog('tog-avaliacao',   cfg.avaliacao);
+    tog('tog-progresso',   cfg.progresso);
+    tog('tog-ocultar',     cfg.ocultar);
+    tog('tog-sequencial',  cfg.sequencial);
+    setVal('f-nota-min', cfg.notaMin || 70);
+    const notaRow = document.getElementById('nota-min-row');
+    if (notaRow) notaRow.style.display = cfg.avaliacao ? 'flex' : 'none';
+
+    // Quiz chip
+    const temQuiz = state.materiais.some(m => m.tipo === 'quiz');
+    const btnQuiz  = document.getElementById('btn-add-quiz');
+    const chipQuiz = document.getElementById('quiz-chip');
+    if (btnQuiz)  btnQuiz.style.display  = temQuiz ? 'none' : '';
+    if (chipQuiz) chipQuiz.style.display = temQuiz ? 'flex' : 'none';
   }
 
   // ── Modal ──────────────────────────────────────────────────
