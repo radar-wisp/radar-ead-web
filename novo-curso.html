@@ -1722,22 +1722,30 @@ var Wizard = (() => {
   }
 
   function _persistirCurso(dadosCurso) {
+    // EadStorage é o alias seguro — window.Storage é a Web Storage API nativa
+    const EadStorage = (typeof window !== 'undefined' && window.Storage && window.Storage.Cursos)
+      ? window.Storage : null;
     try {
-      // Usar Storage.Cursos.criar() garante id, criadoEm e compatibilidade com seed
-      if (typeof Storage !== 'undefined' && Storage.Cursos) {
-        Storage.Cursos.criar(dadosCurso);
+      if (EadStorage) {
+        const novo = EadStorage.Cursos.criar(dadosCurso);
+        console.log('[Wizard] Curso criado:', novo?.id, novo?.titulo);
       } else {
-        // Fallback: escrita direta se storage.js não carregou ainda
+        console.warn('[Wizard] EadStorage não disponível, escrita direta');
         const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
         const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
         lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
         localStorage.setItem('ead_cursos', JSON.stringify(lista));
-        // Garantir que a seed não sobrescreva no próximo boot do admin
-        if (!localStorage.getItem('ead_seeded_v2')) {
-          localStorage.setItem('ead_seeded_v2', '1');
-        }
+        localStorage.setItem('ead_seeded_v2', '1');
       }
-    } catch(e) { console.warn('Erro ao persistir curso:', e); }
+    } catch(e) {
+      console.error('[Wizard] Erro ao persistir:', e);
+      try {
+        const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+        lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
+        localStorage.setItem('ead_cursos', JSON.stringify(lista));
+      } catch(e2) { console.error('[Wizard] Fallback falhou:', e2); }
+    }
     localStorage.removeItem('ead_draft_curso');
   }
 
@@ -1755,22 +1763,15 @@ var Wizard = (() => {
   // ── Rascunho ───────────────────────────────────────────────
   function saveDraft() {
     collectStep(currentStep);
-    // Persiste estado do wizard para retomada posterior
+    // Salva apenas o estado do wizard para retomada — NÃO cria entrada em ead_cursos
     try {
       localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep }));
     } catch(e) {}
-    // Se o nome já foi preenchido, persiste como curso rascunho em ead_cursos
-    if (state.nome && state.nome.trim()) {
-      const curso = _buildCursoObj('rascunho');
-      _persistirCurso(curso);
-      // Recoloca o draft key (foi removido por _persistirCurso)
-      try {
-        localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep }));
-      } catch(e) {}
-    }
     const statusEl = document.getElementById('autosave-status');
-    statusEl.textContent = state.nome ? 'Rascunho salvo em Gestão de Cursos' : 'Rascunho salvo';
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    if (statusEl) {
+      statusEl.textContent = 'Rascunho salvo';
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    }
   }
 
   function loadDraft() {
