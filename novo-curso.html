@@ -1695,11 +1695,9 @@ var Wizard = (() => {
   // ── Publicar ───────────────────────────────────────────────
   // ── Persiste curso no localStorage (mesmo schema do Storage.Cursos) ──
   function _buildCursoObj(statusOverride) {
-    const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     const agora = new Date().toISOString();
     const isPublicado = statusOverride === 'publicado';
     return {
-      id:          genId(),
       titulo:      state.nome,
       descricao:   state.descricao,
       categoria:   state.categoria,
@@ -1712,23 +1710,33 @@ var Wizard = (() => {
       publicoObs:  state.publicoObs,
       visib:       state.visib,
       acessos:     state.acessos,
-      validadeAte: state.validade || null,   // ← campo correto (Storage usa validadeAte)
+      validadeAte: state.validade || null,
       prazo:       state.prazo || null,
       modulos:     state.modulos,
       materiais:   state.materiais,
       config:      state.config,
       status:      statusOverride,
       publicadoEm: isPublicado ? agora : null,
-      criadoEm:    agora,
     };
   }
 
-  function _persistirCurso(curso) {
+  function _persistirCurso(dadosCurso) {
     try {
-      const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
-      lista.push(curso);
-      localStorage.setItem('ead_cursos', JSON.stringify(lista));
-    } catch(e) { console.warn('localStorage indisponível:', e); }
+      // Usar Storage.Cursos.criar() garante id, criadoEm e compatibilidade com seed
+      if (typeof Storage !== 'undefined' && Storage.Cursos) {
+        Storage.Cursos.criar(dadosCurso);
+      } else {
+        // Fallback: escrita direta se storage.js não carregou ainda
+        const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+        lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
+        localStorage.setItem('ead_cursos', JSON.stringify(lista));
+        // Garantir que a seed não sobrescreva no próximo boot do admin
+        if (!localStorage.getItem('ead_seeded_v2')) {
+          localStorage.setItem('ead_seeded_v2', '1');
+        }
+      }
+    } catch(e) { console.warn('Erro ao persistir curso:', e); }
     localStorage.removeItem('ead_draft_curso');
   }
 
@@ -2302,5 +2310,6 @@ var Wizard = (() => {
 
 document.addEventListener('DOMContentLoaded', () => Wizard.init());
 </script>
+<script src="src/js/storage.js"></script>
 </body>
 </html>
