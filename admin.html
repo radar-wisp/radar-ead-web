@@ -2537,13 +2537,12 @@ tbody tr.selected td { background:#f0f4ff }
 
       <!-- Busca de alunos -->
       <div style="position:relative;margin-bottom:10px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
-          oninput="Turmas.filtrarAlunos()"
-          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4)">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4);display:flex">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </span>
+        <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
+          oninput="Turmas.filtrarAlunos()"
+          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text);box-sizing:border-box">
       </div>
 
       <!-- Lista de alunos com checkboxes -->
@@ -2610,15 +2609,26 @@ tbody tr.selected td { background:#f0f4ff }
       <div id="td-participantes" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
     </div>
     <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost btn-sm" onclick="Turmas.abrirGerenciarAlunos(Turmas._viewingId)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Gerenciar alunos
-      </button>
-      <button class="btn btn-ghost btn-sm" onclick="Turmas.abrirEdit(Turmas._viewingId);document.getElementById('modal-turma-dash').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Editar turma
-      </button>
       <button class="btn btn-ghost" onclick="document.getElementById('modal-turma-dash').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: SELEÇÃO POR SETOR/EQUIPE (turmas) ══════════════ -->
+<div class="modal-bg" id="modal-tm-sel">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <h3 id="tm-sel-titulo">Selecionar por setor</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-tm-sel').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div style="padding:4px 0 8px">
+      <div id="tm-sel-lista" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding:0 4px"></div>
+      <div id="tm-sel-vazio" style="display:none;padding:20px;text-align:center;font-size:13px;color:var(--text4)">Nenhum item encontrado.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-tm-sel').classList.remove('open')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -4837,7 +4847,6 @@ var Turmas = (() => {
     const html = `
       <button onclick="Turmas.visualizar('${id}');PortalMenu.close()">${svgEye} Visualizar</button>
       <button onclick="Turmas.abrirEdit('${id}');PortalMenu.close()">${svgEdit} Editar</button>
-      <button onclick="Turmas.abrirGerenciarAlunos('${id}');PortalMenu.close()">${svgUsers} Gerenciar alunos</button>
       <hr class="sep">
       ${podeEncerrar ? `<button onclick="Turmas.encerrar('${id}');PortalMenu.close()">${svgStop} Encerrar turma</button><hr class="sep">` : ''}
       <button class="danger" onclick="Turmas.excluir('${id}');PortalMenu.close()">${svgTrash} Excluir</button>`;
@@ -5052,30 +5061,71 @@ var Turmas = (() => {
   }
 
   /* ── Seleções rápidas ───────────────────────────────────────── */
+  function _abrirSelModal(titulo, itens, onSelect) {
+    const modal = document.getElementById('modal-tm-sel');
+    const lista = document.getElementById('tm-sel-lista');
+    const vazio = document.getElementById('tm-sel-vazio');
+    document.getElementById('tm-sel-titulo').textContent = titulo;
+
+    if (!itens.length) {
+      lista.innerHTML = '';
+      vazio.style.display = 'block';
+    } else {
+      vazio.style.display = 'none';
+      lista.innerHTML = itens.map(item => `
+        <button onclick="Turmas._selModalItem(this)" data-id="${item.id}"
+          style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:none;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:13px;color:var(--text);text-align:left;transition:background .1s"
+          onmouseover="this.style.background='var(--blue-light)'"
+          onmouseout="this.style.background='none'">
+          <span style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">
+            ${(item.nome?.[0]||'?').toUpperCase()}
+          </span>
+          <span style="flex:1">${x(item.nome)}</span>
+          <span style="font-size:11px;color:var(--text4)">${item._count || ''}</span>
+        </button>`).join('');
+    }
+
+    modal._onSelect = onSelect;
+    modal.classList.add('open');
+  }
+
+  // chamado pelo botão inline gerado acima
+  window._tmSelCb = null;
+  function _selModalItem(btn) {
+    const modal = document.getElementById('modal-tm-sel');
+    const id = btn.dataset.id;
+    modal.classList.remove('open');
+    if (typeof modal._onSelect === 'function') modal._onSelect(id);
+  }
+  // expor para onclick inline
+  if (!window.Turmas) window.Turmas = {};
+
   function selecionarPorSetor() {
-    const setores = Storage.Setores.listar();
-    if (!setores.length) { _toast('Nenhum setor cadastrado.', 'i'); return; }
-    const nomes = setores.map((s,i) => `${i+1}. ${s.nome}`).join('\n');
-    const resp  = prompt(`Selecione o setor (número):\n${nomes}`);
-    const idx   = parseInt(resp) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= setores.length) return;
-    const ids = Storage.Alunos.porSetor(setores[idx].id).map(a => a.id);
-    ids.forEach(id => alunosSel.add(id));
-    renderListaAlunos();
-    _toast(`${ids.length} aluno(s) do setor "${setores[idx].nome}" adicionados.`, 's');
+    const setores = Storage.Setores.listar().map(s => ({
+      ...s,
+      _count: Storage.Alunos.porSetor(s.id).length + ' aluno(s)'
+    }));
+    _abrirSelModal('Selecionar por setor', setores, (setorId) => {
+      const setor = Storage.Setores.obter(setorId);
+      const ids = Storage.Alunos.porSetor(setorId).map(a => a.id);
+      ids.forEach(id => alunosSel.add(id));
+      renderListaAlunos();
+      _toast(`${ids.length} aluno(s) do setor "${setor?.nome}" adicionados.`, 's');
+    });
   }
 
   function selecionarPorEquipe() {
-    const equipes = Storage.Equipes.listar();
-    if (!equipes.length) { _toast('Nenhuma equipe cadastrada.', 'i'); return; }
-    const nomes = equipes.map((e,i) => `${i+1}. ${e.nome}`).join('\n');
-    const resp  = prompt(`Selecione a equipe (número):\n${nomes}`);
-    const idx   = parseInt(resp) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= equipes.length) return;
-    const ids = Storage.Alunos.porEquipe(equipes[idx].id).map(a => a.id);
-    ids.forEach(id => alunosSel.add(id));
-    renderListaAlunos();
-    _toast(`${ids.length} aluno(s) da equipe "${equipes[idx].nome}" adicionados.`, 's');
+    const equipes = Storage.Equipes.listar().map(e => ({
+      ...e,
+      _count: Storage.Alunos.porEquipe(e.id).length + ' aluno(s)'
+    }));
+    _abrirSelModal('Selecionar por equipe', equipes, (equipeId) => {
+      const equipe = Storage.Equipes.obter(equipeId);
+      const ids = Storage.Alunos.porEquipe(equipeId).map(a => a.id);
+      ids.forEach(id => alunosSel.add(id));
+      renderListaAlunos();
+      _toast(`${ids.length} aluno(s) da equipe "${equipe?.nome}" adicionados.`, 's');
+    });
   }
 
   function selecionarTodos() {
@@ -5164,7 +5214,7 @@ var Turmas = (() => {
     visualizar, encerrar, excluir, salvar,
     tabModal, renderListaAlunos,
     selecionarPorSetor, selecionarPorEquipe, selecionarTodos, limparAlunos,
-    _menu, _closeMenus, _toggleAluno, _viewingId,
+    _menu, _closeMenus, _toggleAluno, _viewingId, _selModalItem,
   };
 })();
 
