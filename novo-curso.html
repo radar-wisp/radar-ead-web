@@ -1286,8 +1286,31 @@ var Wizard = (() => {
 
     document.getElementById('step-indicator').textContent = `Etapa ${currentStep + 1} de ${TOTAL}`;
 
-    // Se chegou na revisão, renderiza
+    // Re-renderizar componentes dinâmicos ao entrar no pane
+    if (currentStep === 2) {
+      // Chips de acesso e validade toggle
+      ['setor','equipe','cargo','colab'].forEach(t => renderChips(t));
+      const temVal = !!(state.dataInicio || state.validade || state.prazo);
+      document.getElementById('tog-validade')?.classList.toggle('on', temVal);
+      document.getElementById('val-toggle')?.classList.toggle('on', temVal);
+      const fv = document.getElementById('validade-fields');
+      if (fv) fv.style.display = temVal ? 'grid' : 'none';
+    }
     if (currentStep === 3) Conteudo.render();
+    if (currentStep === 4) renderMateriais();
+    if (currentStep === 5) {
+      // Restaurar toggles de configuração
+      const cfg = state.config || {};
+      const tog = (id, v) => document.getElementById(id)?.classList.toggle('on', !!v);
+      tog('tog-obrigatorio', cfg.obrigatorio);
+      tog('tog-certificado', cfg.certificado);
+      tog('tog-avaliacao',   cfg.avaliacao);
+      tog('tog-progresso',   cfg.progresso);
+      tog('tog-ocultar',     cfg.ocultar);
+      tog('tog-sequencial',  cfg.sequencial);
+      const nm = document.getElementById('nota-min-row');
+      if (nm) nm.style.display = cfg.avaliacao ? 'flex' : 'none';
+    }
     if (currentStep === 6) renderReview();
   }
 
@@ -1920,15 +1943,31 @@ var Wizard = (() => {
     const params = new URLSearchParams(window.location.search);
     const editId = params.get('edit');
     if (!editId) return;
-    const EadStorage = (typeof window !== 'undefined' && window.Storage?.Cursos) ? window.Storage : null;
-    const c = EadStorage ? EadStorage.Cursos.obter(editId) : null;
-    if (!c) return;
+
+    // Tentar via Storage object (pode ter sido sobrescrito pelo storage.js)
+    // Fallback: ler diretamente do localStorage
+    let c = null;
+    try {
+      if (typeof Storage !== 'undefined' && Storage.Cursos?.obter) {
+        c = Storage.Cursos.obter(editId);
+      }
+    } catch(e) {}
+
+    if (!c) {
+      // Fallback direto
+      try {
+        const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+        c = lista.find(x => x.id === editId) || null;
+      } catch(e) {}
+    }
+
+    if (!c) { console.warn('[Wizard] Curso não encontrado para edição:', editId); return; }
+
     _editId = editId;
-    // Popular state com dados do curso
     state.nome        = c.titulo        || '';
     state.categoria   = c.categoria     || '';
     state.formato     = c.formato       || 'ead';
-    state.carga       = c.carga         || '';
+    state.carga       = String(c.carga  || '');
     state.nivel       = c.nivel         || 'basico';
     state.descricao   = c.descricao     || '';
     state.capa        = c.capa          || null;
@@ -1943,18 +1982,17 @@ var Wizard = (() => {
     state.modulos     = c.modulos       || [];
     state.materiais   = c.materiais     || [];
     state.config      = { ...state.config, ...(c.config || {}) };
-    // Atualizar título da página
-    const h = document.querySelector('.form-card-head h2');
-    if (h) h.textContent = 'Editar Curso';
-    const btn = document.getElementById('btn-next');
-    // Atualizar label do botão final
     document.title = 'Editar Curso — Radar EAD';
+    console.log('[Wizard] Modo edição:', editId, '|', state.nome, '| materiais:', state.materiais.length);
   }
 
   function init() {
     _loadEditMode();
     updateStepperUI();
-    restoreFields();
+    // rAF garante que o browser pintou o DOM antes de restaurar campos visuais
+    requestAnimationFrame(() => {
+      restoreFields();
+    });
     if (!_editId) loadDraft();
 
     setInterval(() => {
