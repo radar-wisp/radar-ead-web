@@ -662,7 +662,7 @@ input,select,textarea { font-family:var(--font) }
             <div class="field" style="grid-column:1/-1">
               <label>Imagem / Capa do Curso</label>
               <div class="upload-zone" onclick="document.getElementById('f-capa-input').click()">
-                <input type="file" id="f-capa-input" accept="image/*" onchange="Wizard.previewCapa(this)">
+                <input type="file" id="f-capa-input" accept="image/*" onclick="event.stopPropagation()" onchange="Wizard.previewCapa(this)">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block;color:var(--text4)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <div class="uz-title">Clique para selecionar a capa</div>
                 <div class="uz-sub">PNG, JPG ou WEBP — recomendado 1280×720px</div>
@@ -1468,7 +1468,7 @@ var Wizard = (() => {
       const content = document.querySelector('.content');
       if (content) content.insertBefore(banner, content.firstChild);
       // Salva o draft para uso posterior
-      Wizard._pendingDraft = d;
+      _pendingDraft = d;
     } catch(e) {}
   }
 
@@ -1538,10 +1538,11 @@ var Wizard = (() => {
     }, 30000);
   }
 
-  Wizard._pendingDraft = null;
+  // Variável interna — não depende de Wizard estar definido
+  let _pendingDraft = null;
 
-  Wizard._applyDraft = function() {
-    const d = Wizard._pendingDraft;
+  function _applyDraft() {
+    const d = _pendingDraft;
     if (!d) return;
     state = d.state;
     currentStep = d.currentStep;
@@ -1549,15 +1550,15 @@ var Wizard = (() => {
     updateStepperUI();
     const b = document.getElementById('draft-banner');
     if (b) b.remove();
-    Wizard._pendingDraft = null;
-  };
+    _pendingDraft = null;
+  }
 
-  Wizard._discardDraft = function() {
+  function _discardDraft() {
     localStorage.removeItem('ead_draft_curso');
-    Wizard._pendingDraft = null;
+    _pendingDraft = null;
     const b = document.getElementById('draft-banner');
     if (b) b.remove();
-  };
+  }
 
   return {
     next, prev, jumpTo, saveDraft,
@@ -1565,6 +1566,9 @@ var Wizard = (() => {
     toggleCheck, toggleSwitch, previewCapa,
     addFiles, addLink, addQuiz, removeMaterial,
     fecharModal, irParaCurso, init,
+    _applyDraft, _discardDraft,
+    get _pendingDraft() { return _pendingDraft; },
+    set _pendingDraft(v) { _pendingDraft = v; },
   };
 
 })();
