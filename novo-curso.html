@@ -985,17 +985,21 @@ input,select,textarea { font-family:var(--font) }
           <div class="section-title">Validade e Prazo</div>
           <div class="val-toggle-row" id="val-toggle" onclick="Wizard.toggleValidade()">
             <div style="flex:1">
-              <div class="vt-label">Definir data de validade do curso</div>
-              <div class="vt-sub">O curso expira automaticamente na data informada</div>
+              <div class="vt-label">Definir período de disponibilidade</div>
+              <div class="vt-sub">O curso ficará disponível entre as datas informadas</div>
             </div>
             <div class="toggle" id="tog-validade"></div>
           </div>
           <div class="validade-row" id="validade-fields" style="display:none">
             <div class="field" style="margin:0">
-              <label>Válido até</label>
-              <input type="date" id="f-validade">
+              <label>Data inicial</label>
+              <input type="date" id="f-data-inicio">
             </div>
             <div class="field" style="margin:0">
+              <label>Data final</label>
+              <input type="date" id="f-validade">
+            </div>
+            <div class="field" style="margin:0; grid-column: 1 / -1">
               <label>Prazo de conclusão (dias)</label>
               <input type="number" id="f-prazo" placeholder="Ex: 30" min="1">
             </div>
@@ -1226,6 +1230,7 @@ var Wizard = (() => {
 
   let currentStep = 0;
   const TOTAL = 7;
+  let _editId = null; // ID do curso em edição (null = novo curso)
 
   // Estado do formulário
   let state = {
@@ -1234,7 +1239,7 @@ var Wizard = (() => {
     publico: [], publicoObs: '',
     visib: 'todos',
     acessos: { setor: [], equipe: [], cargo: [], colab: [] },
-    validade: '', prazo: '',
+    validade: '', dataInicio: '', prazo: '',
     modulos: [],   // [{ id, titulo, status, aulas:[{id,titulo,tipo,durMin,status}] }]
     materiais: [],
     config: {
@@ -1328,8 +1333,9 @@ var Wizard = (() => {
       state.publicoObs = val('f-publico-obs');
     }
     if (step === 2) {
-      state.validade = val('f-validade');
-      state.prazo    = val('f-prazo');
+      state.dataInicio = val('f-data-inicio');
+      state.validade   = val('f-validade');
+      state.prazo      = val('f-prazo');
     }
     if (step === 3) {
       // state.modulos já é gerenciado diretamente por Conteudo.*
@@ -1400,6 +1406,12 @@ var Wizard = (() => {
   }
 
   // ── Autocomplete ───────────────────────────────────────────
+  // Fecha todos os dropdowns ao clicar fora de qualquer acc-item
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.acc-item'))
+      document.querySelectorAll('.ac-dropdown.open').forEach(d => d.classList.remove('open'));
+  });
+
   function acOpen(tipo) {
     acFilter(tipo, document.getElementById('ac-' + tipo)?.value || '');
   }
@@ -1413,20 +1425,13 @@ var Wizard = (() => {
       o.toLowerCase().includes(term) && !state.acessos[tipo].includes(o)
     );
     _acFocused[tipo] = -1;
-    if (!filtered.length) {
-      dd.innerHTML = `<div class="ac-empty">Nenhum resultado</div>`;
-    } else {
-      dd.innerHTML = filtered.map((o, i) => {
-        const hi = term ? o.replace(new RegExp(`(${term})`, 'gi'), '<span class="ac-match">$1</span>') : o;
-        return `<div class="ac-opt" data-val="${escHtml(o)}" data-i="${i}" onmousedown="event.preventDefault();Wizard.acSelect('${tipo}','${escHtml(o)}')">${hi}</div>`;
-      }).join('');
-    }
+    dd.innerHTML = filtered.length
+      ? filtered.map((o, i) => {
+          const hi = term ? o.replace(new RegExp(`(${term})`, 'gi'), '<span class="ac-match">$1</span>') : o;
+          return `<div class="ac-opt" data-val="${escHtml(o)}" data-i="${i}" onmousedown="event.preventDefault();Wizard.acSelect('${tipo}','${escHtml(o)}')">${hi}</div>`;
+        }).join('')
+      : `<div class="ac-empty">Nenhum resultado</div>`;
     dd.classList.add('open');
-    // Fechar ao clicar fora
-    setTimeout(() => {
-      const close = () => { dd.classList.remove('open'); document.removeEventListener('click', close); };
-      document.addEventListener('click', close, { once: true });
-    }, 10);
   }
 
   function acSelect(tipo, nome) {
@@ -1434,8 +1439,8 @@ var Wizard = (() => {
     state.acessos[tipo].push(nome);
     renderChips(tipo);
     const inp = document.getElementById('ac-' + tipo);
-    if (inp) inp.value = '';
-    document.getElementById('acd-' + tipo)?.classList.remove('open');
+    if (inp) { inp.value = ''; inp.focus(); }
+    acFilter(tipo, ''); // re-abre com lista atualizada
   }
 
   function acKey(e, tipo) {
@@ -1711,8 +1716,9 @@ var Wizard = (() => {
       publicoObs:  state.publicoObs,
       visib:       state.visib,
       acessos:     state.acessos,
-      validadeAte: state.validade || null,
-      prazo:       state.prazo || null,
+      validadeAte:  state.validade   || null,
+      dataInicio:   state.dataInicio || null,
+      prazo:        state.prazo      || null,
       modulos:     state.modulos,
       materiais:   state.materiais,
       config:      state.config,
@@ -1751,12 +1757,28 @@ var Wizard = (() => {
 
   function publicar() {
     collectStep(currentStep);
-    const curso = _buildCursoObj('publicado');
-    _persistirCurso(curso);
+    const dados = _buildCursoObj('publicado');
+    if (_editId) {
+      // Modo edição — atualizar curso existente
+      const EadStorage = (typeof window !== 'undefined' && window.Storage?.Cursos) ? window.Storage : null;
+      try {
+        if (EadStorage) {
+          EadStorage.Cursos.atualizar(_editId, dados);
+        } else {
+          const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
+          const idx = lista.findIndex(c => c.id === _editId);
+          if (idx >= 0) lista[idx] = { ...lista[idx], ...dados };
+          localStorage.setItem('ead_cursos', JSON.stringify(lista));
+        }
+      } catch(e) { console.error('[Wizard] Erro ao atualizar:', e); }
+    } else {
+      _persistirCurso(dados);
+    }
+    localStorage.removeItem('ead_draft_curso');
     const titulo = document.getElementById('modal-sucesso-titulo');
-    if (titulo) titulo.textContent = 'Curso publicado com sucesso!';
+    if (titulo) titulo.textContent = _editId ? 'Curso atualizado com sucesso!' : 'Curso publicado com sucesso!';
     document.getElementById('modal-nome-curso').textContent =
-      `"${state.nome}" foi publicado e já está disponível para os colaboradores.`;
+      `"${state.nome}" foi ${_editId ? 'atualizado' : 'publicado'} e já está disponível para os colaboradores.`;
     document.getElementById('modal-sucesso').classList.add('open');
   }
 
@@ -1804,6 +1826,7 @@ var Wizard = (() => {
     setVal('f-nivel', state.nivel);
     setVal('f-desc', state.descricao);
     setVal('f-publico-obs', state.publicoObs);
+    setVal('f-data-inicio', state.dataInicio);
     setVal('f-validade', state.validade);
     setVal('f-prazo', state.prazo);
 
@@ -1847,17 +1870,52 @@ var Wizard = (() => {
   }
 
   // ── Init ───────────────────────────────────────────────────
-  function init() {
-    updateStepperUI();
-    loadDraft();
+  function _loadEditMode() {
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('edit');
+    if (!editId) return;
+    const EadStorage = (typeof window !== 'undefined' && window.Storage?.Cursos) ? window.Storage : null;
+    const c = EadStorage ? EadStorage.Cursos.obter(editId) : null;
+    if (!c) return;
+    _editId = editId;
+    // Popular state com dados do curso
+    state.nome        = c.titulo        || '';
+    state.categoria   = c.categoria     || '';
+    state.formato     = c.formato       || 'ead';
+    state.carga       = c.carga         || '';
+    state.nivel       = c.nivel         || 'basico';
+    state.descricao   = c.descricao     || '';
+    state.capa        = c.capa          || null;
+    state.capaName    = c.capaName      || null;
+    state.publico     = c.publico       || [];
+    state.publicoObs  = c.publicoObs    || '';
+    state.visib       = c.visib         || 'todos';
+    state.acessos     = c.acessos       || { setor:[], equipe:[], cargo:[], colab:[] };
+    state.dataInicio  = c.dataInicio    || '';
+    state.validade    = c.validadeAte   || '';
+    state.prazo       = c.prazo         || '';
+    state.modulos     = c.modulos       || [];
+    state.materiais   = c.materiais     || [];
+    state.config      = { ...state.config, ...(c.config || {}) };
+    // Atualizar título da página
+    const h = document.querySelector('.form-card-head h2');
+    if (h) h.textContent = 'Editar Curso';
+    const btn = document.getElementById('btn-next');
+    // Atualizar label do botão final
+    document.title = 'Editar Curso — Radar EAD';
+  }
 
-    // Autosave a cada 30s
+  function init() {
+    _loadEditMode();
+    updateStepperUI();
+    restoreFields();
+    if (!_editId) loadDraft();
+
     setInterval(() => {
       collectStep(currentStep);
       try { localStorage.setItem('ead_draft_curso', JSON.stringify({ state, currentStep })); } catch(e) {}
       const status = document.getElementById('autosave-status');
-      status.textContent = 'Salvo automaticamente';
-      setTimeout(() => { status.textContent = ''; }, 2000);
+      if (status) { status.textContent = 'Salvo automaticamente'; setTimeout(() => { status.textContent = ''; }, 2000); }
     }, 30000);
   }
 
