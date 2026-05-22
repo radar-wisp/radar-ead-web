@@ -4502,56 +4502,9 @@ var Cursos = (() => {
     }).join('') + '<div style="padding-top:2px"></div>';
   }
 
-  /* ── Modal de edição ─────────────────────────────────────── */
+  /* ── Modal de edição → abre wizard ──────────────────────── */
   function abrirEdit(id) {
-    cursoEditId = id;
-    const c = Storage.Cursos.obter(id);
-    if (!c) return;
-
-    matEdit = [...(Storage.Materiais.listarPorCurso(id) || [])];
-
-    // Preenche campos — tab 0
-    setVal('mec-nome', c.titulo);
-    setVal('mec-categoria', c.categoria);
-    setVal('mec-formato', c.formato || 'ead');
-    setVal('mec-carga', c.carga);
-    setVal('mec-nivel', c.nivel || 'basico');
-    setVal('mec-descricao', c.descricao);
-    setVal('mec-status', c.status || 'rascunho');
-    setVal('mec-validade', c.validadeAte ? c.validadeAte.split('T')[0] : '');
-    setVal('mec-prazo', c.prazo || '');
-
-    // tab 1 — público
-    const publico = c.publico || [];
-    document.getElementById('mec-publico-chips').innerHTML = [
-      'tecnicos','eletricistas','administrativo','operacional',
-      'gestores','liderança','novos-colaboradores','todos','outros'
-    ].map(v => {
-      const sel = publico.includes(v);
-      return `<span class="tag-chip ${sel?'selected':''}" data-val="${v}"
-        onclick="this.classList.toggle('selected')"
-        style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid ${sel?'var(--blue)':'var(--border)'};border-radius:99px;font-size:12px;font-weight:500;color:${sel?'#fff':'var(--text3)'};cursor:pointer;background:${sel?'var(--blue)':'var(--surface)'};transition:all .12s">
-        ${v.charAt(0).toUpperCase() + v.slice(1).replace('-',' ')}
-      </span>`;
-    }).join('');
-    setVal('mec-visib', c.visib || 'todos');
-    setVal('mec-publico-obs', c.publicoObs || '');
-
-    // tab 2 — materiais
-    renderMatEdit();
-
-    // tab 3 — config
-    renderConfigEdit(c.config || {});
-
-    // Título do modal
-    document.getElementById('mec-titulo').textContent = `Editar: ${c.titulo}`;
-    document.getElementById('mec-subtitulo').textContent =
-      `ID: ${id.slice(0,8)}… · Criado em ${fmtDate(c.criadoEm)}`;
-
-    // Vai para tab 0
-    CursoEdit.tab(0, document.querySelector('.mc-tab'));
-
-    document.getElementById('modal-edit-curso').classList.add('open');
+    window.location.href = 'novo-curso.html?edit=' + encodeURIComponent(id);
   }
 
   function setVal(id, v) {
