@@ -1850,11 +1850,20 @@ var Wizard = (() => {
   // ── Modal ──────────────────────────────────────────────────
   function fecharModal() {
     document.getElementById('modal-sucesso').classList.remove('open');
-    window.location.href = 'admin.html';
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage('wizard:concluido', '*');
+    } else {
+      window.location.href = 'admin.html';
+    }
   }
 
   function irParaCurso() {
-    window.location.href = 'admin.html';
+    // Se estiver dentro do drawer do admin, fecha via postMessage
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage('wizard:concluido', '*');
+    } else {
+      window.location.href = 'admin.html';
+    }
   }
 
   // ── Utils ──────────────────────────────────────────────────
