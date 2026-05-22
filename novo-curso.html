@@ -348,7 +348,83 @@ input,select,textarea { font-family:var(--font) }
 .review-row .rv-val { color:var(--text); flex:1 }
 .review-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:2px }
 
-/* ══════════════ NAV BUTTONS ══════════════ */
+/* ══ ACCORDION ACESSO ══════════════════════════════════════ */
+.acc-item { border:1px solid var(--border); border-radius:var(--r); margin-bottom:8px; overflow:hidden }
+.acc-head {
+  display:flex; align-items:center; gap:10px; padding:10px 14px;
+  cursor:pointer; background:var(--surface); user-select:none;
+  transition:background .12s;
+}
+.acc-head:hover { background:var(--bg) }
+.acc-head-ico { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px }
+.acc-head-title { flex:1; font-size:13px; font-weight:600; color:var(--text) }
+.acc-head-count { font-size:11px; font-weight:600; padding:1px 7px; border-radius:99px; min-width:20px; text-align:center }
+.acc-head-arrow { width:14px; height:14px; color:var(--text4); transition:transform .2s; flex-shrink:0 }
+.acc-item.open .acc-head-arrow { transform:rotate(90deg) }
+.acc-body { display:none; padding:12px 14px; border-top:1px solid var(--border); background:var(--bg) }
+.acc-item.open .acc-body { display:block }
+
+/* Autocomplete inline */
+.ac-wrap { position:relative }
+.ac-input {
+  width:100%; padding:8px 12px; border:1.5px solid var(--border2); border-radius:var(--r);
+  font-size:13px; color:var(--text); background:var(--surface); outline:none;
+  font-family:var(--font); transition:border-color .15s;
+}
+.ac-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08) }
+.ac-dropdown {
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200;
+  background:var(--surface); border:1.5px solid var(--border2); border-radius:var(--r);
+  box-shadow:var(--shm); max-height:160px; overflow-y:auto; display:none;
+}
+.ac-dropdown.open { display:block }
+.ac-opt {
+  padding:8px 12px; font-size:13px; cursor:pointer; color:var(--text);
+  transition:background .1s;
+}
+.ac-opt:hover, .ac-opt.focused { background:var(--blue-l); color:var(--blue) }
+.ac-opt .ac-match { font-weight:700 }
+.ac-empty { padding:8px 12px; font-size:12px; color:var(--text4); text-align:center }
+
+/* Chips compactos */
+.chip-wrap { display:flex; flex-wrap:wrap; gap:5px; min-height:24px; margin-bottom:8px }
+.chip-compact {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 8px 3px 10px; border-radius:99px; font-size:11px; font-weight:600;
+  max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.chip-compact button { background:none; border:none; cursor:pointer; color:inherit; padding:0 0 0 2px; opacity:.7; font-size:13px; line-height:1; flex-shrink:0 }
+.chip-compact button:hover { opacity:1 }
+.chip-compact.setor  { background:var(--blue-l); color:var(--blue) }
+.chip-compact.equipe { background:var(--green-l); color:var(--green-d) }
+.chip-compact.cargo  { background:var(--amber-l); color:var(--amber) }
+.chip-compact.colab  { background:#ede9fe; color:#7c3aed }
+
+/* Collapse excesso */
+.chip-more {
+  display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px;
+  font-size:11px; font-weight:600; background:var(--border); color:var(--text3);
+  cursor:pointer; border:none; font-family:var(--font); transition:background .12s;
+}
+.chip-more:hover { background:var(--border2); color:var(--text) }
+
+/* Grid 2 colunas acesso desktop */
+.acc-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+@media (max-width:640px) { .acc-grid { grid-template-columns:1fr } }
+
+/* Validade toggle — sem duplo disparo */
+.val-toggle-row {
+  display:flex; align-items:center; gap:12px; padding:10px 14px;
+  border:1.5px solid var(--border); border-radius:var(--r); cursor:pointer;
+  background:var(--surface); transition:border-color .15s, background .15s; user-select:none;
+}
+.val-toggle-row.on { border-color:var(--blue); background:var(--blue-l) }
+.val-toggle-row .vt-label { flex:1; font-size:13px; font-weight:600; color:var(--text) }
+.val-toggle-row .vt-sub { font-size:11px; color:var(--text4); margin-top:1px }
+
+/* Fix file-list vazio */
+.file-name { flex:1; font-size:12px; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.file-size { font-size:11px; color:var(--text4); flex-shrink:0 }
 .nav-bar {
   display:flex; align-items:center; justify-content:space-between;
   padding:16px 20px; background:var(--surface);
@@ -685,49 +761,9 @@ input,select,textarea { font-family:var(--font) }
           </div>
         </div>
         <div class="form-card-body">
-          <div class="section-title">Perfis profissionais</div>
-          <div class="tag-grid" id="publico-tags">
-            <div class="tag-chip" data-val="tecnicos" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              Técnicos
-            </div>
-            <div class="tag-chip" data-val="eletricistas" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Eletricistas
-            </div>
-            <div class="tag-chip" data-val="administrativo" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              Administrativo
-            </div>
-            <div class="tag-chip" data-val="operacional" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M20 12h1M3 12H2M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 20v1M12 3V2M4.93 4.93l1.41 1.41"/></svg>
-              Operacional
-            </div>
-            <div class="tag-chip" data-val="gestores" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Gestores
-            </div>
-            <div class="tag-chip" data-val="liderança" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Liderança
-            </div>
-            <div class="tag-chip" data-val="novos-colaboradores" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-              Novos Colaboradores
-            </div>
-            <div class="tag-chip" data-val="todos" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              Todos
-            </div>
-            <div class="tag-chip" data-val="outros" onclick="Wizard.toggleTag(this)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-              Outros
-            </div>
-          </div>
-          <hr class="divider">
           <div class="field">
             <label>Observação sobre o público-alvo</label>
-            <textarea id="f-publico-obs" placeholder="Descreva pré-requisitos, perfil esperado ou outros detalhes..." style="min-height:70px"></textarea>
+            <textarea id="f-publico-obs" placeholder="Descreva pré-requisitos, perfil esperado ou outros detalhes..." style="min-height:100px"></textarea>
           </div>
         </div>
       </div>
@@ -745,7 +781,7 @@ input,select,textarea { font-family:var(--font) }
         </div>
         <div class="form-card-body">
 
-          <!-- Tipo de liberação -->
+          <!-- Visibilidade -->
           <div class="section-title">Visibilidade</div>
           <div class="check-group" style="margin-bottom:20px">
             <label class="check-row checked" id="vis-todos" onclick="Wizard.setVisib('todos')">
@@ -766,80 +802,112 @@ input,select,textarea { font-family:var(--font) }
             </label>
           </div>
 
-          <!-- Restrições (mostra quando restrito) -->
+          <!-- Accordion de restrições -->
           <div id="restricoes-panel" style="display:none">
-            <div class="access-section">
-              <h3>Por Setor</h3>
-              <div class="tags-list" id="tags-setor"></div>
-              <div class="access-add-row">
-                <select id="sel-setor">
-                  <option value="">Selecione um setor...</option>
-                  <option>Tecnologia</option>
-                  <option>Comercial</option>
-                  <option>Operações</option>
-                  <option>Financeiro</option>
-                  <option>RH</option>
-                </select>
-                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('setor')">+ Adicionar</button>
+            <div class="section-title">Restrições de acesso</div>
+            <div class="acc-grid">
+
+              <!-- Setor -->
+              <div class="acc-item" id="acc-setor">
+                <div class="acc-head" onclick="Wizard.toggleAcc('acc-setor')">
+                  <div class="acc-head-ico" style="background:var(--blue-l);color:var(--blue)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
+                  </div>
+                  <span class="acc-head-title">Setor</span>
+                  <span class="acc-head-count" id="cnt-setor" style="background:var(--blue-l);color:var(--blue)">0</span>
+                  <svg class="acc-head-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="acc-body">
+                  <div class="chip-wrap" id="chips-setor"></div>
+                  <div class="ac-wrap">
+                    <input class="ac-input" id="ac-setor" placeholder="Buscar setor..." autocomplete="off"
+                      oninput="Wizard.acFilter('setor',this.value)"
+                      onfocus="Wizard.acOpen('setor')"
+                      onkeydown="Wizard.acKey(event,'setor')">
+                    <div class="ac-dropdown" id="acd-setor"></div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="access-section">
-              <h3>Por Equipe</h3>
-              <div class="tags-list" id="tags-equipe"></div>
-              <div class="access-add-row">
-                <select id="sel-equipe">
-                  <option value="">Selecione uma equipe...</option>
-                  <option>Dev Frontend</option>
-                  <option>Dev Backend</option>
-                  <option>Infraestrutura</option>
-                  <option>Vendas SP</option>
-                  <option>Suporte Técnico</option>
-                </select>
-                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('equipe')">+ Adicionar</button>
+
+              <!-- Equipe -->
+              <div class="acc-item" id="acc-equipe">
+                <div class="acc-head" onclick="Wizard.toggleAcc('acc-equipe')">
+                  <div class="acc-head-ico" style="background:var(--green-l);color:var(--green-d)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                  <span class="acc-head-title">Equipe</span>
+                  <span class="acc-head-count" id="cnt-equipe" style="background:var(--green-l);color:var(--green-d)">0</span>
+                  <svg class="acc-head-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="acc-body">
+                  <div class="chip-wrap" id="chips-equipe"></div>
+                  <div class="ac-wrap">
+                    <input class="ac-input" id="ac-equipe" placeholder="Buscar equipe..." autocomplete="off"
+                      oninput="Wizard.acFilter('equipe',this.value)"
+                      onfocus="Wizard.acOpen('equipe')"
+                      onkeydown="Wizard.acKey(event,'equipe')">
+                    <div class="ac-dropdown" id="acd-equipe"></div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="access-section">
-              <h3>Por Cargo</h3>
-              <div class="tags-list" id="tags-cargo"></div>
-              <div class="access-add-row">
-                <select id="sel-cargo">
-                  <option value="">Selecione um cargo...</option>
-                  <option>Técnico de Campo</option>
-                  <option>Eletricista</option>
-                  <option>Analista</option>
-                  <option>Coordenador</option>
-                  <option>Gerente</option>
-                  <option>Assistente Administrativo</option>
-                </select>
-                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('cargo')">+ Adicionar</button>
+
+              <!-- Cargo -->
+              <div class="acc-item" id="acc-cargo">
+                <div class="acc-head" onclick="Wizard.toggleAcc('acc-cargo')">
+                  <div class="acc-head-ico" style="background:var(--amber-l);color:var(--amber)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <span class="acc-head-title">Cargo</span>
+                  <span class="acc-head-count" id="cnt-cargo" style="background:var(--amber-l);color:var(--amber)">0</span>
+                  <svg class="acc-head-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="acc-body">
+                  <div class="chip-wrap" id="chips-cargo"></div>
+                  <div class="ac-wrap">
+                    <input class="ac-input" id="ac-cargo" placeholder="Buscar cargo..." autocomplete="off"
+                      oninput="Wizard.acFilter('cargo',this.value)"
+                      onfocus="Wizard.acOpen('cargo')"
+                      onkeydown="Wizard.acKey(event,'cargo')">
+                    <div class="ac-dropdown" id="acd-cargo"></div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="access-section">
-              <h3>Colaborador Específico</h3>
-              <div class="tags-list" id="tags-colab"></div>
-              <div class="access-add-row">
-                <select id="sel-colab">
-                  <option value="">Selecione um colaborador...</option>
-                  <option>Ana Beatriz Costa</option>
-                  <option>Carlos Eduardo Lima</option>
-                  <option>Mariana Souza</option>
-                </select>
-                <button class="btn btn-outline btn-sm" onclick="Wizard.addAccess('colab')">+ Adicionar</button>
+
+              <!-- Colaborador -->
+              <div class="acc-item" id="acc-colab">
+                <div class="acc-head" onclick="Wizard.toggleAcc('acc-colab')">
+                  <div class="acc-head-ico" style="background:#ede9fe;color:#7c3aed">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <span class="acc-head-title">Colaborador</span>
+                  <span class="acc-head-count" id="cnt-colab" style="background:#ede9fe;color:#7c3aed">0</span>
+                  <svg class="acc-head-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="acc-body">
+                  <div class="chip-wrap" id="chips-colab"></div>
+                  <div class="ac-wrap">
+                    <input class="ac-input" id="ac-colab" placeholder="Buscar colaborador..." autocomplete="off"
+                      oninput="Wizard.acFilter('colab',this.value)"
+                      onfocus="Wizard.acOpen('colab')"
+                      onkeydown="Wizard.acKey(event,'colab')">
+                    <div class="ac-dropdown" id="acd-colab"></div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+
+            </div><!-- /acc-grid -->
+          </div><!-- /restricoes-panel -->
 
           <hr class="divider">
+
+          <!-- Validade e Prazo — toggle sem label wrapping input -->
           <div class="section-title">Validade e Prazo</div>
-          <div class="check-group">
-            <label class="check-row" onclick="Wizard.toggleCheck(this)">
-              <input type="checkbox" id="chk-validade">
-              <div class="check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-              <div>
-                <div class="check-label">Definir data de validade do curso</div>
-                <div class="check-sub">O curso expira automaticamente na data informada</div>
-              </div>
-            </label>
+          <div class="val-toggle-row" id="val-toggle" onclick="Wizard.toggleValidade()">
+            <div style="flex:1">
+              <div class="vt-label">Definir data de validade do curso</div>
+              <div class="vt-sub">O curso expira automaticamente na data informada</div>
+            </div>
+            <div class="toggle" id="tog-validade"></div>
           </div>
           <div class="validade-row" id="validade-fields" style="display:none">
             <div class="field" style="margin:0">
@@ -848,13 +916,12 @@ input,select,textarea { font-family:var(--font) }
             </div>
             <div class="field" style="margin:0">
               <label>Prazo de conclusão (dias)</label>
-              <input type="number" id="f-prazo" placeholder="Ex: 30">
+              <input type="number" id="f-prazo" placeholder="Ex: 30" min="1">
             </div>
           </div>
+
         </div>
       </div>
-
-      <!-- ══ ETAPA 4: Materiais ══ -->
       <div class="step-pane" id="pane-3">
         <div class="form-card-head">
           <div class="step-icon">
@@ -868,6 +935,48 @@ input,select,textarea { font-family:var(--font) }
         <div class="form-card-body">
 
           <!-- Upload -->
+          <div class="upload-zone" onclick="document.getElementById('f-material-input').click()" id="upload-zone-mat">
+            <input type="file" id="f-material-input" multiple
+              accept=".pdf,.mp4,.webm,.xlsx,.xls,.doc,.docx,.pptx,.zip"
+              onclick="event.stopPropagation()"
+              onchange="Wizard.addFiles(this)">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-title">Arraste arquivos ou clique para selecionar</div>
+            <div class="uz-sub">PDF · MP4 · XLSX · DOC · PPTX · ZIP — máx. 100MB por arquivo</div>
+          </div>
+
+          <!-- Link externo -->
+          <div class="section-title" style="margin-top:16px">Link Externo</div>
+          <div class="link-row">
+            <input type="text" id="f-link-url" placeholder="https://...">
+            <input type="text" id="f-link-nome" placeholder="Título do link" style="max-width:200px">
+            <button type="button" class="btn btn-outline btn-sm" onclick="Wizard.addLink()" style="white-space:nowrap">+ Adicionar</button>
+          </div>
+
+          <!-- Avaliação -->
+          <div class="section-title" style="margin-top:16px">Avaliação</div>
+          <div id="quiz-estado">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-add-quiz" onclick="Wizard.addQuiz()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Adicionar Avaliação
+            </button>
+            <div id="quiz-chip" style="display:none;align-items:center;gap:8px;padding:8px 12px;background:var(--amber-l);border:1px solid var(--amber);border-radius:var(--r);font-size:12px;color:#b45309;font-weight:600">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Avaliação do Curso
+              <button type="button" onclick="Wizard.removeQuiz()" style="background:none;border:none;cursor:pointer;color:#b45309;font-size:15px;line-height:1;padding:0 0 0 4px;opacity:.7" title="Remover">×</button>
+            </div>
+          </div>
+
+          <!-- Lista de materiais -->
+          <div style="display:flex;align-items:center;gap:8px;margin-top:20px;margin-bottom:10px">
+            <span class="section-title" style="margin:0">Materiais adicionados</span>
+            <span id="mat-count" class="badge badge-blue" style="font-size:10px">0</span>
+          </div>
+          <div id="file-list">
+            <div class="empty-state" id="file-empty">Nenhum material adicionado ainda.</div>
+          </div>
+        </div>
+      </div>
           <div class="upload-zone" onclick="document.getElementById('f-material-input').click()" id="upload-zone-mat">
             <input type="file" id="f-material-input" multiple
               accept=".pdf,.mp4,.webm,.xlsx,.xls,.doc,.docx,.pptx,.zip"
@@ -1179,58 +1288,154 @@ var Wizard = (() => {
     document.getElementById('restricoes-panel').style.display = isRestrito ? 'block' : 'none';
   }
 
-  function addAccess(tipo) {
-    const selId = { setor:'sel-setor', equipe:'sel-equipe', cargo:'sel-cargo', colab:'sel-colab' }[tipo];
-    const tagId = { setor:'tags-setor', equipe:'tags-equipe', cargo:'tags-cargo', colab:'tags-colab' }[tipo];
-    const sel = document.getElementById(selId);
-    const nome = sel.value;
-    if (!nome) return;
+  // ── Dados para autocomplete ────────────────────────────────
+  const AC_OPTIONS = {
+    setor:  ['Tecnologia', 'Comercial', 'Operações', 'Financeiro', 'RH', 'Jurídico', 'Marketing'],
+    equipe: ['Dev Frontend', 'Dev Backend', 'Infraestrutura', 'Vendas SP', 'Suporte Técnico', 'Dados'],
+    cargo:  ['Técnico de Campo', 'Eletricista', 'Analista', 'Coordenador', 'Gerente', 'Assistente Administrativo', 'Estagiário'],
+    colab:  ['Ana Beatriz Costa', 'Carlos Eduardo Lima', 'Mariana Souza'],
+  };
+  let _acFocused = {}; // índice focado por tipo
 
-    // Evita duplicata
-    if (state.acessos[tipo].includes(nome)) return;
+  // ── Accordion ──────────────────────────────────────────────
+  function toggleAcc(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('open');
+    if (el.classList.contains('open')) {
+      const inp = el.querySelector('.ac-input');
+      if (inp) setTimeout(() => { inp.focus(); acOpen(id.replace('acc-', '')); }, 50);
+    }
+  }
+
+  // ── Autocomplete ───────────────────────────────────────────
+  function acOpen(tipo) {
+    acFilter(tipo, document.getElementById('ac-' + tipo)?.value || '');
+  }
+
+  function acFilter(tipo, q) {
+    const dd = document.getElementById('acd-' + tipo);
+    if (!dd) return;
+    const opts = AC_OPTIONS[tipo] || [];
+    const term = q.toLowerCase().trim();
+    const filtered = opts.filter(o =>
+      o.toLowerCase().includes(term) && !state.acessos[tipo].includes(o)
+    );
+    _acFocused[tipo] = -1;
+    if (!filtered.length) {
+      dd.innerHTML = `<div class="ac-empty">Nenhum resultado</div>`;
+    } else {
+      dd.innerHTML = filtered.map((o, i) => {
+        const hi = term ? o.replace(new RegExp(`(${term})`, 'gi'), '<span class="ac-match">$1</span>') : o;
+        return `<div class="ac-opt" data-val="${escHtml(o)}" data-i="${i}" onmousedown="event.preventDefault();Wizard.acSelect('${tipo}','${escHtml(o)}')">${hi}</div>`;
+      }).join('');
+    }
+    dd.classList.add('open');
+    // Fechar ao clicar fora
+    setTimeout(() => {
+      const close = () => { dd.classList.remove('open'); document.removeEventListener('click', close); };
+      document.addEventListener('click', close, { once: true });
+    }, 10);
+  }
+
+  function acSelect(tipo, nome) {
+    if (!nome || state.acessos[tipo].includes(nome)) return;
     state.acessos[tipo].push(nome);
-    renderAccessTags(tipo, tagId);
-    sel.value = '';
+    renderChips(tipo);
+    const inp = document.getElementById('ac-' + tipo);
+    if (inp) inp.value = '';
+    document.getElementById('acd-' + tipo)?.classList.remove('open');
+  }
+
+  function acKey(e, tipo) {
+    const dd = document.getElementById('acd-' + tipo);
+    if (!dd || !dd.classList.contains('open')) return;
+    const opts = dd.querySelectorAll('.ac-opt');
+    if (!opts.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _acFocused[tipo] = Math.min((_acFocused[tipo] ?? -1) + 1, opts.length - 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _acFocused[tipo] = Math.max((_acFocused[tipo] ?? 0) - 1, 0);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const idx = _acFocused[tipo] ?? -1;
+      if (idx >= 0 && opts[idx]) acSelect(tipo, opts[idx].dataset.val);
+      return;
+    } else if (e.key === 'Escape') {
+      dd.classList.remove('open'); return;
+    }
+    opts.forEach((o, i) => o.classList.toggle('focused', i === _acFocused[tipo]));
   }
 
   function removeAccess(tipo, nome) {
-    const tagId = { setor:'tags-setor', equipe:'tags-equipe', cargo:'tags-cargo', colab:'tags-colab' }[tipo];
     state.acessos[tipo] = state.acessos[tipo].filter(n => n !== nome);
-    renderAccessTags(tipo, tagId);
+    renderChips(tipo);
   }
 
-  function renderAccessTags(tipo, containerId) {
-    const c = document.getElementById(containerId);
-    if (!state.acessos[tipo].length) {
-      c.innerHTML = '';
-      return;
-    }
-    c.innerHTML = state.acessos[tipo].map(nome =>
-      `<span class="access-tag ${tipo}">
-        ${nome}
-        <button onclick="Wizard.removeAccess('${tipo}','${nome}')">×</button>
+  const CHIP_MAX = 4; // max chips visíveis antes de colapsar
+
+  function renderChips(tipo) {
+    const wrap = document.getElementById('chips-' + tipo);
+    const cnt  = document.getElementById('cnt-' + tipo);
+    if (!wrap) return;
+    const lista = state.acessos[tipo];
+    if (cnt) cnt.textContent = lista.length;
+
+    const visible = lista.slice(0, CHIP_MAX);
+    const overflow = lista.slice(CHIP_MAX);
+    const expanded = wrap.dataset.expanded === '1';
+
+    const shown = expanded ? lista : visible;
+    wrap.innerHTML = shown.map(nome =>
+      `<span class="chip-compact ${tipo}" title="${escHtml(nome)}">
+        ${escHtml(nome.length > 18 ? nome.slice(0,16)+'…' : nome)}
+        <button onclick="Wizard.removeAccess('${tipo}','${escHtml(nome)}')" title="Remover">×</button>
       </span>`
     ).join('');
+
+    if (!expanded && overflow.length) {
+      const more = document.createElement('button');
+      more.className = 'chip-more';
+      more.textContent = `+${overflow.length}`;
+      more.onclick = () => { wrap.dataset.expanded = '1'; renderChips(tipo); };
+      wrap.appendChild(more);
+    }
+    if (expanded && lista.length > CHIP_MAX) {
+      const less = document.createElement('button');
+      less.className = 'chip-more';
+      less.textContent = 'Menos ▲';
+      less.onclick = () => { wrap.dataset.expanded = '0'; renderChips(tipo); };
+      wrap.appendChild(less);
+    }
   }
 
-  // ── Checkbox / validade ────────────────────────────────────
-  function toggleCheck(label) {
-    label.classList.toggle('checked');
-    const chk = label.querySelector('input[type=checkbox]');
-    if (chk && chk.id === 'chk-validade') {
-      const show = label.classList.contains('checked');
-      document.getElementById('validade-fields').style.display = show ? 'grid' : 'none';
-    }
+  // Manter compatibilidade (collectStep usa state.acessos diretamente)
+  function addAccess() {} // não usado mais
+
+  // ── Validade — sem label wrapping input ───────────────────
+  function toggleValidade() {
+    const tog = document.getElementById('tog-validade');
+    const row = document.getElementById('val-toggle');
+    const fields = document.getElementById('validade-fields');
+    const isOn = tog.classList.toggle('on');
+    row.classList.toggle('on', isOn);
+    fields.style.display = isOn ? 'grid' : 'none';
   }
 
   // ── Toggles ────────────────────────────────────────────────
   function toggleSwitch(el) {
     el.classList.toggle('on');
-    // Mostra nota mínima se avaliação obrigatória ativada
     if (el.id === 'tog-avaliacao') {
       document.getElementById('nota-min-row').style.display =
         el.classList.contains('on') ? 'flex' : 'none';
     }
+  }
+
+  // toggleCheck mantido para compatibilidade (não mais usado em validade)
+  function toggleCheck(label) {
+    label.classList.toggle('checked');
   }
 
   // ── Preview de capa ────────────────────────────────────────
@@ -1275,14 +1480,31 @@ var Wizard = (() => {
   }
 
   function addQuiz() {
-    state.materiais.push({
-      id: Date.now(), tipo: 'quiz', nome: 'Avaliação do Curso', ext: 'quiz', tamanho: ''
-    });
+    // Avaliação é única — controla visualmente, não via lista
+    const btn  = document.getElementById('btn-add-quiz');
+    const chip = document.getElementById('quiz-chip');
+    if (btn)  btn.style.display  = 'none';
+    if (chip) chip.style.display = 'flex';
+    // Marca no state se ainda não há quiz
+    if (!state.materiais.find(m => m.tipo === 'quiz')) {
+      state.materiais.push({ id: 'quiz-' + Date.now(), tipo: 'quiz', nome: 'Avaliação do Curso', ext: 'quiz', tamanho: '' });
+      renderMateriais();
+    }
+  }
+
+  function removeQuiz() {
+    state.materiais = state.materiais.filter(m => m.tipo !== 'quiz');
+    const btn  = document.getElementById('btn-add-quiz');
+    const chip = document.getElementById('quiz-chip');
+    if (btn)  btn.style.display  = '';
+    if (chip) chip.style.display = 'none';
     renderMateriais();
   }
 
   function removeMaterial(id) {
-    state.materiais = state.materiais.filter(m => m.id !== id);
+    const mat = state.materiais.find(m => String(m.id) === String(id));
+    if (mat?.tipo === 'quiz') { removeQuiz(); return; }
+    state.materiais = state.materiais.filter(m => String(m.id) !== String(id));
     renderMateriais();
   }
 
@@ -1290,25 +1512,25 @@ var Wizard = (() => {
     const list  = document.getElementById('file-list');
     const empty = document.getElementById('file-empty');
     const count = document.getElementById('mat-count');
-    count.textContent = state.materiais.length;
+    if (!list) return;
 
-    if (!state.materiais.length) {
-      list.innerHTML = '';
-      list.appendChild(empty);
-      empty.style.display = 'block';
+    const semQuiz = state.materiais.filter(m => m.tipo !== 'quiz');
+    if (count) count.textContent = state.materiais.length;
+
+    if (!semQuiz.length) {
+      if (empty) { list.innerHTML = ''; list.appendChild(empty); empty.style.display = 'block'; }
       return;
     }
-    empty.style.display = 'none';
-    list.innerHTML = state.materiais.map(m => {
-      const label = { pdf:'PDF', mp4:'VID', webm:'VID', xlsx:'XLS', xls:'XLS',
-                      doc:'DOC', docx:'DOC', pptx:'PPT', zip:'ZIP',
-                      link:'URL', quiz:'QUIZ' }[m.ext] || m.ext.toUpperCase();
-      return `
-      <div class="file-item">
+    if (empty) empty.style.display = 'none';
+    const labelMap = { pdf:'PDF', mp4:'VID', webm:'VID', xlsx:'XLS', xls:'XLS',
+                       doc:'DOC', docx:'DOC', pptx:'PPT', zip:'ZIP', link:'URL', quiz:'QUIZ' };
+    list.innerHTML = semQuiz.map(m => {
+      const label = labelMap[m.ext] || m.ext.toUpperCase();
+      return `<div class="file-item">
         <div class="file-icon ${m.ext}">${label}</div>
         <div class="file-name">${escHtml(m.nome)}</div>
         <div class="file-size">${m.tamanho}</div>
-        <button class="file-del" onclick="Wizard.removeMaterial(${m.id})" title="Remover">
+        <button type="button" class="file-del" onclick="Wizard.removeMaterial('${m.id}')" title="Remover">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </button>
       </div>`;
@@ -1563,8 +1785,11 @@ var Wizard = (() => {
   return {
     next, prev, jumpTo, saveDraft,
     toggleTag, setVisib, addAccess, removeAccess,
-    toggleCheck, toggleSwitch, previewCapa,
-    addFiles, addLink, addQuiz, removeMaterial,
+    toggleCheck, toggleSwitch, toggleValidade,
+    toggleAcc, acFilter, acOpen, acKey, acSelect,
+    renderChips,
+    previewCapa,
+    addFiles, addLink, addQuiz, removeQuiz, removeMaterial,
     fecharModal, irParaCurso, init,
     _applyDraft, _discardDraft,
     get _pendingDraft() { return _pendingDraft; },
