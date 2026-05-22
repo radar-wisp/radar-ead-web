@@ -426,6 +426,82 @@ input,select,textarea { font-family:var(--font) }
 /* Fix file-list vazio */
 .file-name { flex:1; font-size:12px; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .file-size { font-size:11px; color:var(--text4); flex-shrink:0 }
+
+/* ══ ETAPA CONTEÚDO ════════════════════════════════════════ */
+.cnt-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:48px 24px; border:2px dashed var(--border); border-radius:var(--r);
+  color:var(--text4); gap:10px; text-align:center;
+}
+.cnt-empty p { font-size:13px; margin:0 }
+.cnt-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:8px; flex-wrap:wrap }
+.cnt-stats { display:flex; gap:16px }
+.cnt-stat { font-size:11px; color:var(--text4); display:flex; align-items:center; gap:4px }
+.cnt-stat strong { color:var(--text3); font-weight:600 }
+.mod-card { border:1.5px solid var(--border); border-radius:var(--r); background:var(--surface); margin-bottom:10px; transition:box-shadow .15s, border-color .15s }
+.mod-card.dragging  { opacity:.5; box-shadow:0 8px 24px rgba(0,2,218,.15); border-color:var(--blue-m) }
+.mod-card.drag-over { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-l) }
+.mod-head { display:flex; align-items:center; gap:8px; padding:10px 12px; user-select:none }
+.mod-drag-handle { cursor:grab; color:var(--border2); padding:4px 2px; flex-shrink:0; display:flex; align-items:center; border-radius:4px; transition:color .1s }
+.mod-drag-handle:hover { color:var(--text3) }
+.mod-drag-handle:active { cursor:grabbing }
+.mod-toggle { width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:5px; flex-shrink:0; cursor:pointer; transition:background .1s; color:var(--text3) }
+.mod-toggle:hover { background:var(--bg) }
+.mod-toggle svg { transition:transform .2s }
+.mod-card.collapsed .mod-toggle svg { transform:rotate(-90deg) }
+.mod-badge { font-size:9px; font-weight:700; padding:2px 6px; border-radius:99px; text-transform:uppercase; letter-spacing:.05em; flex-shrink:0 }
+.mod-badge.pub { background:var(--green-l); color:var(--green-d) }
+.mod-badge.rsc { background:var(--border);  color:var(--text4) }
+.mod-badge.ocu { background:var(--amber-l); color:var(--amber) }
+.mod-meta { font-size:10px; color:var(--text4); display:flex; gap:8px; flex-shrink:0; margin-left:auto; align-items:center }
+.mod-actions-btn { display:flex; align-items:center; gap:2px; padding:3px 6px; border-radius:5px; font-size:11px; color:var(--text4); transition:background .1s, color .1s; flex-shrink:0 }
+.mod-actions-btn:hover { background:var(--bg); color:var(--text) }
+.mod-title-input { flex:1; font-size:13px; font-weight:600; color:var(--text); background:transparent; border:none; outline:none; min-width:0; border-radius:4px; padding:2px 6px; margin-left:2px; transition:background .1s }
+.mod-title-input:hover { background:var(--bg) }
+.mod-title-input:focus { background:var(--blue-l); box-shadow:0 0 0 2px var(--blue-m) }
+.mod-body { padding:0 12px 10px 12px; border-top:1px solid var(--border) }
+.mod-card.collapsed .mod-body { display:none }
+.aula-row { display:flex; align-items:center; gap:8px; padding:8px 6px; border-radius:6px; transition:background .1s; position:relative }
+.aula-row:hover { background:var(--bg) }
+.aula-row.dragging { opacity:.45 }
+.aula-row.drag-over-top::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--blue); border-radius:1px }
+.aula-drag { cursor:grab; color:var(--border2); display:flex; align-items:center; flex-shrink:0 }
+.aula-drag:hover { color:var(--text3) }
+.aula-drag:active { cursor:grabbing }
+.aula-type-ico { width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px }
+.aula-type-ico.video    { background:#dbeafe; color:#1d4ed8 }
+.aula-type-ico.pdf      { background:#fee2e2; color:#b91c1c }
+.aula-type-ico.texto    { background:#f0fdf4; color:#15803d }
+.aula-type-ico.quiz     { background:var(--amber-l); color:var(--amber) }
+.aula-type-ico.scorm    { background:#ede9fe; color:#7c3aed }
+.aula-type-ico.link     { background:var(--blue-l); color:var(--blue) }
+.aula-type-ico.download { background:#f1f5f9; color:#475569 }
+.aula-title-input { flex:1; font-size:12px; color:var(--text); background:transparent; border:none; outline:none; border-radius:4px; padding:2px 6px; min-width:0; transition:background .1s }
+.aula-title-input:hover { background:var(--bg) }
+.aula-title-input:focus { background:var(--blue-l); box-shadow:0 0 0 2px var(--blue-m) }
+.aula-dur { font-size:10px; color:var(--text4); flex-shrink:0; background:var(--bg); border-radius:4px; padding:1px 6px; border:1px solid var(--border); min-width:36px; text-align:center; cursor:pointer }
+.aula-pub-dot { width:7px; height:7px; border-radius:99px; flex-shrink:0 }
+.aula-pub-dot.pub { background:var(--green) }
+.aula-pub-dot.rsc { background:var(--border2) }
+.aula-action-btn { opacity:0; padding:3px 5px; border-radius:4px; color:var(--text4); transition:opacity .1s, background .1s }
+.aula-row:hover .aula-action-btn { opacity:1 }
+.aula-action-btn:hover { background:var(--bg); color:var(--text) }
+.btn-add-aula { display:flex; align-items:center; gap:6px; width:100%; margin-top:4px; padding:7px 10px; border-radius:6px; font-size:12px; color:var(--text4); border:1.5px dashed var(--border); background:none; transition:all .15s; font-family:var(--font) }
+.btn-add-aula:hover { background:var(--blue-l); color:var(--blue); border-color:var(--blue-m) }
+.type-picker { display:none; flex-wrap:wrap; gap:6px; padding:10px; margin-top:6px; background:var(--bg); border-radius:var(--r); border:1px solid var(--border) }
+.type-picker.open { display:flex }
+.type-opt { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 12px; border-radius:6px; font-size:10px; font-weight:600; color:var(--text3); background:var(--surface); border:1.5px solid var(--border); cursor:pointer; transition:all .12s; min-width:56px }
+.type-opt:hover { border-color:var(--blue); color:var(--blue); background:var(--blue-l) }
+.cnt-ctx-menu { display:none; position:fixed; z-index:9100; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,2,60,.14); min-width:170px; padding:4px }
+.cnt-ctx-menu.open { display:block }
+.cnt-ctx-menu button { display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px; border-radius:5px; font-size:12px; color:var(--text2); background:none; border:none; cursor:pointer; text-align:left; font-family:var(--font); transition:background .1s }
+.cnt-ctx-menu button:hover { background:var(--blue-l); color:var(--blue) }
+.cnt-ctx-menu button.danger { color:var(--red) }
+.cnt-ctx-menu button.danger:hover { background:var(--red-l) }
+.cnt-ctx-menu .ctx-sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
+.dur-inline { font-size:10px; width:52px; text-align:center; background:var(--blue-l); border:1.5px solid var(--blue-m); border-radius:4px; padding:1px 4px; color:var(--blue); font-family:var(--font); outline:none }
+@media (max-width:640px) { .mod-meta,.aula-dur,.cnt-stats { display:none } }
+
 .nav-bar {
   display:flex; align-items:center; justify-content:space-between;
   padding:16px 20px; background:var(--surface);
@@ -664,14 +740,18 @@ input,select,textarea { font-family:var(--font) }
       </div>
       <div class="step" data-step="3" onclick="Wizard.jumpTo(3)">
         <div class="step-circle"><span class="step-num">4</span></div>
-        <div class="step-label">Materiais</div>
+        <div class="step-label">Conteúdo</div>
       </div>
       <div class="step" data-step="4" onclick="Wizard.jumpTo(4)">
         <div class="step-circle"><span class="step-num">5</span></div>
-        <div class="step-label">Configurações</div>
+        <div class="step-label">Materiais</div>
       </div>
       <div class="step" data-step="5" onclick="Wizard.jumpTo(5)">
         <div class="step-circle"><span class="step-num">6</span></div>
+        <div class="step-label">Configurações</div>
+      </div>
+      <div class="step" data-step="6" onclick="Wizard.jumpTo(6)">
+        <div class="step-circle"><span class="step-num">7</span></div>
         <div class="step-label">Revisão</div>
       </div>
     </div>
@@ -923,7 +1003,43 @@ input,select,textarea { font-family:var(--font) }
 
         </div>
       </div>
+      <!-- ══ ETAPA 4: Conteúdo ══ -->
       <div class="step-pane" id="pane-3">
+        <div class="form-card-head">
+          <div class="step-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <div>
+            <h2>Conteúdo do Curso</h2>
+            <p>Organize módulos e aulas. Edite inline, arraste para reordenar.</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+
+          <!-- Toolbar -->
+          <div class="cnt-toolbar">
+            <div class="cnt-stats" id="cnt-stats">
+              <span class="cnt-stat"><strong id="cst-mods">0</strong> módulos</span>
+              <span class="cnt-stat"><strong id="cst-aulas">0</strong> aulas</span>
+              <span class="cnt-stat"><strong id="cst-dur">0min</strong> duração</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="Conteudo.addModulo()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo módulo
+            </button>
+          </div>
+
+          <!-- Lista de módulos -->
+          <div id="modulos-list"></div>
+
+        </div>
+      </div>
+
+      <!-- Context menu singleton (módulos e aulas) -->
+      <div class="cnt-ctx-menu" id="cnt-ctx"></div>
+
+      <!-- ══ ETAPA 5: Materiais ══ -->
+      <div class="step-pane" id="pane-4">
         <div class="form-card-head">
           <div class="step-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -978,8 +1094,8 @@ input,select,textarea { font-family:var(--font) }
           </div>
         </div>
       </div>
-      <!-- ══ ETAPA 5: Configurações ══ -->
-      <div class="step-pane" id="pane-4">
+      <!-- ══ ETAPA 6: Configurações ══ -->
+      <div class="step-pane" id="pane-5">
         <div class="form-card-head">
           <div class="step-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M20 12h1M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 20v1M12 3V2M4.93 4.93l1.41 1.41M3 12H2"/></svg>
@@ -1045,8 +1161,8 @@ input,select,textarea { font-family:var(--font) }
         </div>
       </div>
 
-      <!-- ══ ETAPA 6: Revisão ══ -->
-      <div class="step-pane" id="pane-5">
+      <!-- ══ ETAPA 7: Revisão ══ -->
+      <div class="step-pane" id="pane-6">
         <div class="form-card-head">
           <div class="step-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -1108,7 +1224,7 @@ input,select,textarea { font-family:var(--font) }
 var Wizard = (() => {
 
   let currentStep = 0;
-  const TOTAL = 6;
+  const TOTAL = 7;
 
   // Estado do formulário
   let state = {
@@ -1118,6 +1234,7 @@ var Wizard = (() => {
     visib: 'todos',
     acessos: { setor: [], equipe: [], cargo: [], colab: [] },
     validade: '', prazo: '',
+    modulos: [],   // [{ id, titulo, status, aulas:[{id,titulo,tipo,durMin,status}] }]
     materiais: [],
     config: {
       obrigatorio: false, certificado: true, avaliacao: false,
@@ -1164,7 +1281,8 @@ var Wizard = (() => {
     document.getElementById('step-indicator').textContent = `Etapa ${currentStep + 1} de ${TOTAL}`;
 
     // Se chegou na revisão, renderiza
-    if (currentStep === 5) renderReview();
+    if (currentStep === 3) Conteudo.render();
+    if (currentStep === 6) renderReview();
   }
 
   function next() {
@@ -1212,7 +1330,10 @@ var Wizard = (() => {
       state.validade = val('f-validade');
       state.prazo    = val('f-prazo');
     }
-    if (step === 4) {
+    if (step === 3) {
+      // state.modulos já é gerenciado diretamente por Conteudo.*
+    }
+    if (step === 5) {
       state.config.obrigatorio = document.getElementById('tog-obrigatorio').classList.contains('on');
       state.config.certificado = document.getElementById('tog-certificado').classList.contains('on');
       state.config.avaliacao   = document.getElementById('tog-avaliacao').classList.contains('on');
@@ -1593,6 +1714,7 @@ var Wizard = (() => {
       acessos:     state.acessos,
       validadeAte: state.validade || null,   // ← campo correto (Storage usa validadeAte)
       prazo:       state.prazo || null,
+      modulos:     state.modulos,
       materiais:   state.materiais,
       config:      state.config,
       status:      statusOverride,
@@ -1728,6 +1850,417 @@ var Wizard = (() => {
       setTimeout(() => { status.textContent = ''; }, 2000);
     }, 30000);
   }
+
+  // ══════════════════════════════════════════════════════════
+  // CONTEÚDO — Módulos + Aulas com DnD inline
+  // ══════════════════════════════════════════════════════════
+  const Conteudo = (() => {
+    const _uid = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+
+    // Ícones por tipo de aula
+    const TIPO_ICO = {
+      video:    '▶',
+      pdf:      '📄',
+      texto:    '📝',
+      quiz:     '❓',
+      scorm:    '🎓',
+      link:     '🔗',
+      download: '⬇',
+    };
+    const TIPO_LABEL = {
+      video:'Vídeo', pdf:'PDF', texto:'Texto', quiz:'Quiz',
+      scorm:'SCORM', link:'Link', download:'Download',
+    };
+
+    // ── DnD state ──────────────────────────────────────────
+    let _dragSrcModIdx  = null;
+    let _dragSrcAulaIdx = null; // null = dragging módulo
+
+    // ── Context menu ───────────────────────────────────────
+    let _ctxClose = null;
+    function openCtx(e, html) {
+      e.preventDefault(); e.stopPropagation();
+      const m = document.getElementById('cnt-ctx');
+      if (!m) return;
+      m.innerHTML = html;
+      m.style.display = 'block';
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const mw = 180, mh = m.offsetHeight || 200;
+      let x = e.clientX, y = e.clientY;
+      if (x + mw > vw - 8) x = vw - mw - 8;
+      if (y + mh > vh - 8) y = vh - mh - 8;
+      m.style.left = x + 'px'; m.style.top = y + 'px';
+      m.classList.add('open');
+      if (_ctxClose) document.removeEventListener('click', _ctxClose);
+      _ctxClose = () => { m.classList.remove('open'); m.style.display='none'; };
+      setTimeout(() => document.addEventListener('click', _ctxClose, { once:true }), 10);
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const m = document.getElementById('cnt-ctx');
+        if (m) { m.classList.remove('open'); m.style.display='none'; }
+      }
+    });
+
+    // ── Helpers ────────────────────────────────────────────
+    function _modulos() { return state.modulos; }
+
+    function _totalDur() {
+      let t = 0;
+      _modulos().forEach(m => m.aulas.forEach(a => { t += (parseInt(a.durMin)||0); }));
+      return t;
+    }
+
+    function _updateStats() {
+      const mods  = _modulos().length;
+      const aulas = _modulos().reduce((s,m) => s + m.aulas.length, 0);
+      const dur   = _totalDur();
+      const ms = document.getElementById('cst-mods');
+      const as = document.getElementById('cst-aulas');
+      const ds = document.getElementById('cst-dur');
+      if (ms) ms.textContent = mods;
+      if (as) as.textContent = aulas;
+      if (ds) ds.textContent = dur >= 60 ? `${Math.floor(dur/60)}h${dur%60?String(dur%60).padStart(2,'0'):''}` : `${dur}min`;
+    }
+
+    // ── Render principal ───────────────────────────────────
+    function render() {
+      const list = document.getElementById('modulos-list');
+      if (!list) return;
+      const mods = _modulos();
+
+      if (!mods.length) {
+        list.innerHTML = `<div class="cnt-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <p>Nenhum módulo ainda. Clique em <strong>Novo módulo</strong> para começar.</p>
+        </div>`;
+        _updateStats();
+        return;
+      }
+
+      list.innerHTML = mods.map((mod, mi) => {
+        const aulaCount = mod.aulas.length;
+        const modDur = mod.aulas.reduce((s,a) => s + (parseInt(a.durMin)||0), 0);
+        const statusLabel = { publicado:'pub', rascunho:'rsc', oculto:'ocu' }[mod.status] || 'rsc';
+        const statusText  = { publicado:'Publicado', rascunho:'Rascunho', oculto:'Oculto' }[mod.status] || 'Rascunho';
+        const isCollapsed = mod.collapsed ? 'collapsed' : '';
+
+        const aulasHtml = mod.aulas.map((aula, ai) => `
+          <div class="aula-row" id="aula-${aula.id}"
+            draggable="true"
+            ondragstart="Conteudo._dndAulaStart(event,${mi},${ai})"
+            ondragover="Conteudo._dndAulaOver(event,${mi},${ai})"
+            ondragleave="Conteudo._dndAulaLeave(event)"
+            ondrop="Conteudo._dndAulaDrop(event,${mi},${ai})">
+            <span class="aula-drag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
+            </span>
+            <span class="aula-type-ico ${aula.tipo}" title="${TIPO_LABEL[aula.tipo]||aula.tipo}">${TIPO_ICO[aula.tipo]||'•'}</span>
+            <input class="aula-title-input" value="${escHtml(aula.titulo)}" placeholder="Título da aula..."
+              oninput="Conteudo._editAulaTitulo(${mi},${ai},this.value)"
+              onblur="Conteudo._editAulaTitulo(${mi},${ai},this.value)">
+            <span class="aula-dur" onclick="Conteudo._editDur(event,${mi},${ai})" title="Duração">${aula.durMin ? aula.durMin+'min' : '—'}</span>
+            <span class="aula-pub-dot ${aula.status==='publicado'?'pub':'rsc'}" title="${aula.status==='publicado'?'Publicado':'Rascunho'}"></span>
+            <button type="button" class="aula-action-btn" title="Mais ações"
+              onclick="Conteudo._ctxAula(event,${mi},${ai})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
+            </button>
+          </div>`).join('');
+
+        return `<div class="mod-card ${isCollapsed}" id="mod-${mod.id}"
+          draggable="true"
+          ondragstart="Conteudo._dndModStart(event,${mi})"
+          ondragover="Conteudo._dndModOver(event,${mi})"
+          ondragleave="Conteudo._dndModLeave(event,${mi})"
+          ondrop="Conteudo._dndModDrop(event,${mi})">
+          <div class="mod-head">
+            <span class="mod-drag-handle" title="Arrastar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
+            </span>
+            <span class="mod-toggle" onclick="Conteudo.toggleMod(${mi})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+            <input class="mod-title-input" value="${escHtml(mod.titulo)}" placeholder="Nome do módulo..."
+              oninput="Conteudo._editModTitulo(${mi},this.value)"
+              onblur="Conteudo._editModTitulo(${mi},this.value)">
+            <span class="mod-badge ${statusLabel}">${statusText}</span>
+            <span class="mod-meta">
+              <span>${aulaCount} aula${aulaCount!==1?'s':''}</span>
+              ${modDur ? `<span>· ${modDur}min</span>` : ''}
+            </span>
+            <button type="button" class="mod-actions-btn" onclick="Conteudo._ctxMod(event,${mi})" title="Ações do módulo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <div class="mod-body">
+            ${aulasHtml}
+            <div id="type-picker-${mi}" class="type-picker">
+              ${Object.entries(TIPO_LABEL).map(([k,v]) => `
+                <div class="type-opt" onclick="Conteudo._addAulaComTipo(${mi},'${k}')">
+                  <span style="font-size:16px">${TIPO_ICO[k]}</span>
+                  <span>${v}</span>
+                </div>`).join('')}
+            </div>
+            <button type="button" class="btn-add-aula" onclick="Conteudo._toggleTypePicker(${mi})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar aula
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+
+      _updateStats();
+    }
+
+    // ── Módulos ────────────────────────────────────────────
+    function addModulo() {
+      state.modulos.push({
+        id: _uid(), titulo: 'Novo Módulo', status: 'rascunho',
+        collapsed: false, aulas: [],
+      });
+      render();
+      // Focar no input do último módulo
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.mod-title-input');
+        if (inputs.length) inputs[inputs.length-1].focus();
+      }, 50);
+    }
+
+    function toggleMod(mi) {
+      state.modulos[mi].collapsed = !state.modulos[mi].collapsed;
+      const card = document.getElementById('mod-' + state.modulos[mi].id);
+      if (card) card.classList.toggle('collapsed', state.modulos[mi].collapsed);
+    }
+
+    function _editModTitulo(mi, val) {
+      if (state.modulos[mi]) state.modulos[mi].titulo = val;
+    }
+
+    function _ctxMod(e, mi) {
+      const mod = state.modulos[mi];
+      const isPublicado = mod.status === 'publicado';
+      const isOculto    = mod.status === 'oculto';
+      openCtx(e, `
+        <button onclick="Conteudo._modStatus(${mi},'${isPublicado?'rascunho':'publicado'}')">
+          ${isPublicado
+            ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Despublicar'
+            : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Publicar'}
+        </button>
+        <button onclick="Conteudo._modStatus(${mi},'${isOculto?'rascunho':'oculto'}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${isOculto?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' :'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'}</svg>
+          ${isOculto ? 'Mostrar' : 'Ocultar'}
+        </button>
+        <button onclick="Conteudo._dupMod(${mi})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Duplicar
+        </button>
+        <button onclick="Conteudo.toggleMod(${mi})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          ${mod.collapsed ? 'Expandir' : 'Recolher'}
+        </button>
+        <hr class="ctx-sep">
+        <button class="danger" onclick="Conteudo._delMod(${mi})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Excluir módulo
+        </button>`);
+    }
+
+    function _modStatus(mi, s) {
+      state.modulos[mi].status = s; render();
+    }
+    function _dupMod(mi) {
+      const m = JSON.parse(JSON.stringify(state.modulos[mi]));
+      m.id = _uid(); m.titulo += ' (cópia)';
+      m.aulas = m.aulas.map(a => ({ ...a, id: _uid() }));
+      state.modulos.splice(mi + 1, 0, m); render();
+    }
+    function _delMod(mi) {
+      if (!confirm(`Excluir módulo "${state.modulos[mi].titulo}" e todas as suas aulas?`)) return;
+      state.modulos.splice(mi, 1); render();
+    }
+
+    // ── Aulas ──────────────────────────────────────────────
+    function _toggleTypePicker(mi) {
+      const p = document.getElementById('type-picker-' + mi);
+      if (!p) return;
+      // Fechar todos os outros
+      document.querySelectorAll('.type-picker.open').forEach(el => {
+        if (el !== p) el.classList.remove('open');
+      });
+      p.classList.toggle('open');
+    }
+
+    function _addAulaComTipo(mi, tipo) {
+      state.modulos[mi].aulas.push({
+        id: _uid(), titulo: '', tipo, durMin: 0, status: 'rascunho',
+      });
+      const p = document.getElementById('type-picker-' + mi);
+      if (p) p.classList.remove('open');
+      render();
+      setTimeout(() => {
+        const rows = document.querySelectorAll(`#mod-${state.modulos[mi].id} .aula-title-input`);
+        if (rows.length) rows[rows.length-1].focus();
+      }, 50);
+    }
+
+    function _editAulaTitulo(mi, ai, v) {
+      if (state.modulos[mi]?.aulas[ai]) state.modulos[mi].aulas[ai].titulo = v;
+    }
+
+    function _editDur(e, mi, ai) {
+      e.stopPropagation();
+      const span = e.currentTarget;
+      const cur  = state.modulos[mi]?.aulas[ai]?.durMin || '';
+      const inp  = document.createElement('input');
+      inp.className = 'dur-inline'; inp.type = 'number'; inp.min = 0;
+      inp.value = cur; inp.placeholder = 'min';
+      span.replaceWith(inp); inp.focus(); inp.select();
+      const save = () => {
+        const v = Math.max(0, parseInt(inp.value)||0);
+        state.modulos[mi].aulas[ai].durMin = v;
+        render();
+      };
+      inp.onblur   = save;
+      inp.onkeydown = ev => { if (ev.key === 'Enter') inp.blur(); if (ev.key === 'Escape') render(); };
+    }
+
+    function _ctxAula(e, mi, ai) {
+      const aula = state.modulos[mi]?.aulas[ai];
+      if (!aula) return;
+      const isPub = aula.status === 'publicado';
+
+      // Opções de "mover para"
+      const moverOpts = state.modulos
+        .map((m, i) => i !== mi ? `<button onclick="Conteudo._moverAula(${mi},${ai},${i})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${escHtml(m.titulo || 'Módulo ' + (i+1))}</button>` : '')
+        .filter(Boolean).join('');
+
+      openCtx(e, `
+        <button onclick="Conteudo._aulaStatus(${mi},${ai},'${isPub?'rascunho':'publicado'}')">
+          ${isPub
+            ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Despublicar'
+            : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Publicar'}
+        </button>
+        <button onclick="Conteudo._dupAula(${mi},${ai})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Duplicar
+        </button>
+        ${moverOpts ? `<hr class="ctx-sep"><div style="font-size:10px;font-weight:700;color:var(--text4);padding:4px 10px;text-transform:uppercase;letter-spacing:.06em">Mover para</div>${moverOpts}` : ''}
+        <hr class="ctx-sep">
+        <button class="danger" onclick="Conteudo._delAula(${mi},${ai})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Excluir aula
+        </button>`);
+    }
+
+    function _aulaStatus(mi, ai, s) {
+      state.modulos[mi].aulas[ai].status = s; render();
+    }
+    function _dupAula(mi, ai) {
+      const a = { ...state.modulos[mi].aulas[ai], id: _uid(), titulo: state.modulos[mi].aulas[ai].titulo + ' (cópia)' };
+      state.modulos[mi].aulas.splice(ai + 1, 0, a); render();
+    }
+    function _delAula(mi, ai) {
+      state.modulos[mi].aulas.splice(ai, 1); render();
+    }
+    function _moverAula(fromMod, fromAula, toMod) {
+      const [aula] = state.modulos[fromMod].aulas.splice(fromAula, 1);
+      state.modulos[toMod].aulas.push(aula);
+      state.modulos[toMod].collapsed = false;
+      render();
+    }
+
+    // ── DnD Módulos ────────────────────────────────────────
+    function _dndModStart(e, mi) {
+      _dragSrcModIdx  = mi;
+      _dragSrcAulaIdx = null;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => {
+        const el = document.getElementById('mod-' + state.modulos[mi].id);
+        if (el) el.classList.add('dragging');
+      }, 0);
+    }
+    function _dndModOver(e, mi) {
+      if (_dragSrcAulaIdx !== null) return; // é uma aula sendo arrastada
+      if (mi === _dragSrcModIdx) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.mod-card.drag-over').forEach(el => el.classList.remove('drag-over'));
+      const el = document.getElementById('mod-' + state.modulos[mi].id);
+      if (el) el.classList.add('drag-over');
+    }
+    function _dndModLeave(e, mi) {
+      const el = document.getElementById('mod-' + state.modulos[mi]?.id);
+      if (el) el.classList.remove('drag-over');
+    }
+    function _dndModDrop(e, mi) {
+      e.preventDefault();
+      document.querySelectorAll('.mod-card.dragging,.mod-card.drag-over').forEach(el => {
+        el.classList.remove('dragging','drag-over');
+      });
+      if (_dragSrcModIdx === null || _dragSrcModIdx === mi || _dragSrcAulaIdx !== null) return;
+      const [mod] = state.modulos.splice(_dragSrcModIdx, 1);
+      state.modulos.splice(mi, 0, mod);
+      _dragSrcModIdx = null;
+      render();
+    }
+
+    // ── DnD Aulas ──────────────────────────────────────────
+    function _dndAulaStart(e, mi, ai) {
+      _dragSrcModIdx  = mi;
+      _dragSrcAulaIdx = ai;
+      e.dataTransfer.effectAllowed = 'move';
+      e.stopPropagation();
+      setTimeout(() => {
+        const el = document.getElementById('aula-' + state.modulos[mi].aulas[ai].id);
+        if (el) el.classList.add('dragging');
+      }, 0);
+    }
+    function _dndAulaOver(e, mi, ai) {
+      if (_dragSrcAulaIdx === null) return;
+      if (mi === _dragSrcModIdx && ai === _dragSrcAulaIdx) return;
+      e.preventDefault(); e.stopPropagation();
+      document.querySelectorAll('.aula-row.drag-over-top').forEach(el => el.classList.remove('drag-over-top'));
+      const el = document.getElementById('aula-' + state.modulos[mi].aulas[ai].id);
+      if (el) el.classList.add('drag-over-top');
+    }
+    function _dndAulaLeave(e) {
+      document.querySelectorAll('.aula-row.drag-over-top').forEach(el => el.classList.remove('drag-over-top'));
+    }
+    function _dndAulaDrop(e, toMod, toAi) {
+      e.preventDefault(); e.stopPropagation();
+      document.querySelectorAll('.aula-row.dragging,.aula-row.drag-over-top').forEach(el => {
+        el.classList.remove('dragging','drag-over-top');
+      });
+      if (_dragSrcAulaIdx === null) return;
+      const fromMod = _dragSrcModIdx, fromAi = _dragSrcAulaIdx;
+      _dragSrcModIdx = null; _dragSrcAulaIdx = null;
+      if (fromMod === toMod && fromAi === toAi) return;
+      const [aula] = state.modulos[fromMod].aulas.splice(fromAi, 1);
+      const targetIdx = (fromMod === toMod && fromAi < toAi) ? toAi - 1 : toAi;
+      state.modulos[toMod].aulas.splice(targetIdx, 0, aula);
+      render();
+    }
+
+    // ── Init ───────────────────────────────────────────────
+    function init() {
+      // Se vier draft, re-renderiza
+      render();
+    }
+
+    return {
+      render, init, addModulo, toggleMod,
+      _editModTitulo, _ctxMod, _modStatus, _dupMod, _delMod,
+      _toggleTypePicker, _addAulaComTipo,
+      _editAulaTitulo, _editDur,
+      _ctxAula, _aulaStatus, _dupAula, _delAula, _moverAula,
+      _dndModStart, _dndModOver, _dndModLeave, _dndModDrop,
+      _dndAulaStart, _dndAulaOver, _dndAulaLeave, _dndAulaDrop,
+    };
+  })();
+
+  // Expor Conteudo globalmente (onclicks no HTML referenciam Conteudo.*)
+  window.Conteudo = Conteudo;
 
   // Variável interna — não depende de Wizard estar definido
   let _pendingDraft = null;
