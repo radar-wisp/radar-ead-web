@@ -777,23 +777,23 @@ tbody tr.selected td { background:#f0f4ff }
   font-family:var(--font); transition:all .12s;
 }
 .gc-actions-btn:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
-.gc-menu {
-  display:none; position:absolute; right:0; top:calc(100% + 3px);
+/* .gc-menu renderizado via #gc-portal-menu (portal no body) */
+#gc-portal-menu {
+  display:none; position:fixed; z-index:9000;
   background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
-  z-index:300; min-width:180px; padding:4px; animation:popIn .12s ease;
+  border-radius:var(--radius-sm); box-shadow:0 8px 24px rgba(0,2,60,.14);
+  min-width:185px; padding:4px; animation:popIn .12s ease;
 }
-.gc-menu.open { display:block }
-.gc-menu button {
+#gc-portal-menu button {
   display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
   border-radius:5px; font-size:12px; color:var(--text2); background:none;
   border:none; cursor:pointer; text-align:left; transition:background .1s;
   font-family:var(--font);
 }
-.gc-menu button:hover { background:var(--blue-light); color:var(--blue) }
-.gc-menu button.danger { color:var(--red) }
-.gc-menu button.danger:hover { background:var(--red-light) }
-.gc-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
+#gc-portal-menu button:hover { background:var(--blue-l); color:var(--blue) }
+#gc-portal-menu button.danger { color:var(--red) }
+#gc-portal-menu button.danger:hover { background:var(--red-l,#fee2e2) }
+#gc-portal-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
 
 /* Stats cards do módulo */
 #gc-stats .stat-val { font-size:22px }
@@ -4117,24 +4117,9 @@ var Cursos = (() => {
         <td style="font-size:11px;color:var(--text4)">${fmtDate(c.criadoEm)}</td>
         <td>
           <div class="gc-actions">
-            <button class="gc-actions-btn" onclick="Cursos.toggleMenu(this)" title="Ações">
+            <button class="gc-actions-btn" onclick="Cursos.toggleMenu(this)" title="Ações" data-menu-open="0">
               Ações ${SVGS.chev}
             </button>
-            <div class="gc-menu">
-              <button onclick="Cursos.visualizar('${c.id}');Cursos.closeMenus()">${SVGS.eye} Visualizar</button>
-              <button onclick="Cursos.abrirEdit('${c.id}');Cursos.closeMenus()">${SVGS.edit} Editar</button>
-              <button onclick="Cursos.duplicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.copy} Duplicar</button>
-              <hr class="sep">
-              <button onclick="Admin.go('materiais');Cursos.closeMenus()">${SVGS.folder} Gerenciar materiais</button>
-              <button onclick="Admin.goAcessos('${c.id}');Cursos.closeMenus()">${SVGS.lock} Gerenciar acessos</button>
-              <hr class="sep">
-              ${status !== 'publicado'
-                ? `<button onclick="Cursos.publicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.play} Publicar</button>`
-                : `<button onclick="Cursos.despublicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.pause} Despublicar</button>`}
-              <button onclick="Cursos.arquivarCurso('${c.id}');Cursos.closeMenus()">${SVGS.arc} Arquivar</button>
-              <hr class="sep">
-              <button class="danger" onclick="Cursos.excluirCurso('${c.id}');Cursos.closeMenus()">${SVGS.trash} Excluir</button>
-            </div>
           </div>
         </td>
       </tr>`;
@@ -4157,16 +4142,45 @@ var Cursos = (() => {
 
   /* ── Menus dropdown ────────────────────────────────────────── */
   function toggleMenu(btn) {
-    const menu = btn.nextElementSibling;
-    const isOpen = menu.classList.contains('open');
+    const isOpen = btn.dataset.menuOpen === '1';
     closeMenus();
-    if (!isOpen) {
-      menu.classList.add('open');
-      setTimeout(() => document.addEventListener('click', closeMenus, { once: true }), 10);
-    }
+    if (isOpen) return;
+
+    const id = btn.closest('tr')?.id?.replace('row-', '') || '';
+    const c  = id ? Storage.Cursos.obter(id) : null;
+    if (!c) return;
+    const status = resolveStatus(c);
+
+    const html = `
+      <button onclick="Cursos.visualizar('${c.id}');PortalMenu.close()">${SVGS.eye} Visualizar</button>
+      <button onclick="Cursos.abrirEdit('${c.id}');PortalMenu.close()">${SVGS.edit} Editar</button>
+      <button onclick="Cursos.duplicarCurso('${c.id}');PortalMenu.close()">${SVGS.copy} Duplicar</button>
+      <hr class="sep">
+      <button onclick="Admin.go('materiais');PortalMenu.close()">${SVGS.folder} Gerenciar materiais</button>
+      <button onclick="Admin.goAcessos('${c.id}');PortalMenu.close()">${SVGS.lock} Gerenciar acessos</button>
+      <hr class="sep">
+      ${status !== 'publicado'
+        ? `<button onclick="Cursos.publicarCurso('${c.id}');PortalMenu.close()">${SVGS.play} Publicar</button>`
+        : `<button onclick="Cursos.despublicarCurso('${c.id}');PortalMenu.close()">${SVGS.pause} Despublicar</button>`}
+      <button onclick="Cursos.arquivarCurso('${c.id}');PortalMenu.close()">${SVGS.arc} Arquivar</button>
+      <hr class="sep">
+      <button class="danger" onclick="Cursos.excluirCurso('${c.id}');PortalMenu.close()">${SVGS.trash} Excluir</button>`;
+
+    btn.dataset.menuOpen = '1';
+    PortalMenu.open(btn, html);
+
+    const obs = new MutationObserver(() => {
+      if (document.getElementById('gc-portal-menu')?.style.display === 'none') {
+        btn.dataset.menuOpen = '0';
+        obs.disconnect();
+      }
+    });
+    const pm = document.getElementById('gc-portal-menu');
+    if (pm) obs.observe(pm, { attributes: true, attributeFilter: ['style'] });
   }
   function closeMenus() {
-    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
+    PortalMenu.close();
+    document.querySelectorAll('[data-menu-open="1"]').forEach(b => b.dataset.menuOpen = '0');
   }
 
   /* ── Seleção em lote ─────────────────────────────────────── */
@@ -8894,5 +8908,66 @@ var PubMod = (() => {
 </script>
 <script src="src/js/storage.js"></script>
 <script src="src/js/admin.js"></script>
+
+<!-- ═══ PORTAL MENU ═════════════════════════════════════════ -->
+<div id="gc-portal-menu"></div>
+
+<script>
+/* ── PortalMenu — dropdown renderizado no body, nunca clipado ── */
+var PortalMenu = (() => {
+  const MARGIN = 8;
+  let _closeListener = null;
+  let _scrollCleanup = null;
+
+  function _el() { return document.getElementById('gc-portal-menu'); }
+
+  function _position(btn) {
+    const p  = _el();
+    const r  = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    p.style.visibility = 'hidden';
+    p.style.display    = 'block';
+    const pw = p.offsetWidth;
+    const ph = p.offsetHeight;
+    p.style.visibility = '';
+    const spaceBelow = vh - r.bottom - MARGIN;
+    const top = spaceBelow >= ph
+      ? r.bottom + window.scrollY + 3
+      : r.top + window.scrollY - ph - 3;
+    let left = r.right + window.scrollX - pw;
+    if (left < MARGIN) left = MARGIN;
+    if (left + pw > vw - MARGIN) left = vw - pw - MARGIN;
+    p.style.top  = top  + 'px';
+    p.style.left = left + 'px';
+  }
+
+  function open(btn, html) {
+    close();
+    const p = _el();
+    p.innerHTML = html;
+    _position(btn);
+    p.style.display = 'block';
+    const onScroll = () => _position(btn);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    _scrollCleanup = () => window.removeEventListener('scroll', onScroll);
+    _closeListener = e => {
+      if (!p.contains(e.target) && e.target !== btn) close();
+    };
+    setTimeout(() => document.addEventListener('click', _closeListener), 10);
+  }
+
+  function close() {
+    const p = _el();
+    if (!p) return;
+    p.style.display = 'none';
+    p.innerHTML = '';
+    if (_closeListener) { document.removeEventListener('click', _closeListener); _closeListener = null; }
+    if (_scrollCleanup) { _scrollCleanup(); _scrollCleanup = null; }
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  return { open, close };
+})();
+</script>
 </body>
-</html>
