@@ -1483,15 +1483,15 @@ tbody tr.selected td { background:#f0f4ff }
             <table>
               <thead>
                 <tr>
-                  <th style="min-width:160px">Turma</th>
-                  <th style="min-width:140px">Curso vinculado</th>
-                  <th style="width:70px;text-align:center">Alunos</th>
-                  <th style="width:120px;text-align:center">Progresso</th>
-                  <th style="min-width:120px">Responsável</th>
-                  <th style="width:96px;white-space:nowrap">Início</th>
-                  <th style="width:110px;white-space:nowrap">Encerramento</th>
-                  <th style="width:110px">Status</th>
-                  <th style="width:88px"></th>
+                  <th>Turma</th>
+                  <th>Curso vinculado</th>
+                  <th style="text-align:center">Alunos</th>
+                  <th style="text-align:center">Progresso</th>
+                  <th>Responsável</th>
+                  <th>Início</th>
+                  <th>Encerramento</th>
+                  <th>Status</th>
+                  <th style="width:80px"></th>
                 </tr>
               </thead>
               <tbody id="tm-tbody"></tbody>
@@ -2384,13 +2384,6 @@ tbody tr.selected td { background:#f0f4ff }
 
     </div>
 
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-curso-view').classList.remove('open')">Fechar</button>
-      <button class="btn btn-outline btn-sm" id="mcv-btn-edit">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Editar curso
-      </button>
-    </div>
   </div>
 </div>
 
@@ -2468,6 +2461,7 @@ tbody tr.selected td { background:#f0f4ff }
     <div class="mc-tabs">
       <button class="mc-tab active" onclick="Turmas.tabModal(0,this)">Dados</button>
       <button class="mc-tab" onclick="Turmas.tabModal(1,this)">Alunos</button>
+      <button class="mc-tab" onclick="Turmas.tabModal(2,this)">Acesso</button>
     </div>
 
     <!-- Tab 0: Dados da turma -->
@@ -2537,12 +2531,13 @@ tbody tr.selected td { background:#f0f4ff }
 
       <!-- Busca de alunos -->
       <div style="position:relative;margin-bottom:10px">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4);display:flex">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
           oninput="Turmas.filtrarAlunos()"
-          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text);box-sizing:border-box">
+          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
       </div>
 
       <!-- Lista de alunos com checkboxes -->
@@ -2554,6 +2549,44 @@ tbody tr.selected td { background:#f0f4ff }
     </div>
 
     <!-- Tab 2: Controle de acesso -->
+    <div class="mc-pane" id="mt-pane-2">
+      <div id="mt-config-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Acesso automático ao criar</div>
+            <div style="font-size:11px;color:var(--text4)">Libera o curso para os alunos ao salvar a turma</div>
+          </div>
+          <div id="mt-cfg-auto" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Bloquear após encerramento</div>
+            <div style="font-size:11px;color:var(--text4)">Remove acesso dos alunos quando a turma encerrar</div>
+          </div>
+          <div id="mt-cfg-bloquear" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Permitir entrada após início</div>
+            <div style="font-size:11px;color:var(--text4)">Novos alunos podem entrar mesmo após a data de início</div>
+          </div>
+          <div id="mt-cfg-entrada" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="padding:11px 0">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prazo de conclusão (dias)</div>
+          <div style="font-size:11px;color:var(--text4);margin-bottom:8px">0 = sem prazo definido</div>
+          <input type="number" id="mt-cfg-prazo" min="0" value="0"
+            style="width:120px;padding:7px 11px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font)">
+        </div>
+      </div>
+    </div>
+
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="Turmas.salvar()">
@@ -2609,26 +2642,15 @@ tbody tr.selected td { background:#f0f4ff }
       <div id="td-participantes" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
     </div>
     <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-turma-dash').classList.remove('open')">Fechar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: SELEÇÃO POR SETOR/EQUIPE (turmas) ══════════════ -->
-<div class="modal-bg" id="modal-tm-sel">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-head">
-      <h3 id="tm-sel-titulo">Selecionar por setor</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-tm-sel').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button class="btn btn-ghost btn-sm" onclick="Turmas.abrirGerenciarAlunos(Turmas._viewingId)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Gerenciar alunos
       </button>
-    </div>
-    <div style="padding:4px 0 8px">
-      <div id="tm-sel-lista" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding:0 4px"></div>
-      <div id="tm-sel-vazio" style="display:none;padding:20px;text-align:center;font-size:13px;color:var(--text4)">Nenhum item encontrado.</div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-tm-sel').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-ghost btn-sm" onclick="Turmas.abrirEdit(Turmas._viewingId);document.getElementById('modal-turma-dash').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar turma
+      </button>
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-turma-dash').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
@@ -4159,18 +4181,24 @@ var Cursos = (() => {
     const c = Storage.Cursos.obter(id);
     if (!c) return;
 
-    const aulas  = Storage.Aulas.totalPorCurso(id);
-    const mods   = Storage.Modulos.listarPorCurso(id).length;
-    const mats   = Storage.Materiais.listarPorCurso(id).length;
+    // Módulos e aulas: prioriza c.modulos (wizard), fallback para Storage legado
+    const modsArr = c.modulos?.length
+      ? c.modulos
+      : Storage.Modulos.listarPorCurso(id);
+    const mods  = modsArr.length;
+    const aulas = c.modulos?.length
+      ? c.modulos.reduce((s, m) => s + (m.aulas?.length || 0), 0)
+      : Storage.Aulas.totalPorCurso(id);
+    const mats   = (c.materiais?.filter(m => m.tipo !== 'quiz').length) || Storage.Materiais.listarPorCurso(id).length;
     const rest   = Storage.Restricoes.porCurso(id);
     const status = resolveStatus(c);
     const prog   = calcProgresso(id);
 
-    const m = document.getElementById('modal-curso-view');
-    if (!m) return;
+    const modal = document.getElementById('modal-curso-view');
+    if (!modal) return;
 
-    // Thumb: capa ou inicial
-    const thumb = m.querySelector('#mcv-thumb');
+    // Thumb
+    const thumb = modal.querySelector('#mcv-thumb');
     if (c.capa) {
       thumb.style.background = `url('${c.capa}') center/cover no-repeat`;
       thumb.textContent = '';
@@ -4180,33 +4208,31 @@ var Cursos = (() => {
     }
 
     // Título e subtítulo
-    m.querySelector('#mcv-titulo').textContent = c.titulo || '—';
-    m.querySelector('#mcv-sub').textContent =
+    modal.querySelector('#mcv-titulo').textContent = c.titulo || '—';
+    modal.querySelector('#mcv-sub').textContent =
       [c.categoria, c.nivel ? ({basico:'Básico',intermediario:'Intermediário',avancado:'Avançado'}[c.nivel]) : null]
         .filter(Boolean).join(' · ') || 'Sem categoria';
 
     // Badges
     const fmtLabel = { ead:'EAD', hibrido:'Híbrido', presencial:'Presencial' };
-    m.querySelector('#mcv-badges').innerHTML =
+    modal.querySelector('#mcv-badges').innerHTML =
       statusBadge(status) +
       `<span class="badge badge-blue" style="white-space:nowrap">${fmtLabel[c.formato] || 'EAD'}</span>` +
       (c.config?.obrigatorio ? `<span class="badge badge-amber">Obrigatório</span>` : '') +
       (c.config?.certificado ? `<span class="badge badge-green">Certificado</span>` : '');
 
     // Descrição
-    const descEl = m.querySelector('#mcv-desc');
-    descEl.textContent = c.descricao || 'Sem descrição.';
-    m.querySelector('#mcv-desc-wrap').style.display = 'block';
+    modal.querySelector('#mcv-desc').textContent = c.descricao || 'Sem descrição.';
 
     // Métricas
     const metric = (val, lbl, color='') =>
       `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center">
-        <div style="font-size:18px;font-weight:700;color:${color||'var(--text)'};">${val}</div>
+        <div style="font-size:18px;font-weight:700;color:${color||'var(--text)'}">${val}</div>
         <div style="font-size:10px;color:var(--text4);margin-top:2px">${lbl}</div>
       </div>`;
-    m.querySelector('#mcv-metrics').innerHTML =
+    modal.querySelector('#mcv-metrics').innerHTML =
       metric(c.carga ? c.carga + 'h' : '—', 'Carga') +
-      metric(mods, 'Módulos') +
+      metric(mods,  'Módulos') +
       metric(aulas, 'Aulas') +
       metric(prog + '%', 'Progresso', prog > 0 ? 'var(--green-d)' : '');
 
@@ -4221,7 +4247,7 @@ var Cursos = (() => {
             : `${fmtDate(c.validadeAte)} (${diff}d restantes)`;
         })()
       : 'Sem validade';
-    m.querySelector('#mcv-details').innerHTML =
+    modal.querySelector('#mcv-details').innerHTML =
       detail('Materiais', mats) +
       detail('Acessos', rest.length ? rest.length + ' restrição(ões)' : 'Todos') +
       detail('Validade', valDesc) +
@@ -4239,9 +4265,9 @@ var Cursos = (() => {
       cfg.progresso   && 'Exibe progresso',
       cfg.ocultar     && 'Ocultar pós-conclusão',
     ].filter(Boolean);
-    const cfgWrap = m.querySelector('#mcv-config-wrap');
+    const cfgWrap = modal.querySelector('#mcv-config-wrap');
     if (cfgChips.length) {
-      m.querySelector('#mcv-config').innerHTML = cfgChips
+      modal.querySelector('#mcv-config').innerHTML = cfgChips
         .map(t => `<span style="font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:3px 10px;color:var(--text3)">${t}</span>`)
         .join('');
       cfgWrap.style.display = 'block';
@@ -4249,14 +4275,9 @@ var Cursos = (() => {
       cfgWrap.style.display = 'none';
     }
 
-    // Botão editar
-    m.querySelector('#mcv-btn-edit').onclick = () => {
-      m.classList.remove('open');
-      abrirEdit(id);
-    };
-
-    m.classList.add('open');
+    modal.classList.add('open');
   }
+
 
   function publicarCurso(id) {
     Storage.Cursos.publicar(id);
@@ -4823,48 +4844,53 @@ var Turmas = (() => {
         <td>${statusBadge(t.status)}</td>
         <td>
           <div class="gc-actions">
-            <button class="gc-actions-btn" onclick="Turmas._menu(this,'${t.id}',${t.status !== 'encerrada' && t.status !== 'cancelada'})" title="Ações">
+            <button class="gc-actions-btn" onclick="Turmas._menu(this)" title="Ações">
               Ações <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
+            <div class="gc-menu">
+              <button onclick="Turmas.visualizar('${t.id}');Turmas._closeMenus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Visualizar
+              </button>
+              <button onclick="Turmas.abrirEdit('${t.id}');Turmas._closeMenus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar
+              </button>
+              <button onclick="Turmas.abrirGerenciarAlunos('${t.id}');Turmas._closeMenus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Gerenciar alunos
+              </button>
+              <hr class="sep">
+              ${t.status !== 'encerrada' && t.status !== 'cancelada'
+                ? `<button onclick="Turmas.encerrar('${t.id}');Turmas._closeMenus()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    Encerrar turma
+                  </button>`
+                : ''}
+              <hr class="sep">
+              <button class="danger" onclick="Turmas.excluir('${t.id}');Turmas._closeMenus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                Excluir
+              </button>
+            </div>
           </div>
         </td>
       </tr>`;
     }).join('');
   }
 
-  /* ── Menu dropdown via PortalMenu (renderizado no body, sem clipping) ── */
-  function _menu(btn, id, podeEncerrar) {
-    const isOpen = btn.dataset.menuOpen === '1';
+  /* ── Menu dropdown ──────────────────────────────────────────── */
+  function _menu(btn) {
+    const menu = btn.nextElementSibling;
+    const isOpen = menu.classList.contains('open');
     _closeMenus();
-    if (isOpen) return;
-
-    const svgEye    = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-    const svgEdit   = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-    const svgUsers  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`;
-    const svgStop   = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
-    const svgTrash  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>`;
-
-    const html = `
-      <button onclick="Turmas.visualizar('${id}');PortalMenu.close()">${svgEye} Visualizar</button>
-      <button onclick="Turmas.abrirEdit('${id}');PortalMenu.close()">${svgEdit} Editar</button>
-      <hr class="sep">
-      ${podeEncerrar ? `<button onclick="Turmas.encerrar('${id}');PortalMenu.close()">${svgStop} Encerrar turma</button><hr class="sep">` : ''}
-      <button class="danger" onclick="Turmas.excluir('${id}');PortalMenu.close()">${svgTrash} Excluir</button>`;
-
-    btn.dataset.menuOpen = '1';
-    PortalMenu.open(btn, html);
-
-    const obs = new MutationObserver(() => {
-      if (document.getElementById('gc-portal-menu')?.style.display === 'none') {
-        btn.dataset.menuOpen = '0';
-        obs.disconnect();
-      }
-    });
-    obs.observe(document.getElementById('gc-portal-menu'), { attributes: true, attributeFilter: ['style'] });
+    if (!isOpen) {
+      menu.classList.add('open');
+      setTimeout(() => document.addEventListener('click', _closeMenus, { once: true }), 10);
+    }
   }
   function _closeMenus() {
-    PortalMenu.close();
-    document.querySelectorAll('[data-menu-open="1"]').forEach(b => b.dataset.menuOpen = '0');
+    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
   }
 
   /* ── Visualizar (dashboard da turma) ───────────────────────── */
@@ -4935,6 +4961,10 @@ var Turmas = (() => {
     });
     document.getElementById('mt-limite').value = '0';
     document.getElementById('mt-status').value = 'aberta';
+    document.getElementById('mt-cfg-prazo').value = '0';
+    setToggle('mt-cfg-auto', true);
+    setToggle('mt-cfg-bloquear', true);
+    setToggle('mt-cfg-entrada', true);
 
     // Popula select de cursos
     _popularSelectCursos();
@@ -4963,6 +4993,12 @@ var Turmas = (() => {
     document.getElementById('mt-status').value     = t.status || 'aberta';
     document.getElementById('mt-inicio').value     = t.dataInicio ? t.dataInicio.slice(0,10) : '';
     document.getElementById('mt-fim').value        = t.dataFim    ? t.dataFim.slice(0,10)    : '';
+    document.getElementById('mt-cfg-prazo').value  = t.config?.prazoConclucaoDias || 0;
+
+    const cfg = t.config || {};
+    setToggle('mt-cfg-auto',     cfg.acessoAutomatico !== false);
+    setToggle('mt-cfg-bloquear', cfg.bloquearAposEncerramento !== false);
+    setToggle('mt-cfg-entrada',  cfg.permitirEntradaAposInicio !== false);
 
     _popularSelectCursos(t.cursoId);
     renderListaAlunos();
@@ -5061,71 +5097,30 @@ var Turmas = (() => {
   }
 
   /* ── Seleções rápidas ───────────────────────────────────────── */
-  function _abrirSelModal(titulo, itens, onSelect) {
-    const modal = document.getElementById('modal-tm-sel');
-    const lista = document.getElementById('tm-sel-lista');
-    const vazio = document.getElementById('tm-sel-vazio');
-    document.getElementById('tm-sel-titulo').textContent = titulo;
-
-    if (!itens.length) {
-      lista.innerHTML = '';
-      vazio.style.display = 'block';
-    } else {
-      vazio.style.display = 'none';
-      lista.innerHTML = itens.map(item => `
-        <button onclick="Turmas._selModalItem(this)" data-id="${item.id}"
-          style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:none;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:13px;color:var(--text);text-align:left;transition:background .1s"
-          onmouseover="this.style.background='var(--blue-light)'"
-          onmouseout="this.style.background='none'">
-          <span style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">
-            ${(item.nome?.[0]||'?').toUpperCase()}
-          </span>
-          <span style="flex:1">${x(item.nome)}</span>
-          <span style="font-size:11px;color:var(--text4)">${item._count || ''}</span>
-        </button>`).join('');
-    }
-
-    modal._onSelect = onSelect;
-    modal.classList.add('open');
-  }
-
-  // chamado pelo botão inline gerado acima
-  window._tmSelCb = null;
-  function _selModalItem(btn) {
-    const modal = document.getElementById('modal-tm-sel');
-    const id = btn.dataset.id;
-    modal.classList.remove('open');
-    if (typeof modal._onSelect === 'function') modal._onSelect(id);
-  }
-  // expor para onclick inline
-  if (!window.Turmas) window.Turmas = {};
-
   function selecionarPorSetor() {
-    const setores = Storage.Setores.listar().map(s => ({
-      ...s,
-      _count: Storage.Alunos.porSetor(s.id).length + ' aluno(s)'
-    }));
-    _abrirSelModal('Selecionar por setor', setores, (setorId) => {
-      const setor = Storage.Setores.obter(setorId);
-      const ids = Storage.Alunos.porSetor(setorId).map(a => a.id);
-      ids.forEach(id => alunosSel.add(id));
-      renderListaAlunos();
-      _toast(`${ids.length} aluno(s) do setor "${setor?.nome}" adicionados.`, 's');
-    });
+    const setores = Storage.Setores.listar();
+    if (!setores.length) { _toast('Nenhum setor cadastrado.', 'i'); return; }
+    const nomes = setores.map((s,i) => `${i+1}. ${s.nome}`).join('\n');
+    const resp  = prompt(`Selecione o setor (número):\n${nomes}`);
+    const idx   = parseInt(resp) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= setores.length) return;
+    const ids = Storage.Alunos.porSetor(setores[idx].id).map(a => a.id);
+    ids.forEach(id => alunosSel.add(id));
+    renderListaAlunos();
+    _toast(`${ids.length} aluno(s) do setor "${setores[idx].nome}" adicionados.`, 's');
   }
 
   function selecionarPorEquipe() {
-    const equipes = Storage.Equipes.listar().map(e => ({
-      ...e,
-      _count: Storage.Alunos.porEquipe(e.id).length + ' aluno(s)'
-    }));
-    _abrirSelModal('Selecionar por equipe', equipes, (equipeId) => {
-      const equipe = Storage.Equipes.obter(equipeId);
-      const ids = Storage.Alunos.porEquipe(equipeId).map(a => a.id);
-      ids.forEach(id => alunosSel.add(id));
-      renderListaAlunos();
-      _toast(`${ids.length} aluno(s) da equipe "${equipe?.nome}" adicionados.`, 's');
-    });
+    const equipes = Storage.Equipes.listar();
+    if (!equipes.length) { _toast('Nenhuma equipe cadastrada.', 'i'); return; }
+    const nomes = equipes.map((e,i) => `${i+1}. ${e.nome}`).join('\n');
+    const resp  = prompt(`Selecione a equipe (número):\n${nomes}`);
+    const idx   = parseInt(resp) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= equipes.length) return;
+    const ids = Storage.Alunos.porEquipe(equipes[idx].id).map(a => a.id);
+    ids.forEach(id => alunosSel.add(id));
+    renderListaAlunos();
+    _toast(`${ids.length} aluno(s) da equipe "${equipes[idx].nome}" adicionados.`, 's');
   }
 
   function selecionarTodos() {
@@ -5156,6 +5151,12 @@ var Turmas = (() => {
       dataInicio:  document.getElementById('mt-inicio')?.value ? new Date(document.getElementById('mt-inicio').value).toISOString() : '',
       dataFim:     document.getElementById('mt-fim')?.value    ? new Date(document.getElementById('mt-fim').value).toISOString()    : '',
       alunos:      [...alunosSel],
+      config: {
+        acessoAutomatico:          getToggleOn('mt-cfg-auto'),
+        bloquearAposEncerramento:  getToggleOn('mt-cfg-bloquear'),
+        permitirEntradaAposInicio: getToggleOn('mt-cfg-entrada'),
+        prazoConclucaoDias:        parseInt(document.getElementById('mt-cfg-prazo')?.value) || 0,
+      },
     };
 
     if (editId) {
@@ -5214,7 +5215,7 @@ var Turmas = (() => {
     visualizar, encerrar, excluir, salvar,
     tabModal, renderListaAlunos,
     selecionarPorSetor, selecionarPorEquipe, selecionarTodos, limparAlunos,
-    _menu, _closeMenus, _toggleAluno, _viewingId, _selModalItem,
+    _menu, _closeMenus, _toggleAluno, _viewingId,
   };
 })();
 
