@@ -515,14 +515,49 @@ var Storage = (() => {
     /** @param {string} cursoId @returns {Array<Material>} */
     listarPorCurso: cursoId => get(K.MATERIAIS).filter(m => m.cursoId === cursoId),
 
+    /** @param {string} id @returns {Material|null} */
+    obter: id => get(K.MATERIAIS).find(m => m.id === id) || null,
+
     /** @param {{cursoId,nome,tipo,tamanho,url}} d @returns {Material} */
     criar: d => {
-      const l = get(K.MATERIAIS), n = { id: uid(), criadoEm: now(), ...d };
+      const l = get(K.MATERIAIS), n = { id: uid(), criadoEm: now(), status: 'ativo', ...d };
       l.push(n); set(K.MATERIAIS, l); return n;
+    },
+
+    /** @param {string} id @param {Partial<Material>} d */
+    atualizar: (id, d) => set(K.MATERIAIS, get(K.MATERIAIS).map(m => m.id === id ? { ...m, ...d } : m)),
+
+    /** @param {string} id */
+    arquivar: id => set(K.MATERIAIS, get(K.MATERIAIS).map(m => m.id === id ? { ...m, status: 'arquivado' } : m)),
+
+    /**
+     * Vincula material a um curso adicional (cursosVinc[]).
+     * @param {string} id @param {string} cursoId
+     */
+    vincular: (id, cursoId) => {
+      const lista = get(K.MATERIAIS);
+      const idx = lista.findIndex(m => m.id === id);
+      if (idx === -1) return;
+      const vinc = lista[idx].cursosVinc || [];
+      if (!vinc.includes(cursoId)) vinc.push(cursoId);
+      lista[idx] = { ...lista[idx], cursosVinc: vinc };
+      set(K.MATERIAIS, lista);
     },
 
     /** @param {string} id */
     excluir: id => set(K.MATERIAIS, get(K.MATERIAIS).filter(m => m.id !== id)),
+
+    /** @returns {{ total, pdf, video, ativos, arquivados }} */
+    stats: () => {
+      const lista = get(K.MATERIAIS);
+      return {
+        total:      lista.length,
+        pdf:        lista.filter(m => m.tipo === 'pdf').length,
+        video:      lista.filter(m => m.tipo === 'video').length,
+        ativos:     lista.filter(m => (m.status || 'ativo') === 'ativo').length,
+        arquivados: lista.filter(m => m.status === 'arquivado').length,
+      };
+    },
   };
 
   // ════════════════════════════════════════════════════════════════
