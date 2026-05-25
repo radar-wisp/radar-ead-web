@@ -94,10 +94,6 @@ input,select,textarea { font-family:var(--font) }
   animation:popIn .3s ease;
 }
 @keyframes popIn { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
-
-/* Drawer editor de curso */
-#curso-editor-drawer { animation: drawerIn .2s ease }
-@keyframes drawerIn { from { opacity:0; transform:translateX(12px) } to { opacity:1; transform:none } }
 .brand { display:flex; align-items:center; gap:10px; margin-bottom:22px }
 .brand-icon {
   width:34px; height:34px; background:var(--blue);
@@ -772,8 +768,8 @@ tbody tr.selected td { background:#f0f4ff }
 .mc-pane { display:none }
 .mc-pane.active { display:block }
 
-/* Dropdown action menu — posicionamento via portal (PortalMenu) */
-.gc-actions { display:inline-block }
+/* Dropdown action menu melhorado */
+.gc-actions { position:relative; display:inline-block }
 .gc-actions-btn {
   display:flex; align-items:center; gap:4px; padding:5px 8px;
   border:1px solid var(--border); border-radius:var(--radius-sm);
@@ -781,17 +777,23 @@ tbody tr.selected td { background:#f0f4ff }
   font-family:var(--font); transition:all .12s;
 }
 .gc-actions-btn:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
-/* gc-menu agora é renderizado via portal — estilos globais usados pelo #gc-portal-menu */
-#gc-portal-menu button {
+.gc-menu {
+  display:none; position:absolute; right:0; top:calc(100% + 3px);
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
+  z-index:300; min-width:180px; padding:4px; animation:popIn .12s ease;
+}
+.gc-menu.open { display:block }
+.gc-menu button {
   display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
   border-radius:5px; font-size:12px; color:var(--text2); background:none;
   border:none; cursor:pointer; text-align:left; transition:background .1s;
   font-family:var(--font);
 }
-#gc-portal-menu button:hover { background:var(--blue-light); color:var(--blue) }
-#gc-portal-menu button.danger { color:var(--red) }
-#gc-portal-menu button.danger:hover { background:var(--red-light) }
-#gc-portal-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
+.gc-menu button:hover { background:var(--blue-light); color:var(--blue) }
+.gc-menu button.danger { color:var(--red) }
+.gc-menu button.danger:hover { background:var(--red-light) }
+.gc-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
 
 /* Stats cards do módulo */
 #gc-stats .stat-val { font-size:22px }
@@ -2345,49 +2347,6 @@ tbody tr.selected td { background:#f0f4ff }
 </div>
 
 
-<!-- ═══ MODAL: VISUALIZAR CURSO ══════════════════════════════ -->
-<div class="modal-bg" id="modal-curso-view">
-  <div class="modal" style="max-width:620px">
-    <div class="modal-head">
-      <div style="display:flex;align-items:center;gap:12px;min-width:0">
-        <div id="mcv-thumb" style="width:40px;height:40px;border-radius:8px;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></div>
-        <div style="min-width:0">
-          <h3 id="mcv-titulo" style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h3>
-          <div id="mcv-sub" style="font-size:11px;color:var(--text4);margin-top:2px"></div>
-        </div>
-      </div>
-      <button class="modal-close" onclick="document.getElementById('modal-curso-view').classList.remove('open')">✕</button>
-    </div>
-
-    <!-- Badges de status + formato -->
-    <div id="mcv-badges" style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border)"></div>
-
-    <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
-
-      <!-- Descrição -->
-      <div id="mcv-desc-wrap">
-        <div style="font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Descrição</div>
-        <div id="mcv-desc" style="font-size:13px;color:var(--text3);line-height:1.6"></div>
-      </div>
-
-      <!-- Grid de métricas -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="mcv-metrics"></div>
-
-      <!-- Detalhes em duas colunas -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px" id="mcv-details"></div>
-
-      <!-- Configurações do curso -->
-      <div id="mcv-config-wrap">
-        <div style="font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Configurações</div>
-        <div id="mcv-config" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-
 <!-- ═══ MODAL: COLABORADOR ════════════════════ -->
 <div class="modal-bg" id="modal-colab">
   <div class="modal">
@@ -2413,38 +2372,141 @@ tbody tr.selected td { background:#f0f4ff }
 
 
 <!-- ═══ MODAL: EDITAR CURSO (tabs) ═══════════════════════════ -->
+<div class="modal-bg" id="modal-edit-curso">
+  <div class="modal" style="max-width:660px">
+    <div class="modal-head">
+      <div>
+        <h3 id="mec-titulo">Editar Curso</h3>
+        <div id="mec-subtitulo" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <button class="modal-close">✕</button>
+    </div>
 
-<!-- ═══ DRAWER EDITOR DE CURSO (iframe → novo-curso.html) ══ -->
-<div id="curso-editor-drawer" style="
-  display:none; position:fixed; inset:0; z-index:8000;
-  background:var(--bg); flex-direction:column;
-">
-  <!-- Header do drawer -->
-  <div style="
-    display:flex; align-items:center; gap:12px;
-    padding:12px 20px; background:var(--surface);
-    border-bottom:1px solid var(--border); flex-shrink:0;
-  ">
-    <button onclick="CursoDrawer.fechar()" style="
-      display:flex; align-items:center; gap:6px;
-      padding:6px 12px; border:1.5px solid var(--border);
-      border-radius:var(--radius-sm); font-size:12px; font-weight:600;
-      color:var(--text3); background:none; cursor:pointer; font-family:var(--font);
-    ">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Voltar para Gestão de Cursos
-    </button>
-    <span id="drawer-titulo" style="font-size:14px; font-weight:700; color:var(--text)">Editar Curso</span>
+    <!-- Tabs -->
+    <div class="mc-tabs">
+      <button class="mc-tab active" onclick="CursoEdit.tab(0,this)">Dados Gerais</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(1,this)">Público</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(2,this)">Materiais</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(3,this)">Configurações</button>
+      <button class="mc-tab" onclick="CursoEdit.tab(4,this)">Revisão</button>
+    </div>
+
+    <!-- Tab 0: Dados Gerais -->
+    <div class="mc-pane active" id="mec-pane-0">
+      <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="fg" style="grid-column:1/-1">
+          <label>Nome do curso *</label>
+          <input type="text" id="mec-nome" placeholder="Nome do treinamento">
+        </div>
+        <div class="fg">
+          <label>Categoria</label>
+          <select id="mec-categoria">
+            <option value="">Selecione...</option>
+            <option>Segurança do Trabalho</option><option>Elétrica</option>
+            <option>Telecomunicações</option><option>Gestão e Liderança</option>
+            <option>Atendimento ao Cliente</option><option>Tecnologia da Informação</option>
+            <option>Administrativo</option><option>Operações</option>
+            <option>Compliance</option><option>Outros</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Formato</label>
+          <select id="mec-formato">
+            <option value="ead">EAD (Online)</option>
+            <option value="hibrido">Híbrido</option>
+            <option value="presencial">Presencial</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Carga horária (h)</label>
+          <input type="number" id="mec-carga" min="1">
+        </div>
+        <div class="fg">
+          <label>Nível</label>
+          <select id="mec-nivel">
+            <option value="basico">Básico</option>
+            <option value="intermediario">Intermediário</option>
+            <option value="avancado">Avançado</option>
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Descrição</label>
+          <textarea id="mec-descricao" rows="3" placeholder="Objetivo e conteúdo..."></textarea>
+        </div>
+        <div class="fg">
+          <label>Status</label>
+          <select id="mec-status">
+            <option value="rascunho">Rascunho</option>
+            <option value="revisao">Em Revisão</option>
+            <option value="publicado">Publicado</option>
+            <option value="arquivado">Arquivado</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Validade (vazio = sem validade)</label>
+          <input type="date" id="mec-validade">
+        </div>
+        <div class="fg">
+          <label>Prazo de conclusão (dias)</label>
+          <input type="number" id="mec-prazo" placeholder="Ex: 30">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Público -->
+    <div class="mc-pane" id="mec-pane-1">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Perfis de acesso</div>
+      <div id="mec-publico-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+      <div class="fg">
+        <label>Visibilidade</label>
+        <select id="mec-visib">
+          <option value="todos">Todos os colaboradores</option>
+          <option value="restrito">Acesso restrito (por setor/equipe)</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label>Observação sobre o público</label>
+        <textarea id="mec-publico-obs" rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- Tab 2: Materiais -->
+    <div class="mc-pane" id="mec-pane-2">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">
+        Materiais do curso <span id="mec-mat-count" style="background:var(--blue-light);color:var(--blue);padding:1px 7px;border-radius:99px;font-size:10px;margin-left:6px">0</span>
+      </div>
+      <div id="mec-materiais-lista" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+        <div style="color:var(--text4);font-size:12px;text-align:center;padding:20px">Nenhum material</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('mec-file-input').click()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload arquivo
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="CursoEdit.addLinkMat()">+ Link externo</button>
+        <input type="file" id="mec-file-input" style="display:none" multiple onchange="CursoEdit.uploadMat(this)">
+      </div>
+    </div>
+
+    <!-- Tab 3: Configurações -->
+    <div class="mc-pane" id="mec-pane-3">
+      <div id="mec-config-body"></div>
+    </div>
+
+    <!-- Tab 4: Revisão -->
+    <div class="mc-pane" id="mec-pane-4">
+      <div id="mec-review-body" style="font-size:13px"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost modal-close">Cancelar</button>
+      <button class="btn btn-primary" onclick="CursoEdit.salvar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 0-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar alterações
+      </button>
+    </div>
   </div>
-  <!-- iframe do wizard -->
-  <iframe
-    id="curso-editor-iframe"
-    src=""
-    style="flex:1; border:none; width:100%; height:100%;"
-    allow="same-origin"
-  ></iframe>
 </div>
-
 
 <!-- ═══ MODAL: TURMA (criar/editar) ════════════════════════════ -->
 <div class="modal-bg" id="modal-turma">
@@ -2723,10 +2785,6 @@ tbody tr.selected td { background:#f0f4ff }
           <select id="mm-modulo">
             <option value="">Selecione um módulo...</option>
           </select>
-        </div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>Tags (separe por vírgula)</label>
-          <input type="text" id="mm-tags" placeholder="Ex: segurança, NR10, elétrica">
         </div>
         <div class="fg">
           <label>Responsável</label>
@@ -4059,9 +4117,24 @@ var Cursos = (() => {
         <td style="font-size:11px;color:var(--text4)">${fmtDate(c.criadoEm)}</td>
         <td>
           <div class="gc-actions">
-            <button class="gc-actions-btn" onclick="Cursos.toggleMenu(this)" title="Ações" data-menu-open="0">
+            <button class="gc-actions-btn" onclick="Cursos.toggleMenu(this)" title="Ações">
               Ações ${SVGS.chev}
             </button>
+            <div class="gc-menu">
+              <button onclick="Cursos.visualizar('${c.id}');Cursos.closeMenus()">${SVGS.eye} Visualizar</button>
+              <button onclick="Cursos.abrirEdit('${c.id}');Cursos.closeMenus()">${SVGS.edit} Editar</button>
+              <button onclick="Cursos.duplicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.copy} Duplicar</button>
+              <hr class="sep">
+              <button onclick="Admin.go('materiais');Cursos.closeMenus()">${SVGS.folder} Gerenciar materiais</button>
+              <button onclick="Admin.goAcessos('${c.id}');Cursos.closeMenus()">${SVGS.lock} Gerenciar acessos</button>
+              <hr class="sep">
+              ${status !== 'publicado'
+                ? `<button onclick="Cursos.publicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.play} Publicar</button>`
+                : `<button onclick="Cursos.despublicarCurso('${c.id}');Cursos.closeMenus()">${SVGS.pause} Despublicar</button>`}
+              <button onclick="Cursos.arquivarCurso('${c.id}');Cursos.closeMenus()">${SVGS.arc} Arquivar</button>
+              <hr class="sep">
+              <button class="danger" onclick="Cursos.excluirCurso('${c.id}');Cursos.closeMenus()">${SVGS.trash} Excluir</button>
+            </div>
           </div>
         </td>
       </tr>`;
@@ -4082,46 +4155,18 @@ var Cursos = (() => {
     return Math.round(total / alunos.length);
   }
 
-  /* ── Menus dropdown via portal ─────────────────────────────── */
+  /* ── Menus dropdown ────────────────────────────────────────── */
   function toggleMenu(btn) {
-    const isOpen = btn.dataset.menuOpen === '1';
+    const menu = btn.nextElementSibling;
+    const isOpen = menu.classList.contains('open');
     closeMenus();
-    if (isOpen) return;
-
-    const id = btn.closest('tr')?.id?.replace('row-', '') || '';
-    const c  = id ? Storage.Cursos.obter(id) : null;
-    if (!c) return;
-    const status = resolveStatus(c);
-
-    const html = `
-      <button onclick="Cursos.visualizar('${c.id}');PortalMenu.close()">${SVGS.eye} Visualizar</button>
-      <button onclick="Cursos.abrirEdit('${c.id}');PortalMenu.close()">${SVGS.edit} Editar</button>
-      <button onclick="Cursos.duplicarCurso('${c.id}');PortalMenu.close()">${SVGS.copy} Duplicar</button>
-      <hr class="sep">
-      <button onclick="Admin.go('materiais');PortalMenu.close()">${SVGS.folder} Gerenciar materiais</button>
-      <button onclick="Admin.goAcessos('${c.id}');PortalMenu.close()">${SVGS.lock} Gerenciar acessos</button>
-      <hr class="sep">
-      ${status !== 'publicado'
-        ? `<button onclick="Cursos.publicarCurso('${c.id}');PortalMenu.close()">${SVGS.play} Publicar</button>`
-        : `<button onclick="Cursos.despublicarCurso('${c.id}');PortalMenu.close()">${SVGS.pause} Despublicar</button>`}
-      <button onclick="Cursos.arquivarCurso('${c.id}');PortalMenu.close()">${SVGS.arc} Arquivar</button>
-      <hr class="sep">
-      <button class="danger" onclick="Cursos.excluirCurso('${c.id}');PortalMenu.close()">${SVGS.trash} Excluir</button>`;
-
-    btn.dataset.menuOpen = '1';
-    PortalMenu.open(btn, html);
-    // Marcar como fechado quando o portal fechar
-    const obs = new MutationObserver(() => {
-      if (document.getElementById('gc-portal-menu')?.style.display === 'none') {
-        btn.dataset.menuOpen = '0';
-        obs.disconnect();
-      }
-    });
-    obs.observe(document.getElementById('gc-portal-menu'), { attributes: true, attributeFilter: ['style'] });
+    if (!isOpen) {
+      menu.classList.add('open');
+      setTimeout(() => document.addEventListener('click', closeMenus, { once: true }), 10);
+    }
   }
   function closeMenus() {
-    PortalMenu.close();
-    document.querySelectorAll('[data-menu-open="1"]').forEach(b => b.dataset.menuOpen = '0');
+    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
   }
 
   /* ── Seleção em lote ─────────────────────────────────────── */
@@ -4180,104 +4225,20 @@ var Cursos = (() => {
   function visualizar(id) {
     const c = Storage.Cursos.obter(id);
     if (!c) return;
-
-    // Módulos e aulas: prioriza c.modulos (wizard), fallback para Storage legado
-    const modsArr = c.modulos?.length
-      ? c.modulos
-      : Storage.Modulos.listarPorCurso(id);
-    const mods  = modsArr.length;
-    const aulas = c.modulos?.length
-      ? c.modulos.reduce((s, m) => s + (m.aulas?.length || 0), 0)
-      : Storage.Aulas.totalPorCurso(id);
-    const mats   = (c.materiais?.filter(m => m.tipo !== 'quiz').length) || Storage.Materiais.listarPorCurso(id).length;
-    const rest   = Storage.Restricoes.porCurso(id);
-    const status = resolveStatus(c);
-    const prog   = calcProgresso(id);
-
-    const modal = document.getElementById('modal-curso-view');
-    if (!modal) return;
-
-    // Thumb
-    const thumb = modal.querySelector('#mcv-thumb');
-    if (c.capa) {
-      thumb.style.background = `url('${c.capa}') center/cover no-repeat`;
-      thumb.textContent = '';
-    } else {
-      thumb.style.background = 'var(--blue-l)';
-      thumb.textContent = c.titulo?.[0]?.toUpperCase() || '?';
-    }
-
-    // Título e subtítulo
-    modal.querySelector('#mcv-titulo').textContent = c.titulo || '—';
-    modal.querySelector('#mcv-sub').textContent =
-      [c.categoria, c.nivel ? ({basico:'Básico',intermediario:'Intermediário',avancado:'Avançado'}[c.nivel]) : null]
-        .filter(Boolean).join(' · ') || 'Sem categoria';
-
-    // Badges
-    const fmtLabel = { ead:'EAD', hibrido:'Híbrido', presencial:'Presencial' };
-    modal.querySelector('#mcv-badges').innerHTML =
-      statusBadge(status) +
-      `<span class="badge badge-blue" style="white-space:nowrap">${fmtLabel[c.formato] || 'EAD'}</span>` +
-      (c.config?.obrigatorio ? `<span class="badge badge-amber">Obrigatório</span>` : '') +
-      (c.config?.certificado ? `<span class="badge badge-green">Certificado</span>` : '');
-
-    // Descrição
-    modal.querySelector('#mcv-desc').textContent = c.descricao || 'Sem descrição.';
-
-    // Métricas
-    const metric = (val, lbl, color='') =>
-      `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center">
-        <div style="font-size:18px;font-weight:700;color:${color||'var(--text)'}">${val}</div>
-        <div style="font-size:10px;color:var(--text4);margin-top:2px">${lbl}</div>
-      </div>`;
-    modal.querySelector('#mcv-metrics').innerHTML =
-      metric(c.carga ? c.carga + 'h' : '—', 'Carga') +
-      metric(mods,  'Módulos') +
-      metric(aulas, 'Aulas') +
-      metric(prog + '%', 'Progresso', prog > 0 ? 'var(--green-d)' : '');
-
-    // Detalhes
-    const detail = (lbl, val) =>
-      `<div style="font-size:12px"><span style="color:var(--text4)">${lbl}:</span> <span style="color:var(--text);font-weight:500">${val}</span></div>`;
-    const valDesc = c.validadeAte
-      ? (() => {
-          const diff = Math.ceil((new Date(c.validadeAte) - new Date()) / 86400000);
-          return diff < 0
-            ? `<span style="color:var(--red)">Expirado em ${fmtDate(c.validadeAte)}</span>`
-            : `${fmtDate(c.validadeAte)} (${diff}d restantes)`;
-        })()
-      : 'Sem validade';
-    modal.querySelector('#mcv-details').innerHTML =
-      detail('Materiais', mats) +
-      detail('Acessos', rest.length ? rest.length + ' restrição(ões)' : 'Todos') +
-      detail('Validade', valDesc) +
-      detail('Prazo conclusão', c.prazo ? c.prazo + ' dias' : '—') +
-      detail('Criado em', fmtDate(c.criadoEm)) +
-      detail('Publicado em', fmtDate(c.publicadoEm));
-
-    // Configurações
-    const cfg = c.config || {};
-    const cfgChips = [
-      cfg.obrigatorio && 'Obrigatório',
-      cfg.certificado && 'Certificado',
-      cfg.avaliacao   && `Avaliação (mín. ${cfg.notaMin || 70}%)`,
-      cfg.sequencial  && 'Acesso sequencial',
-      cfg.progresso   && 'Exibe progresso',
-      cfg.ocultar     && 'Ocultar pós-conclusão',
-    ].filter(Boolean);
-    const cfgWrap = modal.querySelector('#mcv-config-wrap');
-    if (cfgChips.length) {
-      modal.querySelector('#mcv-config').innerHTML = cfgChips
-        .map(t => `<span style="font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:3px 10px;color:var(--text3)">${t}</span>`)
-        .join('');
-      cfgWrap.style.display = 'block';
-    } else {
-      cfgWrap.style.display = 'none';
-    }
-
-    modal.classList.add('open');
+    const aulas = Storage.Aulas.totalPorCurso(id);
+    const mods  = Storage.Modulos.listarPorCurso(id).length;
+    const mats  = Storage.Materiais.listarPorCurso(id).length;
+    const info  = [
+      `Categoria: ${c.categoria || '—'}`,
+      `Formato: ${c.formato || '—'}`,
+      `Carga: ${c.carga || 0}h`,
+      `Módulos: ${mods} | Aulas: ${aulas}`,
+      `Materiais: ${mats}`,
+      `Status: ${resolveStatus(c)}`,
+      `Criado em: ${fmtDate(c.criadoEm)}`,
+    ].join('\n');
+    alert(`📚 ${c.titulo}\n\n${info}`);
   }
-
 
   function publicarCurso(id) {
     Storage.Cursos.publicar(id);
@@ -4395,9 +4356,56 @@ var Cursos = (() => {
     }).join('') + '<div style="padding-top:2px"></div>';
   }
 
-  /* ── Modal de edição → abre wizard ──────────────────────── */
+  /* ── Modal de edição ─────────────────────────────────────── */
   function abrirEdit(id) {
-    CursoDrawer.abrir(id);
+    cursoEditId = id;
+    const c = Storage.Cursos.obter(id);
+    if (!c) return;
+
+    matEdit = [...(Storage.Materiais.listarPorCurso(id) || [])];
+
+    // Preenche campos — tab 0
+    setVal('mec-nome', c.titulo);
+    setVal('mec-categoria', c.categoria);
+    setVal('mec-formato', c.formato || 'ead');
+    setVal('mec-carga', c.carga);
+    setVal('mec-nivel', c.nivel || 'basico');
+    setVal('mec-descricao', c.descricao);
+    setVal('mec-status', c.status || 'rascunho');
+    setVal('mec-validade', c.validadeAte ? c.validadeAte.split('T')[0] : '');
+    setVal('mec-prazo', c.prazo || '');
+
+    // tab 1 — público
+    const publico = c.publico || [];
+    document.getElementById('mec-publico-chips').innerHTML = [
+      'tecnicos','eletricistas','administrativo','operacional',
+      'gestores','liderança','novos-colaboradores','todos','outros'
+    ].map(v => {
+      const sel = publico.includes(v);
+      return `<span class="tag-chip ${sel?'selected':''}" data-val="${v}"
+        onclick="this.classList.toggle('selected')"
+        style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid ${sel?'var(--blue)':'var(--border)'};border-radius:99px;font-size:12px;font-weight:500;color:${sel?'#fff':'var(--text3)'};cursor:pointer;background:${sel?'var(--blue)':'var(--surface)'};transition:all .12s">
+        ${v.charAt(0).toUpperCase() + v.slice(1).replace('-',' ')}
+      </span>`;
+    }).join('');
+    setVal('mec-visib', c.visib || 'todos');
+    setVal('mec-publico-obs', c.publicoObs || '');
+
+    // tab 2 — materiais
+    renderMatEdit();
+
+    // tab 3 — config
+    renderConfigEdit(c.config || {});
+
+    // Título do modal
+    document.getElementById('mec-titulo').textContent = `Editar: ${c.titulo}`;
+    document.getElementById('mec-subtitulo').textContent =
+      `ID: ${id.slice(0,8)}… · Criado em ${fmtDate(c.criadoEm)}`;
+
+    // Vai para tab 0
+    CursoEdit.tab(0, document.querySelector('.mc-tab'));
+
+    document.getElementById('modal-edit-curso').classList.add('open');
   }
 
   function setVal(id, v) {
@@ -5636,7 +5644,7 @@ var MatMod = (() => {
 
     document.getElementById('mm-titulo').textContent = 'Novo Material';
     document.getElementById('mm-sub').textContent = '';
-    ['mm-nome','mm-desc','mm-tags','mm-responsavel','mm-url','mm-url-texto'].forEach(id => {
+    ['mm-nome','mm-desc','mm-responsavel','mm-url','mm-url-texto'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
     document.getElementById('mm-tipo').value = '';
@@ -5663,7 +5671,7 @@ var MatMod = (() => {
     document.getElementById('mm-sub').textContent = `Criado em ${fmtDate(m.criadoEm)}`;
 
     const sv = (elId, v) => { const el = document.getElementById(elId); if (el) el.value = v || ''; };
-    sv('mm-nome', m.nome); sv('mm-desc', m.descricao); sv('mm-tags', m.tags);
+    sv('mm-nome', m.nome); sv('mm-desc', m.descricao);
     sv('mm-responsavel', m.responsavel); sv('mm-tipo', m.tipo);
     sv('mm-categoria', m.categoria); sv('mm-status', m.status||'ativo');
     sv('mm-url', m.url !== '#simulado' ? m.url : '');
@@ -5699,7 +5707,8 @@ var MatMod = (() => {
     const sel = document.getElementById('mm-modulo');
     if (!sel) return;
     const mods = cursoId ? Storage.Modulos.listarPorCurso(cursoId) : [];
-    sel.innerHTML = '<option value="">Selecione um módulo...</option>' +
+    sel.disabled = !cursoId || mods.length === 0;
+    sel.innerHTML = '<option value="">' + (!cursoId ? 'Selecione um curso primeiro' : mods.length === 0 ? 'Nenhum módulo cadastrado' : 'Selecione um módulo...') + '</option>' +
       mods.map(m => `<option value="${x(m.id)}" ${m.id === selectedId?'selected':''}>${x(m.titulo)}</option>`).join('');
   }
 
@@ -5835,7 +5844,7 @@ var MatMod = (() => {
       descricao:    document.getElementById('mm-desc')?.value.trim() || '',
       tipo,
       categoria:    document.getElementById('mm-categoria')?.value || '',
-      tags:         document.getElementById('mm-tags')?.value.trim() || '',
+      tags:         '',
       cursoId:      document.getElementById('mm-curso')?.value || '',
       moduloId:     document.getElementById('mm-modulo')?.value || '',
       responsavel:  document.getElementById('mm-responsavel')?.value.trim() || '',
@@ -8885,138 +8894,5 @@ var PubMod = (() => {
 </script>
 <script src="src/js/storage.js"></script>
 <script src="src/js/admin.js"></script>
-
-<!-- ═══ PORTAL MENU ═══════════════════════════════════════════ -->
-<div id="gc-portal-menu" style="
-  display:none; position:fixed; z-index:9000;
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:8px; box-shadow:0 8px 24px rgba(0,2,60,.14);
-  min-width:180px; padding:4px;
-  animation:popIn .12s ease;
-"></div>
-
-<script>
-/* ── Portal Menu — renderiza no body, nunca clipado ─────────── */
-/* ── CursoDrawer — abre novo-curso.html em iframe fullscreen ── */
-var CursoDrawer = (() => {
-  function abrir(id) {
-    const drawer = document.getElementById('curso-editor-drawer');
-    const iframe = document.getElementById('curso-editor-iframe');
-    const titulo = document.getElementById('drawer-titulo');
-    if (!drawer || !iframe) return;
-
-    const c = Storage.Cursos.obter(id);
-    if (titulo) titulo.textContent = c ? `Editar: ${c.titulo}` : 'Editar Curso';
-
-    iframe.src = 'novo-curso.html?edit=' + encodeURIComponent(id);
-    drawer.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-
-    // Escutar mensagem do iframe quando o wizard finalizar
-    window._drawerEditId = id;
-  }
-
-  function fechar() {
-    const drawer = document.getElementById('curso-editor-drawer');
-    const iframe = document.getElementById('curso-editor-iframe');
-    if (!drawer) return;
-    drawer.style.display = 'none';
-    if (iframe) iframe.src = '';
-    document.body.style.overflow = '';
-    window._drawerEditId = null;
-    // Recarregar tabela de cursos
-    if (typeof Cursos !== 'undefined') Cursos.renderTabela?.();
-  }
-
-  // Fechar ao pressionar Escape
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && document.getElementById('curso-editor-drawer')?.style.display === 'flex')
-      fechar();
-  });
-
-  // Escutar evento do iframe (quando clicar "Ir para curso" ou fechar modal de sucesso)
-  window.addEventListener('message', e => {
-    if (e.data === 'wizard:concluido') fechar();
-  });
-
-  return { abrir, fechar };
-})();
-
-var PortalMenu = (() => {
-  const MARGIN = 8; // px de margem das bordas da viewport
-  let _closeListener = null;
-
-  function _portal() { return document.getElementById('gc-portal-menu'); }
-
-  /* Calcula posição ideal (baixo preferencial, vira pra cima se não cabe) */
-  function _position(btn) {
-    const p    = _portal();
-    const r    = btn.getBoundingClientRect();
-    const vw   = window.innerWidth;
-    const vh   = window.innerHeight;
-
-    // Primeiro: tornar visível com opacity 0 para medir
-    p.style.visibility = 'hidden';
-    p.style.display    = 'block';
-    const pw = p.offsetWidth;
-    const ph = p.offsetHeight;
-    p.style.visibility = '';
-
-    // Vertical — preferir abaixo, virar para cima se não couber
-    let top;
-    const spaceBelow = vh - r.bottom - MARGIN;
-    const spaceAbove = r.top - MARGIN;
-    if (spaceBelow >= ph || spaceBelow >= spaceAbove) {
-      top = r.bottom + window.scrollY + 3;
-    } else {
-      top = r.top + window.scrollY - ph - 3;
-    }
-
-    // Horizontal — alinhar à direita do botão, recuar se sair da viewport
-    let left = r.right + window.scrollX - pw;
-    if (left < MARGIN) left = MARGIN;
-    if (left + pw > vw - MARGIN) left = vw - pw - MARGIN;
-
-    p.style.top  = top  + 'px';
-    p.style.left = left + 'px';
-  }
-
-  function open(btn, html) {
-    close();
-    const p = _portal();
-    p.innerHTML = html;
-    _position(btn);
-    p.style.display = 'block';
-
-    // Reposicionar no scroll (para fixed + scrollY funcionar)
-    const onScroll = () => _position(btn);
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Fechar ao clicar fora
-    _closeListener = (e) => {
-      if (!p.contains(e.target) && e.target !== btn) {
-        close();
-        window.removeEventListener('scroll', onScroll);
-      }
-    };
-    setTimeout(() => document.addEventListener('click', _closeListener), 10);
-  }
-
-  function close() {
-    const p = _portal();
-    p.style.display = 'none';
-    p.innerHTML = '';
-    if (_closeListener) {
-      document.removeEventListener('click', _closeListener);
-      _closeListener = null;
-    }
-  }
-
-  // Fechar ao pressionar Escape
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-
-  return { open, close };
-})();
-</script>
 </body>
 </html>
