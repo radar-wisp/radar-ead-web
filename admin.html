@@ -2347,6 +2347,35 @@ tbody tr.selected td { background:#f0f4ff }
 </div>
 
 
+<!-- ═══ MODAL: VISUALIZAR CURSO ══════════════════════════════════ -->
+<div class="modal-bg" id="modal-curso-view">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <div id="mcv-thumb" style="width:40px;height:40px;border-radius:8px;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;font-weight:700"></div>
+        <div style="min-width:0">
+          <h3 id="mcv-titulo" style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h3>
+          <div id="mcv-sub" style="font-size:11px;color:var(--text4);margin-top:2px"></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal-curso-view').classList.remove('open')">✕</button>
+    </div>
+    <div id="mcv-badges" style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border)"></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Descrição</div>
+        <div id="mcv-desc" style="font-size:13px;color:var(--text3);line-height:1.6"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="mcv-metrics"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px" id="mcv-details"></div>
+      <div id="mcv-config-wrap">
+        <div style="font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Configurações</div>
+        <div id="mcv-config" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: COLABORADOR ════════════════════ -->
 <div class="modal-bg" id="modal-colab">
   <div class="modal">
@@ -4239,19 +4268,99 @@ var Cursos = (() => {
   function visualizar(id) {
     const c = Storage.Cursos.obter(id);
     if (!c) return;
-    const aulas = Storage.Aulas.totalPorCurso(id);
-    const mods  = Storage.Modulos.listarPorCurso(id).length;
-    const mats  = Storage.Materiais.listarPorCurso(id).length;
-    const info  = [
-      `Categoria: ${c.categoria || '—'}`,
-      `Formato: ${c.formato || '—'}`,
-      `Carga: ${c.carga || 0}h`,
-      `Módulos: ${mods} | Aulas: ${aulas}`,
-      `Materiais: ${mats}`,
-      `Status: ${resolveStatus(c)}`,
-      `Criado em: ${fmtDate(c.criadoEm)}`,
-    ].join('\n');
-    alert(`📚 ${c.titulo}\n\n${info}`);
+
+    // Módulos e aulas: prioriza c.modulos (wizard), fallback Storage legado
+    const modsArr = c.modulos?.length ? c.modulos : Storage.Modulos.listarPorCurso(id);
+    const mods    = modsArr.length;
+    const aulas   = c.modulos?.length
+      ? c.modulos.reduce((s, m) => s + (m.aulas?.length || 0), 0)
+      : Storage.Aulas.totalPorCurso(id);
+    const mats    = (c.materiais?.filter(m => m.tipo !== 'quiz').length) || Storage.Materiais.listarPorCurso(id).length;
+    const status  = resolveStatus(c);
+    const prog    = calcProgresso(id);
+
+    const modal = document.getElementById('modal-curso-view');
+    if (!modal) return;
+
+    // Thumb
+    const thumb = modal.querySelector('#mcv-thumb');
+    if (c.capa) {
+      thumb.style.background = `url('${c.capa}') center/cover no-repeat`;
+      thumb.textContent = '';
+    } else {
+      thumb.style.background = 'var(--blue-l)';
+      thumb.textContent = (c.titulo?.[0] || '?').toUpperCase();
+    }
+
+    // Título e subtítulo
+    modal.querySelector('#mcv-titulo').textContent = c.titulo || '—';
+    const nivelMap = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado' };
+    modal.querySelector('#mcv-sub').textContent =
+      [c.categoria, nivelMap[c.nivel]].filter(Boolean).join(' · ') || 'Sem categoria';
+
+    // Badges
+    const fmtLabel = { ead:'EAD', hibrido:'Híbrido', presencial:'Presencial' };
+    modal.querySelector('#mcv-badges').innerHTML =
+      statusBadge(status) +
+      `<span class="badge badge-blue">${fmtLabel[c.formato] || 'EAD'}</span>` +
+      (c.config?.obrigatorio ? `<span class="badge badge-amber">Obrigatório</span>` : '') +
+      (c.config?.certificado ? `<span class="badge badge-green">Certificado</span>` : '');
+
+    // Descrição
+    modal.querySelector('#mcv-desc').textContent = c.descricao || 'Sem descrição.';
+
+    // Métricas
+    const metric = (v, l, color) =>
+      `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:${color||'var(--text)'}">${v}</div>
+        <div style="font-size:10px;color:var(--text4);margin-top:2px">${l}</div>
+      </div>`;
+    modal.querySelector('#mcv-metrics').innerHTML =
+      metric(c.carga ? c.carga+'h' : '—', 'Carga') +
+      metric(mods,  'Módulos') +
+      metric(aulas, 'Aulas') +
+      metric(prog+'%', 'Progresso', prog > 0 ? 'var(--green-d,#15803d)' : '');
+
+    // Detalhes
+    const detail = (l, v) =>
+      `<div style="font-size:12px"><span style="color:var(--text4)">${l}:</span> <span style="color:var(--text);font-weight:500">${v}</span></div>`;
+    const valDesc = c.validadeAte
+      ? (() => {
+          const diff = Math.ceil((new Date(c.validadeAte) - new Date()) / 86400000);
+          return diff < 0
+            ? `<span style="color:var(--red)">Expirado em ${fmtDate(c.validadeAte)}</span>`
+            : `${fmtDate(c.validadeAte)} (${diff}d)`;
+        })()
+      : 'Sem validade';
+    modal.querySelector('#mcv-details').innerHTML =
+      detail('Materiais', mats) +
+      detail('Acessos', Storage.Restricoes.porCurso(id).length ? Storage.Restricoes.porCurso(id).length+' restrição(ões)' : 'Todos') +
+      detail('Validade', valDesc) +
+      detail('Prazo', c.prazo ? c.prazo+' dias' : '—') +
+      detail('Criado em', fmtDate(c.criadoEm)) +
+      detail('Publicado em', fmtDate(c.publicadoEm));
+
+    // Configurações
+    const cfg = c.config || {};
+    const chips = [
+      cfg.obrigatorio && 'Obrigatório',
+      cfg.certificado && 'Certificado',
+      cfg.avaliacao   && `Avaliação (mín. ${cfg.notaMin||70}%)`,
+      cfg.sequencial  && 'Sequencial',
+      cfg.progresso   && 'Exibe progresso',
+      cfg.ocultar     && 'Ocultar pós-conclusão',
+    ].filter(Boolean);
+    const cfgWrap = modal.querySelector('#mcv-config-wrap');
+    if (chips.length) {
+      modal.querySelector('#mcv-config').innerHTML = chips
+        .map(t => `<span style="font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:3px 10px;color:var(--text3)">${t}</span>`)
+        .join('');
+      cfgWrap.style.display = 'block';
+    } else {
+      cfgWrap.style.display = 'none';
+    }
+
+    modal.classList.add('open');
   }
 
   function publicarCurso(id) {
