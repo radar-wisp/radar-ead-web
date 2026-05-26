@@ -2662,6 +2662,40 @@ tbody tr.selected td { background:#f0f4ff }
   </div>
 </div>
 
+<!-- ═══ MODAL: CONFIRMAÇÃO (módulo Turmas) ══════════════════════ -->
+<div class="modal-bg" id="modal-tm-confirm">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <h3 id="tm-confirm-titulo">Confirmar ação</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-tm-confirm').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p id="tm-confirm-msg" style="font-size:14px;color:var(--text2);line-height:1.6;margin:0 0 20px"></p>
+    <div class="modal-foot">
+      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-tm-confirm').classList.remove('open')">Cancelar</button>
+      <button id="tm-confirm-ok" class="btn btn-danger">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: SELEÇÃO (módulo Turmas — setor/equipe) ═══════════ -->
+<div class="modal-bg" id="modal-tm-select">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <h3 id="tm-select-titulo">Selecionar</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-tm-select').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <select id="tm-select-opcoes" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:20px"></select>
+    <div class="modal-foot">
+      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-tm-select').classList.remove('open')">Cancelar</button>
+      <button id="tm-select-ok" class="btn btn-primary">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: MATERIAL (criar/editar) ═════════════════════════ -->
 <div class="modal-bg" id="modal-material">
   <div class="modal" style="max-width:640px">
