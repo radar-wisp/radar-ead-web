@@ -477,6 +477,13 @@ var Storage = (() => {
     )),
 
     /**
+     * Remove aluno permanentemente.
+     * TODO MIGRAÇÃO: substituir por DELETE /api/v1/alunos/:id
+     * @param {string} id
+     */
+    excluir: id => set(K.ALUNOS, get(K.ALUNOS).filter(a => a.id !== id)),
+
+    /**
      * Stats globais de alunos.
      * @returns {{ total, ativos, bloqueados, inativos, pendentes, cursosAtivos, certificados }}
      */
