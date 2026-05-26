@@ -55,62 +55,14 @@ var AlunosMod = (() => {
   /** Atalho para querySelector */
   function _q(sel) { return document.querySelector(sel); }
 
-  /** Escapa HTML para evitar XSS */
-  function _x(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  /* global EadUtils */
 
-  /**
-   * Formata data ISO 8601 para pt-BR.
-   * @param {string|null} iso
-   * @returns {string}
-   */
-  function _fmtDate(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('pt-BR', {
-      day: '2-digit', month: '2-digit', year: '2-digit',
-    });
-  }
+  // Aliases locais para EadUtils (mantém nomes internos intactos)
+  const _x           = EadUtils.escapeHtml;
+  const _fmtDate     = EadUtils.fmtDate;
+  const _fmtRelative = EadUtils.fmtRelative;
+  const _toast       = EadUtils.toast;
 
-  /**
-   * Formata data relativa ao momento atual.
-   * @param {string|null} iso
-   * @returns {string}
-   */
-  function _fmtRelative(iso) {
-    if (!iso) return 'Nunca';
-    const diff = Math.floor((Date.now() - new Date(iso)) / 60000);
-    if (diff < 1)    return 'Agora';
-    if (diff < 60)   return `${diff}min atrás`;
-    if (diff < 1440) return `${Math.floor(diff / 60)}h atrás`;
-    return _fmtDate(iso);
-  }
-
-  /** Helper para setar value de campo pelo ID */
-  function _setVal(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.value = val ?? '';
-  }
-
-  /**
-   * Exibe toast usando o container global #toasts.
-   * @param {string} msg
-   * @param {'s'|'e'|'i'} tipo
-   */
-  function _toast(msg, tipo = 'i') {
-    const s = document.getElementById('toasts');
-    if (!s) return;
-    const el = document.createElement('div');
-    el.className = `toast ${tipo}`;
-    el.innerHTML = `<span>${{ s: '✅', e: '❌', i: 'ℹ️' }[tipo] || 'ℹ️'}</span><span>${_x(msg)}</span>`;
-    s.appendChild(el);
-    setTimeout(() => el.remove(), 3500);
-  }
 
   // ══════════════════════════════════════════════════════════════
   // CONFIGURAÇÕES VISUAIS DE STATUS
