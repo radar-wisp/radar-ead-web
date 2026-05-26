@@ -1383,6 +1383,24 @@ tbody tr.selected td { background:#f0f4ff }
             <input class="ift-date" type="date" id="tm-filtro-data" title="Início a partir de" onchange="Turmas.renderTabela()">
           </div>
           <div class="ift-sep"></div>
+          <!-- Filtro responsável -->
+          <div class="ift-field fixed" style="min-width:160px">
+            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input class="ift-input" type="text" id="tm-filtro-resp" placeholder="Responsável..." oninput="Turmas.renderTabela()">
+          </div>
+          <div class="ift-sep"></div>
+          <!-- Filtro status select (espelha chips) -->
+          <div class="ift-field fixed" style="min-width:150px">
+            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+            <select class="ift-select" id="tm-filtro-status-sel" onchange="Turmas.renderTabela()">
+              <option value="">Todos os status</option>
+              <option value="aberta">Aberta</option>
+              <option value="em_andamento">Em andamento</option>
+              <option value="encerrada">Encerrada</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+          <div class="ift-sep"></div>
           <!-- Limpar -->
           <button class="ift-btn" onclick="Turmas.resetFiltros()" title="Limpar filtros">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -2455,7 +2473,7 @@ tbody tr.selected td { background:#f0f4ff }
 
 <!-- ═══ MODAL: TURMA (criar/editar) ════════════════════════════ -->
 <div class="modal-bg" id="modal-turma">
-  <div class="modal" style="max-width:600px">
+  <div class="modal" style="max-width:640px">
     <div class="modal-head">
       <div>
         <h3 id="mt-titulo">Nova Turma</h3>
@@ -2468,21 +2486,20 @@ tbody tr.selected td { background:#f0f4ff }
     <div class="mc-tabs">
       <button class="mc-tab active" onclick="Turmas.tabModal(0,this)">Dados</button>
       <button class="mc-tab" onclick="Turmas.tabModal(1,this)">Alunos</button>
-      <button class="mc-tab" onclick="Turmas.tabModal(2,this)">Acesso</button>
     </div>
 
     <!-- Tab 0: Dados da turma -->
     <div class="mc-pane active" id="mt-pane-0">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="fg" style="grid-column:1/-1">
+      <div class="form-row">
+        <div class="fg full">
           <label>Nome da turma *</label>
           <input type="text" id="mt-nome" placeholder="Ex: Turma Janeiro 2025">
         </div>
-        <div class="fg" style="grid-column:1/-1">
+        <div class="fg full">
           <label>Curso vinculado *</label>
           <select id="mt-curso"></select>
         </div>
-        <div class="fg" style="grid-column:1/-1">
+        <div class="fg full">
           <label>Descrição</label>
           <textarea id="mt-desc" rows="2" placeholder="Objetivo ou observações da turma..."></textarea>
         </div>
@@ -2502,7 +2519,7 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Data de encerramento</label>
           <input type="date" id="mt-fim">
         </div>
-        <div class="fg" style="grid-column:1/-1">
+        <div class="fg">
           <label>Status</label>
           <select id="mt-status">
             <option value="aberta">Aberta</option>
@@ -2538,64 +2555,23 @@ tbody tr.selected td { background:#f0f4ff }
 
       <!-- Busca de alunos -->
       <div style="position:relative;margin-bottom:10px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
-          oninput="Turmas.filtrarAlunos()"
-          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
         <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4)">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </span>
+        <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
+          oninput="Turmas.filtrarAlunos()"
+          style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
       </div>
 
       <!-- Lista de alunos com checkboxes -->
-      <div id="mt-alunos-lista" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm)">
-      </div>
+      <div id="mt-alunos-lista" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm)"></div>
       <div style="margin-top:10px;font-size:12px;color:var(--text3)">
         <span id="mt-alunos-count" style="font-weight:600;color:var(--blue)">0</span> aluno(s) selecionado(s)
       </div>
     </div>
 
-    <!-- Tab 2: Controle de acesso -->
-    <div class="mc-pane" id="mt-pane-2">
-      <div id="mt-config-body">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Acesso automático ao criar</div>
-            <div style="font-size:11px;color:var(--text4)">Libera o curso para os alunos ao salvar a turma</div>
-          </div>
-          <div id="mt-cfg-auto" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Bloquear após encerramento</div>
-            <div style="font-size:11px;color:var(--text4)">Remove acesso dos alunos quando a turma encerrar</div>
-          </div>
-          <div id="mt-cfg-bloquear" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Permitir entrada após início</div>
-            <div style="font-size:11px;color:var(--text4)">Novos alunos podem entrar mesmo após a data de início</div>
-          </div>
-          <div id="mt-cfg-entrada" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
-            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-          </div>
-        </div>
-        <div style="padding:11px 0">
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prazo de conclusão (dias)</div>
-          <div style="font-size:11px;color:var(--text4);margin-bottom:8px">0 = sem prazo definido</div>
-          <input type="number" id="mt-cfg-prazo" min="0" value="0"
-            style="width:120px;padding:7px 11px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font)">
-        </div>
-      </div>
-    </div>
-
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="Turmas.salvar()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Salvar turma
