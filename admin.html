@@ -3079,6 +3079,61 @@ tbody tr.selected td { background:#f0f4ff }
   </div>
 </div>
 
+<!-- ═══ MINI-MODAL: NOVO SETOR ══════════════════════════════ -->
+<div class="modal-bg" id="modal-novo-setor">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <h3>Novo Setor</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-novo-setor').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label class="lbl">Nome do setor <span style="color:var(--red)">*</span></label>
+        <input class="inp" id="ns-nome" placeholder="Ex: Tecnologia" maxlength="60">
+      </div>
+      <div>
+        <label class="lbl">Cor</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="color" id="ns-cor" value="#0002da" style="width:36px;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
+          <span id="ns-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-novo-setor').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="AlunosMod.salvarSetor()">Criar Setor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MINI-MODAL: NOVA EQUIPE ══════════════════════════════ -->
+<div class="modal-bg" id="modal-nova-equipe">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <h3>Nova Equipe</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-nova-equipe').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label class="lbl">Nome da equipe <span style="color:var(--red)">*</span></label>
+        <input class="inp" id="ne-nome" placeholder="Ex: Frontend" maxlength="60">
+      </div>
+      <div>
+        <label class="lbl">Setor <span style="color:var(--red)">*</span></label>
+        <select class="inp" id="ne-setor"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-nova-equipe').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="AlunosMod.salvarEquipe()">Criar Equipe</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: ALUNO (criar/editar) ═══════════════════════════ -->
 <div class="modal-bg" id="modal-aluno">
   <div class="modal" style="max-width:620px">
