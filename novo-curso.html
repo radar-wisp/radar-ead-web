@@ -479,7 +479,10 @@ input,select,textarea { font-family:var(--font) }
 .aula-title-input { flex:1; font-size:12px; color:var(--text); background:transparent; border:none; outline:none; border-radius:4px; padding:2px 6px; min-width:0; transition:background .1s }
 .aula-title-input:hover { background:var(--bg) }
 .aula-title-input:focus { background:var(--blue-l); box-shadow:0 0 0 2px var(--blue-m) }
-.aula-dur { font-size:10px; color:var(--text4); flex-shrink:0; background:var(--bg); border-radius:4px; padding:1px 6px; border:1px solid var(--border); min-width:36px; text-align:center; cursor:pointer }
+.field-error { border-color:var(--red) !important; box-shadow:0 0 0 2px rgba(224,36,36,.12) !important; }
+.field-msg { font-size:11px; color:var(--red); margin-top:4px; }
+.aula-dur { font-size:11px; color:var(--blue); flex-shrink:0; background:var(--blue-l); border-radius:6px; padding:3px 9px; border:1px solid var(--blue-m); min-width:42px; text-align:center; cursor:pointer; font-weight:600; transition:background .12s,color .12s; }
+.aula-dur:hover { background:var(--blue-m); color:var(--blue-d); }
 .aula-pub-dot { width:7px; height:7px; border-radius:99px; flex-shrink:0 }
 .aula-pub-dot.pub { background:var(--green) }
 .aula-pub-dot.rsc { background:var(--border2) }
@@ -772,7 +775,8 @@ input,select,textarea { font-family:var(--font) }
         </div>
         <div class="form-card-body">
           <div class="grid-2">
-            <div class="field" style="grid-column:1/-1">
+            <!-- Linha 1: Nome + Categoria -->
+            <div class="field">
               <label>Nome do Curso <span class="req">*</span></label>
               <input type="text" id="f-nome" placeholder="Ex: Segurança no Trabalho — NR10">
             </div>
@@ -792,6 +796,7 @@ input,select,textarea { font-family:var(--font) }
                 <option>Outros</option>
               </select>
             </div>
+            <!-- Linha 2: Formato + Carga + Nível -->
             <div class="field">
               <label>Formato</label>
               <select id="f-formato">
@@ -812,13 +817,14 @@ input,select,textarea { font-family:var(--font) }
                 <option value="avancado">Avançado</option>
               </select>
             </div>
-            <div class="field" style="grid-column:1/-1">
+            <!-- Linha 3: Descrição + Capa (lado a lado) -->
+            <div class="field">
               <label>Descrição</label>
-              <textarea id="f-desc" placeholder="Descreva o objetivo, conteúdo e benefícios do curso..."></textarea>
+              <textarea id="f-desc" placeholder="Descreva o objetivo, conteúdo e benefícios do curso..." style="height:148px;resize:vertical"></textarea>
             </div>
-            <div class="field" style="grid-column:1/-1">
+            <div class="field">
               <label>Imagem / Capa do Curso</label>
-              <div class="upload-zone" onclick="document.getElementById('f-capa-input').click()">
+              <div class="upload-zone" onclick="document.getElementById('f-capa-input').click()" style="height:148px">
                 <input type="file" id="f-capa-input" accept="image/*" onclick="event.stopPropagation()" onchange="Wizard.previewCapa(this)">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block;color:var(--text4)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <div class="uz-title">Clique para selecionar a capa</div>
@@ -864,7 +870,7 @@ input,select,textarea { font-family:var(--font) }
 
           <!-- Visibilidade -->
           <div class="section-title">Visibilidade</div>
-          <div class="check-group" style="margin-bottom:20px">
+          <div class="check-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
             <label class="check-row checked" id="vis-todos" onclick="Wizard.setVisib('todos')">
               <div class="radio-box"><div class="radio-inner"></div></div>
               <span class="check-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
@@ -990,7 +996,7 @@ input,select,textarea { font-family:var(--font) }
             </div>
             <div class="toggle" id="tog-validade"></div>
           </div>
-          <div class="validade-row" id="validade-fields" style="display:none">
+          <div class="validade-row" id="validade-fields" style="display:none;grid-template-columns:1fr 1fr 1fr">
             <div class="field" style="margin:0">
               <label>Data inicial</label>
               <input type="date" id="f-data-inicio">
@@ -999,9 +1005,10 @@ input,select,textarea { font-family:var(--font) }
               <label>Data final</label>
               <input type="date" id="f-validade">
             </div>
-            <div class="field" style="margin:0; grid-column: 1 / -1">
+            <div class="field" style="margin:0">
               <label>Prazo de conclusão (dias)</label>
               <input type="number" id="f-prazo" placeholder="Ex: 30" min="1">
+              <div style="font-size:11px;color:var(--text4);margin-top:4px;line-height:1.4">Dias corridos para concluir após o aluno iniciar o curso.</div>
             </div>
           </div>
 
@@ -1122,7 +1129,7 @@ input,select,textarea { font-family:var(--font) }
               <div class="toggle-label">Certificado Automático</div>
               <div class="toggle-desc">Emitir certificado ao concluir 100% do curso</div>
             </div>
-            <div class="toggle on" id="tog-certificado" onclick="Wizard.toggleSwitch(this)"></div>
+            <div class="toggle" id="tog-certificado" onclick="Wizard.toggleSwitch(this)"></div>
           </div>
           <div class="toggle-row">
             <div class="toggle-info">
@@ -1146,7 +1153,7 @@ input,select,textarea { font-family:var(--font) }
               <div class="toggle-label">Controle de Progresso</div>
               <div class="toggle-desc">Registrar e exibir o progresso de cada colaborador</div>
             </div>
-            <div class="toggle on" id="tog-progresso" onclick="Wizard.toggleSwitch(this)"></div>
+            <div class="toggle" id="tog-progresso" onclick="Wizard.toggleSwitch(this)"></div>
           </div>
           <div class="toggle-row">
             <div class="toggle-info">
@@ -1243,8 +1250,8 @@ var Wizard = (() => {
     modulos: [],   // [{ id, titulo, status, aulas:[{id,titulo,tipo,durMin,status}] }]
     materiais: [],
     config: {
-      obrigatorio: false, certificado: true, avaliacao: false,
-      notaMin: 70, progresso: true, ocultar: false, sequencial: false,
+      obrigatorio: false, certificado: false, avaliacao: false,
+      notaMin: 70, progresso: false, ocultar: false, sequencial: false,
     },
     status: 'rascunho',
   };
@@ -1381,13 +1388,30 @@ var Wizard = (() => {
 
   // ── Validação por etapa ────────────────────────────────────
   function validate(step) {
+    // Remove erros anteriores
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+    document.querySelectorAll('.field-msg').forEach(el => el.remove());
+
+    const markError = (id, msg) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('field-error');
+      const hint = document.createElement('div');
+      hint.className = 'field-msg';
+      hint.textContent = msg;
+      el.parentNode.appendChild(hint);
+      el.focus();
+    };
+
     if (step === 0) {
-      const nome = val('f-nome');
-      const cat  = val('f-categoria');
+      const nome  = val('f-nome');
+      const cat   = val('f-categoria');
       const carga = val('f-carga');
-      if (!nome) { alert('Informe o nome do curso.'); return false; }
-      if (!cat)  { alert('Selecione uma categoria.'); return false; }
-      if (!carga || isNaN(carga) || +carga < 1) { alert('Informe a carga horária.'); return false; }
+      let ok = true;
+      if (!nome)                            { markError('f-nome',  'Informe o nome do curso.');    ok = false; }
+      if (!cat)                             { markError('f-categoria','Selecione uma categoria.'); ok = false; }
+      if (!carga || isNaN(carga) || +carga < 1) { markError('f-carga','Informe a carga horária válida.'); ok = false; }
+      return ok;
     }
     return true;
   }
@@ -1918,11 +1942,12 @@ var Wizard = (() => {
   }
 
   function irParaCurso() {
-    // Se estiver dentro do drawer do admin, fecha via postMessage
     if (window.parent && window.parent !== window) {
+      // Dentro do drawer: fecha e pede ao admin para ir para cursos
       window.parent.postMessage('wizard:concluido', '*');
     } else {
-      window.location.href = 'admin.html';
+      // Navegação direta: vai para admin e sinaliza aba cursos via hash
+      window.location.href = 'admin.html#cursos';
     }
   }
 
