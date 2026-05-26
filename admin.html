@@ -200,6 +200,7 @@ input,select,textarea { font-family:var(--font) }
   font-size:10px; font-weight:700; background:var(--blue-light);
   color:var(--blue); padding:1px 6px; border-radius:99px;
 }
+.sb-item-child { padding-left:32px !important; font-size:12px; }
 .sb-item:hover { background:var(--sb-hov-bg); color:var(--sb-text-act) }
 .sb-item.active {
   background:var(--sb-act-bg); color:var(--sb-text-act); font-weight:600;
@@ -777,28 +778,7 @@ tbody tr.selected td { background:#f0f4ff }
   font-family:var(--font); transition:all .12s;
 }
 .gc-actions-btn:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
-/* Painel lateral Setores/Equipes */
-#al-setores-panel {
-  display: none;
-  position: fixed; top: 0; right: 0;
-  width: 420px; max-width: 95vw; height: 100vh;
-  background: var(--surface); border-left: 1px solid var(--border);
-  box-shadow: -4px 0 24px rgba(0,2,60,.10);
-  z-index: 500; flex-direction: column;
-  animation: slideInRight .18s ease;
-}
-#al-setores-panel.open { display: flex; }
 @keyframes slideInRight { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-#al-setores-panel .sp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
-}
-#al-setores-panel .sp-head h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
-#al-setores-panel .sp-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
-#al-setores-panel .sp-foot {
-  padding: 12px 20px; border-top: 1px solid var(--border);
-  display: flex; gap: 8px; flex-shrink: 0;
-}
 
 /* .gc-menu renderizado via #gc-portal-menu (portal no body) */
 #gc-portal-menu {
@@ -947,6 +927,115 @@ tbody tr.selected td { background:#f0f4ff }
   .ift-field { min-width:120px }
 }
 
+
+/* ── Tela Setores e Equipes ─────────────────────────────────── */
+.se-breadcrumb {
+  display:flex; align-items:center; gap:6px;
+  font-size:12px; color:var(--text4); margin-bottom:14px;
+}
+.se-breadcrumb a {
+  color:var(--text3); text-decoration:none; cursor:pointer;
+}
+.se-breadcrumb a:hover { color:var(--blue); }
+.se-breadcrumb-sep { color:var(--border2); }
+
+#se-stats {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; margin-bottom:20px;
+}
+#se-stats .stat {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 18px;
+}
+#se-stats .stat-val {
+  font-size:22px; font-weight:700; color:var(--text); line-height:1;
+}
+#se-stats .stat-val.blue { color:var(--blue); }
+#se-stats .stat-lbl { font-size:12px; color:var(--text4); margin-top:4px; }
+
+#se-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
+  gap:16px;
+}
+
+.se-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+}
+.se-card-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px; border-bottom:1px solid var(--border);
+  background:var(--bg);
+}
+.se-card-head-left {
+  display:flex; align-items:center; gap:8px; min-width:0;
+}
+.se-card-head-right { display:flex; gap:4px; flex-shrink:0; }
+.se-dot {
+  width:10px; height:10px; border-radius:50%; flex-shrink:0;
+}
+.se-card-title {
+  font-size:14px; font-weight:600; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.se-badge {
+  font-size:11px; color:var(--text4);
+  background:var(--blue-light); color:var(--blue);
+  border-radius:20px; padding:2px 8px; flex-shrink:0;
+}
+
+.se-equipes { padding:8px 0; }
+.se-equipe-row {
+  display:flex; align-items:center; gap:8px;
+  padding:7px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background .1s;
+}
+.se-equipe-row:last-of-type { border-bottom:none; }
+.se-equipe-row:hover { background:var(--bg); }
+.se-equipe-icon { color:var(--text4); flex-shrink:0; }
+.se-equipe-nome {
+  flex:1; font-size:13px; color:var(--text2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.se-equipe-count {
+  font-size:11px; color:var(--text4); flex-shrink:0;
+}
+.se-equipe-actions {
+  display:flex; gap:2px; opacity:0; transition:opacity .1s;
+}
+.se-equipe-row:hover .se-equipe-actions { opacity:1; }
+
+.se-add-equipe {
+  display:flex; align-items:center; gap:6px;
+  width:100%; padding:8px 16px;
+  font-size:12px; color:var(--text4);
+  background:none; border:none; cursor:pointer;
+  transition:color .1s, background .1s;
+}
+.se-add-equipe:hover { color:var(--blue); background:var(--blue-light); }
+
+.se-empty-eq {
+  font-size:12px; color:var(--text4);
+  padding:10px 16px; font-style:italic;
+}
+
+.se-empty {
+  grid-column:1/-1; text-align:center;
+  padding:64px 20px; color:var(--text4);
+}
+.se-empty-icon {
+  margin-bottom:16px; opacity:.3;
+}
+.se-empty h3 {
+  font-size:16px; font-weight:600; color:var(--text2); margin-bottom:6px;
+}
+.se-empty p { font-size:13px; margin-bottom:20px; }
+
+.se-btn-danger:hover { color:var(--red) !important; }
+/* ── fim Tela Setores e Equipes ─────────────────────────────── */
+
 </style>
 </head>
 <body>
@@ -1062,6 +1151,10 @@ tbody tr.selected td { background:#f0f4ff }
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
         <span class="sb-item-label">Alunos</span>
         
+      </button>
+      <button class="sb-item sb-item-child" data-pg="setores-equipes">
+        <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="sb-item-label">Setores e Equipes</span>
       </button>
       <button class="sb-item" data-pg="acessos">
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -1948,6 +2041,46 @@ tbody tr.selected td { background:#f0f4ff }
 
       </div>
       <!-- ═══ FIM COLABORADORES / ALUNOS ═══════════════════════ -->
+
+      <!-- ═══ SETORES E EQUIPES ════════════════════════════════════ -->
+      <div class="pg" id="pg-setores-equipes">
+
+        <!-- Breadcrumb -->
+        <nav class="se-breadcrumb">
+          <a onclick="Admin.go('dashboard')">Radar EAD</a>
+          <span class="se-breadcrumb-sep">›</span>
+          <a onclick="Admin.go('colaboradores')">Alunos</a>
+          <span class="se-breadcrumb-sep">›</span>
+          <span>Setores e Equipes</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="ph">
+          <div>
+            <h2>Setores e Equipes</h2>
+            <p>Gerencie setores, equipes e vínculos dos colaboradores.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="SetoresEquipesMod.novaEquipe()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nova Equipe
+            </button>
+            <button class="btn btn-primary" onclick="SetoresEquipesMod.novoSetor()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo Setor
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div id="se-stats"></div>
+
+        <!-- Grid de Cards -->
+        <div id="se-grid"></div>
+
+      </div>
+      <!-- ═══ FIM SETORES E EQUIPES ════════════════════════════════ -->
+
 
 
 <!-- ═══ CERTIFICADOS ════════════════════════════════════════════ -->
@@ -3056,80 +3189,60 @@ tbody tr.selected td { background:#f0f4ff }
   </div>
 </div>
 
-<!-- ═══ PAINEL LATERAL: SETORES E EQUIPES ═══════════════════ -->
-<div id="al-setores-panel">
-  <div class="sp-head">
-    <h3>Setores e Equipes</h3>
-    <button class="modal-close" onclick="document.getElementById('al-setores-panel').classList.remove('open')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="sp-body">
-    <div id="setores-equipes"></div>
-  </div>
-  <div class="sp-foot">
-    <button class="btn btn-outline btn-sm" onclick="AlunosMod.criarSetor()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Novo Setor
-    </button>
-    <button class="btn btn-outline btn-sm" onclick="AlunosMod.criarEquipe()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Nova Equipe
-    </button>
-  </div>
-</div>
-
-<!-- ═══ MINI-MODAL: NOVO SETOR ══════════════════════════════ -->
-<div class="modal-bg" id="modal-novo-setor">
-  <div class="modal" style="max-width:360px">
+<!-- ═══ MODAL: SETOR (criar/editar) ═════════════════════════ -->
+<div class="modal-bg" id="modal-se-setor">
+  <div class="modal" style="max-width:380px">
     <div class="modal-head">
-      <h3>Novo Setor</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-novo-setor').classList.remove('open')">
+      <h3 id="mse-titulo">Novo Setor</h3>
+      <button class="modal-close" onclick="SetoresModals.fecharSetor()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
       <div>
         <label class="lbl">Nome do setor <span style="color:var(--red)">*</span></label>
-        <input class="inp" id="ns-nome" placeholder="Ex: Tecnologia" maxlength="60">
+        <input class="inp" id="mse-nome" placeholder="Ex: Comercial" maxlength="60"
+          onkeydown="if(event.key==='Enter') SetoresModals.salvarSetor()">
       </div>
       <div>
-        <label class="lbl">Cor</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="color" id="ns-cor" value="#0002da" style="width:36px;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
-          <span id="ns-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
+        <label class="lbl">Cor identificadora</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="color" id="mse-cor" value="#0002da"
+            style="width:38px;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
+          <span id="mse-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
         </div>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-novo-setor').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="AlunosMod.salvarSetor()">Criar Setor</button>
+      <button class="btn btn-ghost" onclick="SetoresModals.fecharSetor()">Cancelar</button>
+      <button class="btn btn-primary" onclick="SetoresModals.salvarSetor()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ MINI-MODAL: NOVA EQUIPE ══════════════════════════════ -->
-<div class="modal-bg" id="modal-nova-equipe">
-  <div class="modal" style="max-width:360px">
+<!-- ═══ MODAL: EQUIPE (criar/editar) ════════════════════════ -->
+<div class="modal-bg" id="modal-se-equipe">
+  <div class="modal" style="max-width:380px">
     <div class="modal-head">
-      <h3>Nova Equipe</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-nova-equipe').classList.remove('open')">
+      <h3 id="meq-titulo">Nova Equipe</h3>
+      <button class="modal-close" onclick="SetoresModals.fecharEquipe()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
       <div>
         <label class="lbl">Nome da equipe <span style="color:var(--red)">*</span></label>
-        <input class="inp" id="ne-nome" placeholder="Ex: Frontend" maxlength="60">
+        <input class="inp" id="meq-nome" placeholder="Ex: Comercial Anápolis" maxlength="60"
+          onkeydown="if(event.key==='Enter') SetoresModals.salvarEquipe()">
       </div>
       <div>
         <label class="lbl">Setor <span style="color:var(--red)">*</span></label>
-        <select class="inp" id="ne-setor"></select>
+        <select class="inp" id="meq-setor"></select>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-nova-equipe').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="AlunosMod.salvarEquipe()">Criar Equipe</button>
+      <button class="btn btn-ghost" onclick="SetoresModals.fecharEquipe()">Cancelar</button>
+      <button class="btn btn-primary" onclick="SetoresModals.salvarEquipe()">Salvar</button>
     </div>
   </div>
 </div>
@@ -8362,6 +8475,9 @@ var PubMod = (() => {
 <script src="src/js/modules/gestao-alunos.js"></script>
 <script src="src/js/modules/controle-acessos.js"></script>
 <script src="src/js/modules/central-certificados.js"></script>
+<script src="src/js/modules/setores-equipes/cards.js"></script>
+<script src="src/js/modules/setores-equipes/modals.js"></script>
+<script src="src/js/modules/setores-equipes/index.js"></script>
 <script src="src/js/admin.js"></script>
 
 <!-- ═══ PORTAL MENU ═════════════════════════════════════════ -->
