@@ -64,6 +64,12 @@ var AlunosMod = (() => {
   const _fmtRelative = EadUtils.fmtRelative;
   const _toast       = EadUtils.toast;
 
+  /** Seta value de campo pelo ID */
+  function _setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val ?? '';
+  }
+
 
   // ══════════════════════════════════════════════════════════════
   // CONFIGURAÇÕES VISUAIS DE STATUS
