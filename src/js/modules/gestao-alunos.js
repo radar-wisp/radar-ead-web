@@ -32,8 +32,6 @@
  * ║  • _menu(btn), _cm(), _loadEquipes()                             ║
  * ║                                                                  ║
  * ║  MIGRAÇÃO BACKEND: Apenas window.Storage precisa mudar.          ║
- * ║  Exceção: excluir() acessa localStorage diretamente —            ║
- * ║  marcado com TODO para migração.                                 ║
  * ╚══════════════════════════════════════════════════════════════════╝
  *
  * @module GestaoAlunos
@@ -447,18 +445,12 @@ var AlunosMod = (() => {
 
   /**
    * Exclui permanentemente um aluno.
-   * TODO MIGRAÇÃO: substituir acesso direto ao localStorage por
-   * DELETE /api/v1/alunos/:id quando o backend estiver disponível.
+   * TODO MIGRAÇÃO: Storage.Alunos.excluir() deve chamar DELETE /api/v1/alunos/:id
    * @param {string} id
    */
   function excluir(id) {
     if (!confirm('Excluir aluno permanentemente?')) return;
-    try {
-      const lista = JSON.parse(localStorage.getItem('ead_alunos') || '[]');
-      localStorage.setItem('ead_alunos', JSON.stringify(lista.filter(a => a.id !== id)));
-    } catch (e) {
-      console.warn('[GestaoAlunos] Falha ao excluir:', e);
-    }
+    Storage.Alunos.excluir(id);
     _toast('Aluno excluído.', 'i');
     refresh();
   }
