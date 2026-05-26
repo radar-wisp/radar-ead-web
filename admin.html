@@ -1247,10 +1247,6 @@ tbody tr.selected td { background:#f0f4ff }
             <p>Administre, publique e monitore todos os treinamentos</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn btn-ghost" onclick="Cursos.exportar()" title="Exportar lista">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exportar
-            </button>
             <button class="btn btn-primary" onclick="window.location.href='novo-curso.html'">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Novo Curso
@@ -9094,11 +9090,30 @@ var CursoDrawer = (() => {
   });
 
   window.addEventListener('message', e => {
-    if (e.data === 'wizard:concluido') fechar();
+    if (e.data === 'wizard:concluido') {
+      fechar();
+      if (typeof Admin !== 'undefined') Admin.go('cursos');
+    }
   });
 
   return { abrir, fechar };
 })();
+
+// Redireciona para aba Cursos quando vindo do wizard via hash
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.location.hash === '#cursos') {
+    history.replaceState(null, '', window.location.pathname);
+    // Aguarda o Admin inicializar (boot é chamado em admin.js)
+    const tryGo = () => {
+      if (typeof Admin !== 'undefined' && typeof Admin.go === 'function') {
+        Admin.go('cursos');
+      } else {
+        setTimeout(tryGo, 80);
+      }
+    };
+    tryGo();
+  }
+});
 </script>
 
 </body>
