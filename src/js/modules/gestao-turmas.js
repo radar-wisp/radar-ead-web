@@ -380,29 +380,82 @@ var Turmas = (() => {
    * @param {object} t — turma
    * @returns {string}
    */
-  function _renderLinha(t) {
-    const curso   = t.cursoId ? Storage.Cursos.obter(t.cursoId) : null;
-    const stats   = Storage.Turmas.stats(t.id);
-    const prog    = Storage.Turmas.progresso(t.id);
-    const nAlunos = t.alunos?.length || 0;
-    const limiteHtml = t.limiteAlunos > 0
-      ? `<div style="font-size:10px;color:var(--text4)">${nAlunos}/${t.limiteAlunos}</div>`
-      : `<div style="font-size:10px;color:var(--text4)">ilimitado</div>`;
+  /** Célula: nome e descrição resumida da turma. */
+  function _renderCelulaNome(t) {
+    const desc = t.descricao ? _x(t.descricao).slice(0, 50) + '…' : '—';
+    return `<td>
+      <div style="font-weight:600;font-size:13px;color:var(--text)">${_x(t.nome)}</div>
+      <div style="font-size:11px;color:var(--text4)">${desc}</div>
+    </td>`;
+  }
 
+  /** Célula: contagem de alunos e limite. */
+  function _renderCelulaAlunos(t) {
+    const n      = t.alunos?.length || 0;
+    const limite = t.limiteAlunos > 0
+      ? `<div style="font-size:10px;color:var(--text4)">${n}/${t.limiteAlunos}</div>`
+      : `<div style="font-size:10px;color:var(--text4)">ilimitado</div>`;
+    return `<td style="text-align:center">
+      <span style="font-size:14px;font-weight:600">${n}</span>
+      ${limite}
+    </td>`;
+  }
+
+  /** Célula: menu dropdown de ações da linha. */
+  function _renderMenuAcoes(t) {
     const podeEncerrar = t.status !== 'encerrada' && t.status !== 'cancelada';
+    const btnEncerrar  = podeEncerrar
+      ? `<button onclick="Turmas.encerrar('${t.id}');Turmas._closeMenus()">
+           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+           Encerrar turma
+         </button>`
+      : '';
+    return `<td>
+      <div class="gc-actions">
+        <button class="gc-actions-btn" onclick="Turmas._menu(this)" title="Ações">
+          Ações
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="gc-menu">
+          <button onclick="Turmas.visualizar('${t.id}');Turmas._closeMenus()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Visualizar
+          </button>
+          <button onclick="Turmas.abrirEdit('${t.id}');Turmas._closeMenus()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar
+          </button>
+          <button onclick="Turmas.abrirGerenciarAlunos('${t.id}');Turmas._closeMenus()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Gerenciar alunos
+          </button>
+          <hr class="sep">
+          ${btnEncerrar}
+          <hr class="sep">
+          <button class="danger" onclick="Turmas.excluir('${t.id}');Turmas._closeMenus()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            Excluir
+          </button>
+        </div>
+      </div>
+    </td>`;
+  }
+
+  /**
+   * Gera o HTML de uma linha da tabela para uma turma.
+   * @param {object} t — turma
+   * @returns {string}
+   */
+  function _renderLinha(t) {
+    const curso = t.cursoId ? Storage.Cursos.obter(t.cursoId) : null;
+    const prog  = Storage.Turmas.progresso(t.id);
 
     return `<tr>
-      <td>
-        <div style="font-weight:600;font-size:13px;color:var(--text)">${_x(t.nome)}</div>
-        <div style="font-size:11px;color:var(--text4)">${t.descricao ? _x(t.descricao).slice(0, 50) + '…' : '—'}</div>
-      </td>
+      ${_renderCelulaNome(t)}
       <td style="font-size:12px;color:var(--text3)">
         ${curso ? _x(curso.titulo) : '<span style="color:var(--text4)">—</span>'}
       </td>
-      <td style="text-align:center">
-        <span style="font-size:14px;font-weight:600">${nAlunos}</span>
-        ${limiteHtml}
-      </td>
+      ${_renderCelulaAlunos(t)}
       <td style="min-width:90px">
         <div class="gc-prog-wrap">
           <div class="gc-prog-bar"><div class="gc-prog-fill" style="width:${prog}%"></div></div>
@@ -413,40 +466,7 @@ var Turmas = (() => {
       <td style="font-size:11px;color:var(--text4)">${_fmtDate(t.dataInicio)}</td>
       <td style="font-size:11px;color:var(--text4)">${_fmtDate(t.dataFim)}</td>
       <td>${_statusBadge(t.status)}</td>
-      <td>
-        <div class="gc-actions">
-          <button class="gc-actions-btn" onclick="Turmas._menu(this)" title="Ações">
-            Ações
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="gc-menu">
-            <button onclick="Turmas.visualizar('${t.id}');Turmas._closeMenus()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              Visualizar
-            </button>
-            <button onclick="Turmas.abrirEdit('${t.id}');Turmas._closeMenus()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Editar
-            </button>
-            <button onclick="Turmas.abrirGerenciarAlunos('${t.id}');Turmas._closeMenus()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              Gerenciar alunos
-            </button>
-            <hr class="sep">
-            ${podeEncerrar
-              ? `<button onclick="Turmas.encerrar('${t.id}');Turmas._closeMenus()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                  Encerrar turma
-                </button>`
-              : ''}
-            <hr class="sep">
-            <button class="danger" onclick="Turmas.excluir('${t.id}');Turmas._closeMenus()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-              Excluir
-            </button>
-          </div>
-        </div>
-      </td>
+      ${_renderMenuAcoes(t)}
     </tr>`;
   }
 
