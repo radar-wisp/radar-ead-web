@@ -46,6 +46,7 @@ var Admin = (() => {
       materiais:      'Materiais de Apoio',
       avaliacoes:     'Avaliações',
       colaboradores:  'Alunos',
+      'setores-equipes': 'Setores e Equipes',
       acessos:        'Controle de Acessos',
       relatorios:     'Relatórios',
       certificados:   'Certificados',
@@ -58,6 +59,7 @@ var Admin = (() => {
 
   const renders = {
     dashboard, cursos, materiais, acessos, colaboradores, publicacao,
+    'setores-equipes': () => { if (typeof SetoresEquipesMod !== 'undefined') SetoresEquipesMod.init(); },
     // Módulos futuros — stub que mostra "em breve"
     turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
     avaliacoes:     () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
