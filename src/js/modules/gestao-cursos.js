@@ -60,9 +60,8 @@ var Cursos = (() => {
   let _cursoEditId  = null;
   let _matEdit      = [];
 
-  // ── Constante de chave para log de atividades ─────────────────
-  const ATIVIDADES_KEY = 'ead_atividades';
-  const MAX_ATIVIDADES = 50;
+  // ── Cache de progresso (por ciclo de renderização) ────────────
+  let _progressCache = {};
 
   // ══════════════════════════════════════════════════════════════
   // UTILITÁRIOS INTERNOS (não expostos)
@@ -200,23 +199,28 @@ var Cursos = (() => {
 
   /**
    * Calcula progresso médio (%) de todos os alunos ativos em um curso.
+   * Resultado é cacheado por ciclo de renderização (_progressCache).
    * @param {string} cursoId
    * @returns {number} 0–100
    */
   function _calcProgresso(cursoId) {
+    if (_progressCache[cursoId] !== undefined) return _progressCache[cursoId];
+
     const mids  = Storage.Modulos.listarPorCurso(cursoId).map(m => m.id);
     const aids  = Storage.Aulas.listar().filter(a => mids.includes(a.moduloId)).map(a => a.id);
-    if (!aids.length) return 0;
+    if (!aids.length) { _progressCache[cursoId] = 0; return 0; }
 
     const alunos = Storage.Alunos.listar().filter(a => a.ativo);
-    if (!alunos.length) return 0;
+    if (!alunos.length) { _progressCache[cursoId] = 0; return 0; }
 
     let total = 0;
     alunos.forEach(al => {
       const done = Storage.Progresso.concluidas(al.id).filter(id => aids.includes(id)).length;
       total += Math.round((done / aids.length) * 100);
     });
-    return Math.round(total / alunos.length);
+    const resultado = Math.round(total / alunos.length);
+    _progressCache[cursoId] = resultado;
+    return resultado;
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -291,6 +295,7 @@ var Cursos = (() => {
    * Função pura de leitura: não altera estado do Storage.
    */
   function renderTabela() {
+    _progressCache = {}; // limpa cache do ciclo anterior
     const agora = new Date();
 
     // Lê filtros ativos
@@ -770,18 +775,12 @@ var Cursos = (() => {
   // ══════════════════════════════════════════════════════════════
 
   /**
-   * Persiste uma atividade no histórico local.
-   * MIGRAÇÃO: substituir por POST /api/v1/atividades
+   * Persiste uma atividade via Storage.Atividades.
+   * MIGRAÇÃO: Storage.Atividades.registrar substituirá por POST /api/v1/atividades
    * @param {{ tipo: string, cursoId?: string, materialNome?: string }} ev
    */
   function _logAtividade(ev) {
-    try {
-      const lista = JSON.parse(localStorage.getItem(ATIVIDADES_KEY) || '[]');
-      lista.unshift({ ...ev, ts: new Date().toISOString() });
-      localStorage.setItem(ATIVIDADES_KEY, JSON.stringify(lista.slice(0, MAX_ATIVIDADES)));
-    } catch (e) {
-      console.warn('[GestaoCursos] Falha ao registrar atividade:', e);
-    }
+    Storage.Atividades.registrar(ev);
   }
 
   /**
@@ -794,10 +793,7 @@ var Cursos = (() => {
     // Agrega atividades de múltiplas fontes
     const ativ = [];
 
-    try {
-      const saved = JSON.parse(localStorage.getItem(ATIVIDADES_KEY) || '[]');
-      saved.forEach(a => ativ.push(a));
-    } catch (e) { /* ignora */ }
+    Storage.Atividades.listar().forEach(a => ativ.push(a));
 
     // Inclui criação/publicação de cursos como atividades implícitas
     Storage.Cursos.listar().forEach(c => {
@@ -902,12 +898,12 @@ var Cursos = (() => {
    * Comunicação unidirecional: Cursos → Dashboard (via DOM).
    */
   function _sincronizarDashboard() {
+    const _lista = Storage.Cursos.listar();
     const el = document.getElementById('ds-cursos');
-    if (el) el.textContent = Storage.Cursos.listar().length;
+    if (el) el.textContent = _lista.length;
 
     const ep = document.getElementById('ds-publicados');
-    if (ep) ep.textContent = Storage.Cursos.listar()
-      .filter(c => c.status === 'publicado').length;
+    if (ep) ep.textContent = _lista.filter(c => c.status === 'publicado').length;
   }
 
   // ══════════════════════════════════════════════════════════════
