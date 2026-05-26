@@ -263,7 +263,7 @@ var Turmas = (() => {
    * Limpa todos os filtros e volta ao estado inicial.
    */
   function resetFiltros() {
-    ['tm-busca', 'tm-filtro-status', 'tm-filtro-curso', 'tm-filtro-data'].forEach(id => {
+    ['tm-busca', 'tm-filtro-status', 'tm-filtro-curso', 'tm-filtro-data', 'tm-filtro-resp', 'tm-filtro-status-sel'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -340,9 +340,10 @@ var Turmas = (() => {
    */
   function renderTabela() {
     const busca   = (_q('#tm-busca')?.value        || '').toLowerCase().trim();
-    const fStatus = _q('#tm-filtro-status')?.value || '';
+    const fStatus = _q('#tm-filtro-status')?.value || _q('#tm-filtro-status-sel')?.value || '';
     const fCurso  = _q('#tm-filtro-curso')?.value  || '';
     const fData   = _q('#tm-filtro-data')?.value   || '';
+    const fResp   = (_q('#tm-filtro-resp')?.value  || '').toLowerCase().trim();
 
     let lista = Storage.Turmas.listar();
 
@@ -353,6 +354,7 @@ var Turmas = (() => {
     if (fStatus) lista = lista.filter(t => t.status === fStatus);
     if (fCurso)  lista = lista.filter(t => t.cursoId === fCurso);
     if (fData)   lista = lista.filter(t => t.dataInicio && t.dataInicio.slice(0, 10) >= fData);
+    if (fResp)   lista = lista.filter(t => t.responsavel?.toLowerCase().includes(fResp));
 
     // Ordena: mais recente primeiro
     lista.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
@@ -401,42 +403,14 @@ var Turmas = (() => {
     </td>`;
   }
 
-  /** Célula: menu dropdown de ações da linha. */
+  /** Célula: botão Ações usando PortalMenu (mesmo padrão de Cursos). */
   function _renderMenuAcoes(t) {
-    const podeEncerrar = t.status !== 'encerrada' && t.status !== 'cancelada';
-    const btnEncerrar  = podeEncerrar
-      ? `<button onclick="Turmas.encerrar('${t.id}');Turmas._closeMenus()">
-           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-           Encerrar turma
-         </button>`
-      : '';
     return `<td>
       <div class="gc-actions">
-        <button class="gc-actions-btn" onclick="Turmas._menu(this)" title="Ações">
+        <button class="gc-actions-btn" onclick="Turmas._menu(this)" title="Ações" data-id="${t.id}" data-menu-open="0">
           Ações
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="gc-menu">
-          <button onclick="Turmas.visualizar('${t.id}');Turmas._closeMenus()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Visualizar
-          </button>
-          <button onclick="Turmas.abrirEdit('${t.id}');Turmas._closeMenus()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Editar
-          </button>
-          <button onclick="Turmas.abrirGerenciarAlunos('${t.id}');Turmas._closeMenus()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Gerenciar alunos
-          </button>
-          <hr class="sep">
-          ${btnEncerrar}
-          <hr class="sep">
-          <button class="danger" onclick="Turmas.excluir('${t.id}');Turmas._closeMenus()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-            Excluir
-          </button>
-        </div>
       </div>
     </td>`;
   }
@@ -471,26 +445,66 @@ var Turmas = (() => {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // MENU DROPDOWN
+  // MENU DROPDOWN (via PortalMenu — mesmo padrão de Cursos)
   // ══════════════════════════════════════════════════════════════
 
   /**
-   * Abre o menu de ações de uma linha da tabela.
+   * Abre o menu de ações via PortalMenu.
    * @param {HTMLElement} btn
    */
   function _menu(btn) {
-    const menu   = btn.nextElementSibling;
-    const isOpen = menu.classList.contains('open');
+    const isOpen = btn.dataset.menuOpen === '1';
     _closeMenus();
-    if (!isOpen) {
-      menu.classList.add('open');
-      setTimeout(() => document.addEventListener('click', _closeMenus, { once: true }), 10);
+    if (isOpen) return;
+
+    const id = btn.dataset.id;
+    const t  = id ? Storage.Turmas.obter(id) : null;
+    if (!t) return;
+
+    const podeEncerrar = t.status !== 'encerrada' && t.status !== 'cancelada';
+
+    const html = `
+      <button onclick="Turmas.visualizar('${t.id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Visualizar
+      </button>
+      <button onclick="Turmas.abrirEdit('${t.id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar
+      </button>
+      <button onclick="Turmas.abrirGerenciarAlunos('${t.id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Gerenciar alunos
+      </button>
+      <hr class="sep">
+      ${podeEncerrar
+        ? `<button onclick="Turmas.encerrar('${t.id}');PortalMenu.close()">
+             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+             Encerrar turma
+           </button>`
+        : ''}
+      <hr class="sep">
+      <button class="danger" onclick="Turmas.excluir('${t.id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        Excluir
+      </button>`;
+
+    btn.dataset.menuOpen = '1';
+    PortalMenu.open(btn, html);
+
+    const pm = document.getElementById('gc-portal-menu');
+    if (pm) {
+      const obs = new MutationObserver(() => {
+        if (pm.style.display === 'none') { btn.dataset.menuOpen = '0'; obs.disconnect(); }
+      });
+      obs.observe(pm, { attributes: true, attributeFilter: ['style'] });
     }
   }
 
   /** Fecha todos os menus abertos */
   function _closeMenus() {
-    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
+    if (typeof PortalMenu !== 'undefined') PortalMenu.close();
+    document.querySelectorAll('[data-menu-open="1"]').forEach(b => { b.dataset.menuOpen = '0'; });
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -597,11 +611,7 @@ var Turmas = (() => {
     if (status) status.value = 'aberta';
     if (prazo)  prazo.value  = '0';
 
-    // Toggles — valores padrão
-    _setToggle('mt-cfg-auto',     true);
-    _setToggle('mt-cfg-bloquear', true);
-    _setToggle('mt-cfg-entrada',  true);
-
+    // Toggles — removidos (aba Acesso excluída)
     _popularSelectCursos();
     renderListaAlunos();
     tabModal(0, document.querySelector('.mc-tab'));
@@ -631,11 +641,6 @@ var Turmas = (() => {
     _setVal('mt-inicio',      t.dataInicio  ? t.dataInicio.slice(0, 10) : '');
     _setVal('mt-fim',         t.dataFim     ? t.dataFim.slice(0, 10)    : '');
     _setVal('mt-cfg-prazo',   t.config?.prazoConclucaoDias || 0);
-
-    const cfg = t.config || {};
-    _setToggle('mt-cfg-auto',     cfg.acessoAutomatico !== false);
-    _setToggle('mt-cfg-bloquear', cfg.bloquearAposEncerramento !== false);
-    _setToggle('mt-cfg-entrada',  cfg.permitirEntradaAposInicio !== false);
 
     _popularSelectCursos(t.cursoId);
     renderListaAlunos();
@@ -860,10 +865,7 @@ var Turmas = (() => {
       dataFim:      fim    ? new Date(fim).toISOString()    : '',
       alunos:       [..._alunosSel],
       config: {
-        acessoAutomatico:          _getToggleOn('mt-cfg-auto'),
-        bloquearAposEncerramento:  _getToggleOn('mt-cfg-bloquear'),
-        permitirEntradaAposInicio: _getToggleOn('mt-cfg-entrada'),
-        prazoConclucaoDias:        parseInt(document.getElementById('mt-cfg-prazo')?.value) || 0,
+        prazoConclucaoDias: parseInt(document.getElementById('mt-cfg-prazo')?.value) || 0,
       },
     };
 
