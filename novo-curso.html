@@ -481,7 +481,7 @@ input,select,textarea { font-family:var(--font) }
 .aula-title-input:focus { background:var(--blue-l); box-shadow:0 0 0 2px var(--blue-m) }
 .field-error { border-color:var(--red) !important; box-shadow:0 0 0 2px rgba(224,36,36,.12) !important; }
 .field-msg { font-size:11px; color:var(--red); margin-top:4px; }
-.aula-dur { font-size:11px; color:var(--blue); flex-shrink:0; background:var(--blue-l); border-radius:6px; padding:3px 9px; border:1px solid var(--blue-m); min-width:42px; text-align:center; cursor:pointer; font-weight:600; transition:background .12s,color .12s; }
+.aula-dur { font-size:12px; color:var(--blue); flex-shrink:0; background:var(--blue-l); border-radius:6px; padding:5px 12px; border:1px solid var(--blue-m); min-width:58px; text-align:center; cursor:pointer; font-weight:600; transition:background .12s,color .12s; white-space:nowrap; }
 .aula-dur:hover { background:var(--blue-m); color:var(--blue-d); }
 .aula-pub-dot { width:7px; height:7px; border-radius:99px; flex-shrink:0 }
 .aula-pub-dot.pub { background:var(--green) }
@@ -502,7 +502,7 @@ input,select,textarea { font-family:var(--font) }
 .cnt-ctx-menu button.danger { color:var(--red) }
 .cnt-ctx-menu button.danger:hover { background:var(--red-l) }
 .cnt-ctx-menu .ctx-sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
-.dur-inline { font-size:10px; width:52px; text-align:center; background:var(--blue-l); border:1.5px solid var(--blue-m); border-radius:4px; padding:1px 4px; color:var(--blue); font-family:var(--font); outline:none }
+.dur-inline { font-size:12px; width:68px; text-align:center; background:var(--blue-l); border:1.5px solid var(--blue-m); border-radius:6px; padding:4px 8px; color:var(--blue); font-family:var(--font); font-weight:600; outline:none }
 @media (max-width:640px) { .mod-meta,.aula-dur,.cnt-stats { display:none } }
 
 .nav-bar {
@@ -774,8 +774,8 @@ input,select,textarea { font-family:var(--font) }
           </div>
         </div>
         <div class="form-card-body">
+          <!-- Linha 1: Nome + Categoria -->
           <div class="grid-2">
-            <!-- Linha 1: Nome + Categoria -->
             <div class="field">
               <label>Nome do Curso <span class="req">*</span></label>
               <input type="text" id="f-nome" placeholder="Ex: Segurança no Trabalho — NR10">
@@ -796,7 +796,9 @@ input,select,textarea { font-family:var(--font) }
                 <option>Outros</option>
               </select>
             </div>
-            <!-- Linha 2: Formato + Carga + Nível -->
+          </div>
+          <!-- Linha 2: Formato + Carga + Nível -->
+          <div class="grid-3" style="margin-top:16px">
             <div class="field">
               <label>Formato</label>
               <select id="f-formato">
@@ -817,7 +819,9 @@ input,select,textarea { font-family:var(--font) }
                 <option value="avancado">Avançado</option>
               </select>
             </div>
-            <!-- Linha 3: Descrição + Capa (lado a lado) -->
+          </div>
+          <!-- Linha 3: Descrição + Capa -->
+          <div class="grid-2" style="margin-top:16px">
             <div class="field">
               <label>Descrição</label>
               <textarea id="f-desc" placeholder="Descreva o objetivo, conteúdo e benefícios do curso..." style="height:148px;resize:vertical"></textarea>
