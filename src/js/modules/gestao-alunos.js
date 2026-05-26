@@ -792,10 +792,24 @@ var AlunosMod = (() => {
   }
 
   function criarSetor() {
-    const nome = prompt('Nome do setor:');
-    if (!nome) return;
-    const cor = prompt('Cor hex (opcional):', '#0002da') || '#0002da';
+    const inp = document.getElementById('ns-nome');
+    const cor = document.getElementById('ns-cor');
+    if (inp) inp.value = '';
+    if (cor) { cor.value = '#0002da'; }
+    const lbl = document.getElementById('ns-cor-lbl');
+    if (lbl) lbl.textContent = '#0002da';
+    // sync color label on change
+    if (cor) cor.oninput = () => { if (lbl) lbl.textContent = cor.value; };
+    document.getElementById('modal-novo-setor')?.classList.add('open');
+    setTimeout(() => inp?.focus(), 50);
+  }
+
+  function salvarSetor() {
+    const nome = document.getElementById('ns-nome')?.value.trim();
+    const cor  = document.getElementById('ns-cor')?.value || '#0002da';
+    if (!nome) { alert('Informe o nome do setor.'); return; }
     Storage.Setores.criar({ nome, cor });
+    document.getElementById('modal-novo-setor')?.classList.remove('open');
     renderSetoresEquipes();
     _popularFiltros();
     _toast('Setor criado!', 's');
@@ -804,12 +818,25 @@ var AlunosMod = (() => {
   function criarEquipe() {
     const setores = Storage.Setores.listar();
     if (!setores.length) { _toast('Crie um setor primeiro.', 'i'); return; }
-    const nome = prompt('Nome da equipe:');
-    if (!nome) return;
-    const opts = setores.map((s, i) => `${i + 1}. ${s.nome}`).join('\n');
-    const idx  = parseInt(prompt(`Setor da equipe:\n${opts}`)) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= setores.length) return;
-    Storage.Equipes.criar({ nome, setorId: setores[idx].id });
+    const sel = document.getElementById('ne-setor');
+    if (sel) {
+      sel.innerHTML = setores.map(s =>
+        `<option value="${_x(s.id)}">${_x(s.nome)}</option>`
+      ).join('');
+    }
+    const inp = document.getElementById('ne-nome');
+    if (inp) inp.value = '';
+    document.getElementById('modal-nova-equipe')?.classList.add('open');
+    setTimeout(() => inp?.focus(), 50);
+  }
+
+  function salvarEquipe() {
+    const nome    = document.getElementById('ne-nome')?.value.trim();
+    const setorId = document.getElementById('ne-setor')?.value;
+    if (!nome)    { alert('Informe o nome da equipe.'); return; }
+    if (!setorId) { alert('Selecione um setor.'); return; }
+    Storage.Equipes.criar({ nome, setorId });
+    document.getElementById('modal-nova-equipe')?.classList.remove('open');
     renderSetoresEquipes();
     _popularFiltros();
     _toast('Equipe criada!', 's');
@@ -898,5 +925,8 @@ var AlunosMod = (() => {
 
     // Compatibilidade com admin.js legado
     toggleColab: (id, ativo) => ativo ? ativar(id) : bloquear(id),
+    renderColabList: renderTabela,   // alias exigido por admin.js
+    salvarSetor,
+    salvarEquipe,
   };
 })();
