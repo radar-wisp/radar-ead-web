@@ -44,6 +44,7 @@ var Storage = (() => {
     AVALIACOES: 'ead_avaliacoes', // → tabela: avaliacoes
     QUESTOES:   'ead_questoes',   // → tabela: questoes
     RESPOSTAS:  'ead_respostas',  // → tabela: respostas_aluno
+    ATIVIDADES: 'ead_atividades', // → tabela: atividades_log
   };
 
   // ── Helpers internos (não expostos) ──────────────────────────────
@@ -1503,6 +1504,24 @@ var Storage = (() => {
     )),
   };
 
+  // ── ATIVIDADES ────────────────────────────────────────────────────
+  // MIGRAÇÃO: substituir por POST/GET /api/v1/atividades
+  const MAX_ATIVIDADES = 50;
+
+  const Atividades = {
+    registrar: ev => {
+      try {
+        const lista = get(K.ATIVIDADES);
+        lista.unshift({ ...ev, ts: now() });
+        set(K.ATIVIDADES, lista.slice(0, MAX_ATIVIDADES));
+      } catch (e) {
+        console.warn('[Storage.Atividades] Falha ao registrar:', e);
+      }
+    },
+
+    listar: () => { try { return get(K.ATIVIDADES); } catch { return []; } },
+  };
+
   // ── API PÚBLICA ───────────────────────────────────────────────────
   // Contrato imutável. admin.js e aluno.js dependem exatamente disto.
   // Qualquer implementação (localStorage, REST, GraphQL) deve
@@ -1528,6 +1547,7 @@ var Storage = (() => {
     Questoes,
     Respostas,
     Progresso,
+    Atividades,
   };
 
 })();
