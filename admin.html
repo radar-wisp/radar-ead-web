@@ -1944,9 +1944,6 @@ tbody tr.selected td { background:#f0f4ff }
             <p>Gerencie colaboradores, equipes, setores e acessos</p>
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="AlunosMod.abrirSetores()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Setores e Equipes
-            </button>
             <button class="btn btn-primary" onclick="AlunosMod.abrirModal()">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Aluno
             </button>
@@ -3247,6 +3244,29 @@ tbody tr.selected td { background:#f0f4ff }
   </div>
 </div>
 
+<!-- ═══ MODAL: VINCULAR TURMA ══════════════════════════════ -->
+<div class="modal-bg" id="modal-vincular-turma">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <div>
+        <h3>Vincular Turma</h3>
+        <div id="mvt-sub" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal-vincular-turma').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px">
+      <label class="lbl">Selecione a turma</label>
+      <select class="inp" id="mvt-turma" style="margin-top:6px"></select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-vincular-turma').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="AlunosMod.confirmarVincularTurma()">Vincular</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: ALUNO (criar/editar) ═══════════════════════════ -->
 <div class="modal-bg" id="modal-aluno">
   <div class="modal" style="max-width:620px">
@@ -3277,7 +3297,8 @@ tbody tr.selected td { background:#f0f4ff }
         </div>
         <div class="fg">
           <label>Matrícula</label>
-          <input type="text" id="mal-matricula" placeholder="Ex: 001234">
+          <input type="text" id="mal-matricula" placeholder="Gerada automaticamente" readonly
+            style="background:var(--bg);color:var(--text4);cursor:default">
         </div>
         <div class="fg">
           <label>Telefone</label>
@@ -3422,10 +3443,6 @@ tbody tr.selected td { background:#f0f4ff }
 
     <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost btn-sm" id="pa-btn-bloquear" onclick="AlunosMod.alternarBloqueio()"></button>
-      <button class="btn btn-ghost btn-sm" id="pa-btn-reset" onclick="AlunosMod.resetarSenhaModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Resetar senha
-      </button>
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-perfil-aluno').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
