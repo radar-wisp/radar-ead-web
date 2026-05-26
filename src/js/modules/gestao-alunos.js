@@ -70,6 +70,18 @@ var AlunosMod = (() => {
     if (el) el.value = val ?? '';
   }
 
+  /**
+   * Gera matrícula sequencial única: "MAT" + ano + número zero-padded.
+   * Ex: MAT2025001
+   * @returns {string}
+   */
+  function _gerarMatricula() {
+    const ano   = new Date().getFullYear();
+    const lista = Storage.Alunos.listar();
+    const seq   = String(lista.length + 1).padStart(3, '0');
+    return `MAT${ano}${seq}`;
+  }
+
 
   // ══════════════════════════════════════════════════════════════
   // CONFIGURAÇÕES VISUAIS DE STATUS
@@ -360,15 +372,6 @@ var AlunosMod = (() => {
     const id = btn.dataset.alId;
     const al = Storage.Alunos.obter(id);
     if (!al) return;
-    const bloqBtn = al.ativo
-      ? `<button onclick="AlunosMod.bloquear('${id}');PortalMenu.close()">
-           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-           Bloquear
-         </button>`
-      : `<button onclick="AlunosMod.ativar('${id}');PortalMenu.close()">
-           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-           Ativar
-         </button>`;
     PortalMenu.open(btn, `
       <button onclick="AlunosMod.verPerfil('${id}');PortalMenu.close()">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -382,12 +385,6 @@ var AlunosMod = (() => {
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         Vincular turma
       </button>
-      <hr class="sep">
-      <button onclick="AlunosMod.resetarSenha('${id}');PortalMenu.close()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-        Resetar senha
-      </button>
-      ${bloqBtn}
       <hr class="sep">
       <button class="danger" onclick="AlunosMod.excluir('${id}');PortalMenu.close()">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
@@ -431,15 +428,32 @@ var AlunosMod = (() => {
     refresh();
   }
 
+  let _vincularAlunoId = null;
+
   function vincularTurma(alunoId) {
     const turmas = Storage.Turmas.listar();
     if (!turmas.length) { _toast('Nenhuma turma disponível.', 'i'); return; }
-    const opts = turmas.map((t, i) => `${i + 1}. ${t.nome}`).join('\n');
-    const resp = prompt(`Selecionar turma para o aluno:\n${opts}`);
-    const idx  = parseInt(resp) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= turmas.length) return;
-    Storage.Turmas.adicionarAluno(turmas[idx].id, alunoId);
-    _toast(`Aluno vinculado a "${turmas[idx].nome}"!`, 's');
+    _vincularAlunoId = alunoId;
+    const al  = Storage.Alunos.obter(alunoId);
+    const sub = document.getElementById('mvt-sub');
+    if (sub) sub.textContent = al?.nome || '';
+    const sel = document.getElementById('mvt-turma');
+    if (sel) {
+      sel.innerHTML = turmas.map(t =>
+        `<option value="${_x(t.id)}">${_x(t.nome)}</option>`
+      ).join('');
+    }
+    document.getElementById('modal-vincular-turma')?.classList.add('open');
+  }
+
+  function confirmarVincularTurma() {
+    const turmaId = document.getElementById('mvt-turma')?.value;
+    if (!turmaId || !_vincularAlunoId) return;
+    Storage.Turmas.adicionarAluno(turmaId, _vincularAlunoId);
+    const nome = Storage.Turmas.listar().find(t => t.id === turmaId)?.nome || '';
+    document.getElementById('modal-vincular-turma')?.classList.remove('open');
+    _vincularAlunoId = null;
+    _toast(`Aluno vinculado a "${nome}"!`, 's');
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -454,8 +468,12 @@ var AlunosMod = (() => {
     if (tituloEl) tituloEl.textContent = 'Novo Aluno';
     if (subEl)    subEl.textContent    = '';
 
-    ['mal-nome', 'mal-email', 'mal-matricula', 'mal-telefone', 'mal-cargo', 'mal-unidade', 'mal-senha']
+    ['mal-nome', 'mal-email', 'mal-telefone', 'mal-cargo', 'mal-unidade', 'mal-senha']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+    // Matrícula gerada automaticamente
+    const matEl = document.getElementById('mal-matricula');
+    if (matEl) matEl.value = _gerarMatricula();
 
     _setVal('mal-status', 'ativo');
 
@@ -628,7 +646,7 @@ var AlunosMod = (() => {
     // Botão bloquear/ativar
     const btnBlq = document.getElementById('pa-btn-bloquear');
     if (btnBlq) {
-      btnBlq.textContent = al.ativo ? '🔒 Bloquear' : '✓ Ativar';
+      btnBlq.textContent = al.ativo ? 'Bloquear' : 'Ativar';
       btnBlq.onclick = al.ativo
         ? () => { bloquear(id); verPerfil(id); }
         : () => { ativar(id);   verPerfil(id); };
@@ -914,6 +932,7 @@ var AlunosMod = (() => {
     resetarSenha,
     excluir,
     vincularTurma,
+    confirmarVincularTurma,
 
     // Menu
     _menu,
