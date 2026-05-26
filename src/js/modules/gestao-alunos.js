@@ -47,6 +47,7 @@ var AlunosMod = (() => {
   // ── Estado interno do módulo ──────────────────────────────────
   let _editId   = null;  // ID do aluno sendo editado (null = novo)
   let _perfilId = null;  // ID do aluno sendo visualizado no perfil
+  let _progCache = null; // Cache de progresso por ciclo de renderTabela()
 
   // ══════════════════════════════════════════════════════════════
   // UTILITÁRIOS INTERNOS
@@ -189,6 +190,7 @@ var AlunosMod = (() => {
   // ══════════════════════════════════════════════════════════════
 
   function renderTabela() {
+    _progCache = new Map(); // inicia cache para este ciclo
     const busca   = (_q('#al-busca')?.value          || '').toLowerCase().trim();
     const fStatus = _q('#al-filtro-status')?.value   || '';
     const fSetor  = _q('#al-filtro-setor')?.value    || '';
@@ -231,6 +233,7 @@ var AlunosMod = (() => {
     const equipes = Storage.Equipes.listar();
 
     tbody.innerHTML = lista.map(al => _renderLinha(al, setores, equipes)).join('');
+    _progCache = null; // libera cache após render
   }
 
   /**
@@ -330,11 +333,20 @@ var AlunosMod = (() => {
    * @param {string} alunoId
    * @returns {number} 0–100
    */
+  /**
+   * Calcula o progresso geral do aluno em todos os cursos publicados.
+   * Usa _progCache quando disponível (ciclo de renderTabela) para evitar O(n²).
+   * @param {string} alunoId
+   * @returns {number} 0–100
+   */
   function _progGeral(alunoId) {
+    if (_progCache && _progCache.has(alunoId)) return _progCache.get(alunoId);
     const cursos = Storage.Cursos.listar().filter(c => c.status === 'publicado');
     if (!cursos.length) return 0;
     const soma = cursos.reduce((acc, c) => acc + Storage.Progresso.pctCurso(alunoId, c.id), 0);
-    return Math.round(soma / cursos.length);
+    const result = Math.round(soma / cursos.length);
+    if (_progCache) _progCache.set(alunoId, result);
+    return result;
   }
 
   /**
