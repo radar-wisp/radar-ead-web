@@ -748,15 +748,8 @@ var AlunosMod = (() => {
   // ══════════════════════════════════════════════════════════════
 
   function abrirSetores() {
-    renderSetoresEquipes();
-    const panel = document.getElementById('al-setores-panel');
-    if (panel) {
-      const isOpen = panel.classList.contains('open');
-      panel.classList.toggle('open', !isOpen);
-    } else {
-      // fallback: modal (compatibilidade)
-      document.getElementById('modal-setores')?.classList.add('open');
-    }
+    // Navega para a tela administrativa de Setores e Equipes
+    if (typeof Admin !== 'undefined') Admin.go('setores-equipes');
   }
 
   function renderSetoresEquipes() {
