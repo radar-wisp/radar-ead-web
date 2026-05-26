@@ -1037,6 +1037,47 @@ tbody tr.selected td { background:#f0f4ff }
 /* ── fim Tela Setores e Equipes ─────────────────────────────── */
 
 .mc-pane .fg { margin-top:0 !important; }
+
+/* ── Stepper modal-aluno ──────────────────────────────────── */
+.mal-stepper {
+  display:flex; align-items:center;
+  padding:16px 24px; background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.mal-step {
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.mal-step-circle {
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700;
+  background:var(--border); color:var(--text4);
+  transition:background .2s, color .2s;
+  flex-shrink:0;
+}
+.mal-step-label {
+  font-size:12px; font-weight:500; color:var(--text4);
+  transition:color .2s;
+}
+.mal-step.active .mal-step-circle {
+  background:var(--blue); color:#fff;
+}
+.mal-step.active .mal-step-label { color:var(--text); font-weight:600; }
+.mal-step.done .mal-step-circle {
+  background:var(--green); color:#fff;
+}
+.mal-step.done .mal-step-circle::before { content:'✓'; }
+.mal-step.done .mal-step-circle { font-size:0; }
+.mal-step.done .mal-step-circle::before { font-size:13px; }
+.mal-step.done .mal-step-label { color:var(--text3); }
+.mal-step-line {
+  flex:1; height:2px; background:var(--border); margin:0 8px;
+  transition:background .2s;
+}
+.mal-step-line.done { background:var(--green); }
+.mc-pane .fg { margin-top:0 !important; }
+/* ── fim Stepper ──────────────────────────────────────────── */
+
 </style>
 </head>
 <body>
@@ -3276,24 +3317,38 @@ tbody tr.selected td { background:#f0f4ff }
         <h3 id="mal-titulo">Novo Aluno</h3>
         <div id="mal-sub" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
       </div>
-      <button class="modal-close" onclick="document.getElementById('modal-aluno').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="modal-close" onclick="document.getElementById('modal-aluno').classList.remove('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
-    <div class="mc-tabs">
-      <button class="mc-tab active" onclick="AlunosMod.tabModal(0,this)">Dados Pessoais</button>
-      <button class="mc-tab" onclick="AlunosMod.tabModal(1,this)">Organização</button>
-      <button class="mc-tab" onclick="AlunosMod.tabModal(2,this)">Acesso</button>
+    <!-- Stepper -->
+    <div class="mal-stepper">
+      <div class="mal-step active" id="mal-step-0">
+        <div class="mal-step-circle">1</div>
+        <span class="mal-step-label">Dados Pessoais</span>
+      </div>
+      <div class="mal-step-line"></div>
+      <div class="mal-step" id="mal-step-1">
+        <div class="mal-step-circle">2</div>
+        <span class="mal-step-label">Organização</span>
+      </div>
+      <div class="mal-step-line"></div>
+      <div class="mal-step" id="mal-step-2">
+        <div class="mal-step-circle">3</div>
+        <span class="mal-step-label">Acesso</span>
+      </div>
     </div>
 
-    <!-- Tab 0: Dados Pessoais -->
+    <!-- Pane 0: Dados Pessoais -->
     <div class="mc-pane active" id="mal-pane-0">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="fg" style="grid-column:1/-1">
-          <label>Nome completo *</label>
+          <label>Nome completo <span style="color:var(--red)">*</span></label>
           <input type="text" id="mal-nome" placeholder="Nome do colaborador">
         </div>
         <div class="fg">
-          <label>E-mail *</label>
+          <label>E-mail <span style="color:var(--red)">*</span></label>
           <input type="email" id="mal-email" placeholder="email@empresa.com">
         </div>
         <div class="fg">
@@ -3312,7 +3367,7 @@ tbody tr.selected td { background:#f0f4ff }
       </div>
     </div>
 
-    <!-- Tab 1: Organização -->
+    <!-- Pane 1: Organização -->
     <div class="mc-pane" id="mal-pane-1">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
         <div class="fg">
@@ -3334,11 +3389,11 @@ tbody tr.selected td { background:#f0f4ff }
       </div>
     </div>
 
-    <!-- Tab 2: Acesso -->
+    <!-- Pane 2: Acesso -->
     <div class="mc-pane" id="mal-pane-2">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
         <div class="fg">
-          <label>Senha inicial *</label>
+          <label>Senha inicial <span style="color:var(--red)">*</span></label>
           <input type="text" id="mal-senha" placeholder="Senha de primeiro acesso">
         </div>
         <div class="fg">
@@ -3368,13 +3423,19 @@ tbody tr.selected td { background:#f0f4ff }
 
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-aluno').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="AlunosMod.salvar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar aluno
+      <button class="btn btn-ghost" id="mal-btn-prev" onclick="AlunosMod.stepModal(-1)" style="display:none">
+        ← Anterior
+      </button>
+      <button class="btn btn-primary" id="mal-btn-next" onclick="AlunosMod.stepModal(1)">
+        Próximo →
+      </button>
+      <button class="btn btn-primary" id="mal-btn-salvar" onclick="AlunosMod.salvar()" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar aluno
       </button>
     </div>
   </div>
 </div>
-
 
 <!-- ═══ MODAL: PERFIL DO ALUNO ══════════════════════════════════ -->
 <div class="modal-bg" id="modal-perfil-aluno">
