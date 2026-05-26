@@ -134,6 +134,70 @@ var Turmas = (() => {
   }
 
   // ══════════════════════════════════════════════════════════════
+  // DIÁLOGOS INTERNOS — substitutos de confirm() / prompt() / alert()
+  // ══════════════════════════════════════════════════════════════
+
+  /**
+   * Exibe o modal de confirmação genérico (#modal-tm-confirm).
+   * @param {string}   titulo
+   * @param {string}   msg
+   * @param {string}   labelOk   — texto do botão de confirmação
+   * @param {string}   tipoBotao — 'danger' | 'primary'
+   * @param {Function} onOk      — callback executado ao confirmar
+   */
+  function _confirm(titulo, msg, labelOk, tipoBotao, onOk) {
+    const modal  = document.getElementById('modal-tm-confirm');
+    const elTit  = document.getElementById('tm-confirm-titulo');
+    const elMsg  = document.getElementById('tm-confirm-msg');
+    const btnOk  = document.getElementById('tm-confirm-ok');
+    if (!modal || !elTit || !elMsg || !btnOk) {
+      // fallback seguro caso o modal não exista no HTML
+      if (window.confirm(msg)) onOk();
+      return;
+    }
+    elTit.textContent = titulo;
+    elMsg.textContent = msg;
+    btnOk.textContent = labelOk;
+    btnOk.className   = `btn btn-${tipoBotao}`;
+    // Remove listener anterior para evitar duplos disparo
+    btnOk.replaceWith(btnOk.cloneNode(true));
+    const btnOkNovo = document.getElementById('tm-confirm-ok');
+    btnOkNovo.addEventListener('click', () => {
+      modal.classList.remove('open');
+      onOk();
+    });
+    modal.classList.add('open');
+  }
+
+  /**
+   * Exibe um select inline no modal #modal-tm-select para substituir prompt().
+   * @param {string}   titulo
+   * @param {Array<{id:string,nome:string}>} opcoes
+   * @param {Function} onOk — callback(item) com o item escolhido
+   */
+  function _selectPrompt(titulo, opcoes, onOk) {
+    const modal = document.getElementById('modal-tm-select');
+    const elTit = document.getElementById('tm-select-titulo');
+    const sel   = document.getElementById('tm-select-opcoes');
+    const btnOk = document.getElementById('tm-select-ok');
+    if (!modal || !elTit || !sel || !btnOk) return;
+
+    elTit.textContent = titulo;
+    sel.innerHTML = opcoes.map(o =>
+      `<option value="${_x(o.id)}">${_x(o.nome)}</option>`
+    ).join('');
+    btnOk.replaceWith(btnOk.cloneNode(true));
+    const btnOkNovo = document.getElementById('tm-select-ok');
+    btnOkNovo.addEventListener('click', () => {
+      const escolhido = opcoes.find(o => o.id === sel.value);
+      if (!escolhido) return;
+      modal.classList.remove('open');
+      onOk(escolhido);
+    });
+    modal.classList.add('open');
+  }
+
+  // ══════════════════════════════════════════════════════════════
   // STATUS — helpers de resolução e apresentação
   // ══════════════════════════════════════════════════════════════
 
@@ -706,39 +770,33 @@ var Turmas = (() => {
   // ══════════════════════════════════════════════════════════════
 
   /**
-   * Adiciona todos os alunos de um setor escolhido via prompt.
+   * Adiciona todos os alunos de um setor escolhido via modal de seleção.
    */
   function selecionarPorSetor() {
     const setores = Storage.Setores.listar();
     if (!setores.length) { _toast('Nenhum setor cadastrado.', 'i'); return; }
 
-    const nomes = setores.map((s, i) => `${i + 1}. ${s.nome}`).join('\n');
-    const resp  = prompt(`Selecione o setor (número):\n${nomes}`);
-    const idx   = parseInt(resp) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= setores.length) return;
-
-    const ids = Storage.Alunos.porSetor(setores[idx].id).map(a => a.id);
-    ids.forEach(id => _alunosSel.add(id));
-    renderListaAlunos();
-    _toast(`${ids.length} aluno(s) do setor "${setores[idx].nome}" adicionados.`, 's');
+    _selectPrompt('Selecionar por setor', setores, (setor) => {
+      const ids = Storage.Alunos.porSetor(setor.id).map(a => a.id);
+      ids.forEach(id => _alunosSel.add(id));
+      renderListaAlunos();
+      _toast(`${ids.length} aluno(s) do setor "${setor.nome}" adicionados.`, 's');
+    });
   }
 
   /**
-   * Adiciona todos os alunos de uma equipe escolhida via prompt.
+   * Adiciona todos os alunos de uma equipe escolhida via modal de seleção.
    */
   function selecionarPorEquipe() {
     const equipes = Storage.Equipes.listar();
     if (!equipes.length) { _toast('Nenhuma equipe cadastrada.', 'i'); return; }
 
-    const nomes = equipes.map((e, i) => `${i + 1}. ${e.nome}`).join('\n');
-    const resp  = prompt(`Selecione a equipe (número):\n${nomes}`);
-    const idx   = parseInt(resp) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= equipes.length) return;
-
-    const ids = Storage.Alunos.porEquipe(equipes[idx].id).map(a => a.id);
-    ids.forEach(id => _alunosSel.add(id));
-    renderListaAlunos();
-    _toast(`${ids.length} aluno(s) da equipe "${equipes[idx].nome}" adicionados.`, 's');
+    _selectPrompt('Selecionar por equipe', equipes, (equipe) => {
+      const ids = Storage.Alunos.porEquipe(equipe.id).map(a => a.id);
+      ids.forEach(id => _alunosSel.add(id));
+      renderListaAlunos();
+      _toast(`${ids.length} aluno(s) da equipe "${equipe.nome}" adicionados.`, 's');
+    });
   }
 
   /** Seleciona todos os alunos ativos. */
@@ -765,8 +823,8 @@ var Turmas = (() => {
     const nome    = document.getElementById('mt-nome')?.value.trim();
     const cursoId = document.getElementById('mt-curso')?.value;
 
-    if (!nome)    { alert('Informe o nome da turma.'); return; }
-    if (!cursoId) { alert('Selecione um curso.'); return; }
+    if (!nome)    { _toast('Informe o nome da turma.', 'e'); return; }
+    if (!cursoId) { _toast('Selecione um curso.', 'e'); return; }
 
     const inicio = document.getElementById('mt-inicio')?.value;
     const fim    = document.getElementById('mt-fim')?.value;
@@ -813,10 +871,18 @@ var Turmas = (() => {
    */
   function encerrar(id) {
     const t = Storage.Turmas.obter(id);
-    if (!t || !confirm(`Encerrar a turma "${t.nome}"?\n\nEsta ação não pode ser desfeita.`)) return;
-    Storage.Turmas.encerrar(id);
-    _toast('Turma encerrada.', 'i');
-    refresh();
+    if (!t) return;
+    _confirm(
+      'Encerrar turma',
+      `Deseja encerrar a turma "${t.nome}"? Esta ação não pode ser desfeita.`,
+      'Encerrar',
+      'danger',
+      () => {
+        Storage.Turmas.encerrar(id);
+        _toast('Turma encerrada.', 'i');
+        refresh();
+      }
+    );
   }
 
   /**
@@ -825,10 +891,18 @@ var Turmas = (() => {
    */
   function excluir(id) {
     const t = Storage.Turmas.obter(id);
-    if (!t || !confirm(`Excluir permanentemente "${t.nome}"?\n\nEsta ação não pode ser desfeita.`)) return;
-    Storage.Turmas.excluir(id);
-    _toast('Turma excluída.', 'i');
-    refresh();
+    if (!t) return;
+    _confirm(
+      'Excluir turma',
+      `Excluir permanentemente "${t.nome}"? Esta ação não pode ser desfeita.`,
+      'Excluir',
+      'danger',
+      () => {
+        Storage.Turmas.excluir(id);
+        _toast('Turma excluída.', 'i');
+        refresh();
+      }
+    );
   }
 
   // ══════════════════════════════════════════════════════════════
