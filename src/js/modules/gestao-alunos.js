@@ -290,35 +290,10 @@ var AlunosMod = (() => {
       <td style="font-size:11px;color:var(--text4)">${_fmtRelative(al.ultimoAcesso)}</td>
       <td>
         <div class="gc-actions">
-          <button class="gc-actions-btn" onclick="AlunosMod._menu(this)">
+          <button class="gc-actions-btn" data-al-id="${al.id}" onclick="AlunosMod._menu(this)">
             Ações
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
-          <div class="gc-menu">
-            <button onclick="AlunosMod.verPerfil('${al.id}');AlunosMod._cm()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              Visualizar perfil
-            </button>
-            <button onclick="AlunosMod.abrirEdit('${al.id}');AlunosMod._cm()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Editar
-            </button>
-            <button onclick="AlunosMod.vincularTurma('${al.id}');AlunosMod._cm()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              Vincular turma
-            </button>
-            <hr class="sep">
-            <button onclick="AlunosMod.resetarSenha('${al.id}');AlunosMod._cm()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-              Resetar senha
-            </button>
-            ${acaoBloqueio}
-            <hr class="sep">
-            <button class="danger" onclick="AlunosMod.excluir('${al.id}');AlunosMod._cm()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-              Excluir
-            </button>
-          </div>
         </div>
       </td>
     </tr>`;
@@ -371,19 +346,50 @@ var AlunosMod = (() => {
   // MENU DROPDOWN
   // ══════════════════════════════════════════════════════════════
 
+  /**
+   * Abre o dropdown de ações via PortalMenu.
+   * O menu é renderizado no body para nunca ser clipado pela tabela.
+   */
   function _menu(btn) {
-    const m      = btn.nextElementSibling;
-    const isOpen = m.classList.contains('open');
-    _cm();
-    if (!isOpen) {
-      m.classList.add('open');
-      setTimeout(() => document.addEventListener('click', _cm, { once: true }), 10);
-    }
+    const id = btn.dataset.alId;
+    const al = Storage.Alunos.obter(id);
+    if (!al) return;
+    const bloqBtn = al.ativo
+      ? `<button onclick="AlunosMod.bloquear('${id}');PortalMenu.close()">
+           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+           Bloquear
+         </button>`
+      : `<button onclick="AlunosMod.ativar('${id}');PortalMenu.close()">
+           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+           Ativar
+         </button>`;
+    PortalMenu.open(btn, `
+      <button onclick="AlunosMod.verPerfil('${id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Visualizar perfil
+      </button>
+      <button onclick="AlunosMod.abrirEdit('${id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar
+      </button>
+      <button onclick="AlunosMod.vincularTurma('${id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Vincular turma
+      </button>
+      <hr class="sep">
+      <button onclick="AlunosMod.resetarSenha('${id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        Resetar senha
+      </button>
+      ${bloqBtn}
+      <hr class="sep">
+      <button class="danger" onclick="AlunosMod.excluir('${id}');PortalMenu.close()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        Excluir
+      </button>`);
   }
 
-  function _cm() {
-    document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
-  }
+  function _cm() { PortalMenu.close(); }
 
   // ══════════════════════════════════════════════════════════════
   // AÇÕES INDIVIDUAIS
@@ -737,7 +743,14 @@ var AlunosMod = (() => {
 
   function abrirSetores() {
     renderSetoresEquipes();
-    document.getElementById('modal-setores')?.classList.add('open');
+    const panel = document.getElementById('al-setores-panel');
+    if (panel) {
+      const isOpen = panel.classList.contains('open');
+      panel.classList.toggle('open', !isOpen);
+    } else {
+      // fallback: modal (compatibilidade)
+      document.getElementById('modal-setores')?.classList.add('open');
+    }
   }
 
   function renderSetoresEquipes() {
