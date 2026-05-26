@@ -1036,6 +1036,7 @@ tbody tr.selected td { background:#f0f4ff }
 .se-btn-danger:hover { color:var(--red) !important; }
 /* ── fim Tela Setores e Equipes ─────────────────────────────── */
 
+.mc-pane .fg { margin-top:0 !important; }
 </style>
 </head>
 <body>
@@ -3313,7 +3314,7 @@ tbody tr.selected td { background:#f0f4ff }
 
     <!-- Tab 1: Organização -->
     <div class="mc-pane" id="mal-pane-1">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
         <div class="fg">
           <label>Setor</label>
           <select id="mal-setor" onchange="AlunosMod._loadEquipes()">
@@ -3335,7 +3336,7 @@ tbody tr.selected td { background:#f0f4ff }
 
     <!-- Tab 2: Acesso -->
     <div class="mc-pane" id="mal-pane-2">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
         <div class="fg">
           <label>Senha inicial *</label>
           <input type="text" id="mal-senha" placeholder="Senha de primeiro acesso">
