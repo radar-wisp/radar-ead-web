@@ -402,32 +402,14 @@ var Aluno = (() => {
     document.getElementById('btnImprimirCert').onclick = () => window.print();
   }
 
-  /* ════════════════════════════════════
-     HELPERS
-  ════════════════════════════════════ */
-  function toEmbed(url) {
-    if (!url) return '';
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([A-Za-z0-9_-]{11})/);
-    return m ? `https://www.youtube.com/embed/${m[1]}` : url;
-  }
+  /* global EadUtils */
 
-  function tipoLabel(t) {
-    return { video:'🎬 Vídeo', texto:'📝 Texto', pdf:'📄 PDF', link:'🔗 Link' }[t] || t;
-  }
+  // Aliases locais para EadUtils
+  const x         = EadUtils.escapeHtml;
+  const toast     = EadUtils.toast;
+  const toEmbed   = EadUtils.toEmbed;
+  const tipoLabel = EadUtils.tipoLabel;
 
-  function x(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function toast(msg, tipo='i') {
-    const stack = document.getElementById('toasts');
-    const el    = document.createElement('div');
-    el.className = `toast ${tipo}`;
-    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]}</span><span>${msg}</span>`;
-    stack.appendChild(el);
-    setTimeout(() => el.remove(), 3000);
-  }
 
   return {
     boot,
