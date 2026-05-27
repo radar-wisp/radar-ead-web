@@ -29,6 +29,18 @@ var SetoresEquipesMod = (() => {
 
   const _toast = EadUtils.toast;
 
+  // ── Helpers ───────────────────────────────────────────────────
+
+  /**
+   * Centraliza confirmações de exclusão.
+   * Ponto único para futura troca por modal customizado.
+   * @param {string} msg
+   * @returns {boolean}
+   */
+  function _confirmarExclusao(msg) {
+    return confirm(msg);
+  }
+
   // ── Renderização principal ────────────────────────────────────
 
   function _renderPage() {
@@ -36,7 +48,6 @@ var SetoresEquipesMod = (() => {
     if (!grid) return;
 
     const setores = Storage.Setores.listar();
-    const equipes = Storage.Equipes.listar();
 
     // Stats
     const statsEl = document.getElementById('se-stats');
@@ -48,14 +59,15 @@ var SetoresEquipesMod = (() => {
       return;
     }
 
+    // cards.js busca as equipes internamente por setor
     grid.innerHTML = setores
-      .map(s => SetoresCards.renderSetor(s, equipes))
+      .map(s => SetoresCards.renderSetor(s))
       .join('');
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────
 
-  function init() { _renderPage(); }
+  function init()    { _renderPage(); }
 
   function refresh() {
     _renderPage();
@@ -65,29 +77,27 @@ var SetoresEquipesMod = (() => {
 
   // ── Ações: Setores ────────────────────────────────────────────
 
-  function novoSetor()      { SetoresModals.abrirNovoSetor(); }
-  function editarSetor(id)  { SetoresModals.abrirEditarSetor(id); }
+  function novoSetor()     { SetoresModals.abrirNovoSetor(); }
+  function editarSetor(id) { SetoresModals.abrirEditarSetor(id); }
 
   function excluirSetor(id) {
     const s    = Storage.Setores.obter(id);
-    const eqs  = Storage.Equipes.listar().filter(e => e.setorId === id).length;
+    const eqs  = Storage.Equipes.listarPorSetor(id).length;
     const cols = Storage.Alunos.porSetor(id).length;
 
     let aviso = `Excluir o setor "${s?.nome}"?`;
     if (eqs > 0 || cols > 0) {
       aviso += `\n\nAtenção: ${eqs} equipe(s) e ${cols} colaborador(es) serão desvinculados.`;
     }
-    if (!confirm(aviso)) return;
+    if (!_confirmarExclusao(aviso)) return;
 
     // Desvincular equipes e colaboradores do setor
-    Storage.Equipes.listar()
-      .filter(e => e.setorId === id)
-      .forEach(e => {
-        Storage.Equipes.excluir(e.id);
-        Storage.Alunos.porEquipe(e.id).forEach(a =>
-          Storage.Alunos.atualizar(a.id, { equipeId: null })
-        );
-      });
+    Storage.Equipes.listarPorSetor(id).forEach(e => {
+      Storage.Equipes.excluir(e.id);
+      Storage.Alunos.porEquipe(e.id).forEach(a =>
+        Storage.Alunos.atualizar(a.id, { equipeId: null })
+      );
+    });
     Storage.Alunos.porSetor(id).forEach(a =>
       Storage.Alunos.atualizar(a.id, { setorId: null })
     );
@@ -99,8 +109,8 @@ var SetoresEquipesMod = (() => {
 
   // ── Ações: Equipes ────────────────────────────────────────────
 
-  function novaEquipe(setorId)   { SetoresModals.abrirNovaEquipe(setorId); }
-  function editarEquipe(id)      { SetoresModals.abrirEditarEquipe(id); }
+  function novaEquipe(setorId)  { SetoresModals.abrirNovaEquipe(setorId); }
+  function editarEquipe(id)     { SetoresModals.abrirEditarEquipe(id); }
 
   function excluirEquipe(id) {
     const e    = Storage.Equipes.obter(id);
@@ -108,7 +118,7 @@ var SetoresEquipesMod = (() => {
 
     let aviso = `Excluir a equipe "${e?.nome}"?`;
     if (cols > 0) aviso += `\n\n${cols} colaborador(es) serão desvinculados.`;
-    if (!confirm(aviso)) return;
+    if (!_confirmarExclusao(aviso)) return;
 
     Storage.Alunos.porEquipe(id).forEach(a =>
       Storage.Alunos.atualizar(a.id, { equipeId: null })
