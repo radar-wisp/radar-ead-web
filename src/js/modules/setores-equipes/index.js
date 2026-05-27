@@ -53,15 +53,14 @@ var SetoresEquipesMod = (() => {
     const statsEl = document.getElementById('se-stats');
     if (statsEl) statsEl.innerHTML = SetoresCards.renderStats();
 
-    // Grid de cards
+    // Grid de cards — primeiro setor inicia expandido
     if (!setores.length) {
       grid.innerHTML = SetoresCards.renderVazio();
       return;
     }
 
-    // cards.js busca as equipes internamente por setor
     grid.innerHTML = setores
-      .map(s => SetoresCards.renderSetor(s))
+      .map((s, i) => SetoresCards.renderSetor(s, i === 0))
       .join('');
   }
 
@@ -71,7 +70,6 @@ var SetoresEquipesMod = (() => {
 
   function refresh() {
     _renderPage();
-    // Atualiza filtros do módulo Alunos se estiver disponível
     if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
@@ -91,7 +89,6 @@ var SetoresEquipesMod = (() => {
     }
     if (!_confirmarExclusao(aviso)) return;
 
-    // Desvincular equipes e colaboradores do setor
     Storage.Equipes.listarPorSetor(id).forEach(e => {
       Storage.Equipes.excluir(e.id);
       Storage.Alunos.porEquipe(e.id).forEach(a =>
