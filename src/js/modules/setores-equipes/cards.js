@@ -38,6 +38,11 @@ var SetoresCards = (() => {
       <line x1="5" y1="12" x2="19" y2="12"/>
     </svg>`,
 
+    chevron: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" class="se-chevron">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>`,
+
     casa: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -45,43 +50,78 @@ var SetoresCards = (() => {
     </svg>`,
   };
 
+  // ── Estado de expansão (em memória por sessão) ────────────────
+  const _expandido = {};
+
+  /**
+   * Alterna expandido/recolhido de um setor.
+   * Chamado pelo onclick do cabeçalho do card.
+   * @param {string} setorId
+   */
+  function toggleSetor(setorId) {
+    _expandido[setorId] = !_expandido[setorId];
+    const card    = document.getElementById(`setor-${setorId}`);
+    const body    = card?.querySelector('.se-equipes');
+    const chevron = card?.querySelector('.se-chevron');
+    if (!card || !body) return;
+
+    if (_expandido[setorId]) {
+      card.classList.add('se-expanded');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    } else {
+      card.classList.remove('se-expanded');
+      body.style.maxHeight = '0';
+    }
+    if (chevron) chevron.style.transform = _expandido[setorId] ? 'rotate(180deg)' : '';
+  }
+
   // ── Renderização ──────────────────────────────────────────────
 
   /**
-   * Card de um setor com suas equipes aninhadas.
-   * Busca as equipes internamente via Storage.Equipes.listarPorSetor().
+   * Card de um setor com corpo expansível (accordion).
+   * Primeiro setor inicia expandido por padrão.
    * @param {{id,nome,cor}} setor
+   * @param {boolean}       [primeiroAberto=false]
    * @returns {string} HTML
    */
-  function renderSetor(setor) {
+  function renderSetor(setor, primeiroAberto = false) {
     const eqs  = Storage.Equipes.listarPorSetor(setor.id);
     const cnt  = Storage.Alunos.porSetor(setor.id).length;
     const cor  = setor.cor || '#0002da';
+
+    // Estado inicial
+    _expandido[setor.id] = primeiroAberto;
+    const expandidoCls   = primeiroAberto ? 'se-expanded' : '';
+    const chevronStyle   = primeiroAberto ? 'transform:rotate(180deg)' : '';
+    // max-height inline: aberto = valor grande, fechado = 0
+    const bodyStyle      = primeiroAberto ? 'max-height:600px' : 'max-height:0';
 
     const equipeRows = eqs.length
       ? eqs.map(e => _renderEquipe(e)).join('')
       : `<div class="se-empty-eq">Nenhuma equipe cadastrada.</div>`;
 
     return `
-      <div class="se-card" id="setor-${setor.id}">
-        <div class="se-card-head">
+      <div class="se-card ${expandidoCls}" id="setor-${setor.id}">
+        <div class="se-card-head" onclick="SetoresCards.toggleSetor('${setor.id}')" role="button" tabindex="0"
+          onkeydown="if(event.key==='Enter'||event.key===' ')SetoresCards.toggleSetor('${setor.id}')">
           <div class="se-card-head-left">
             <span class="se-dot" style="background:${cor}"></span>
             <strong class="se-card-title">${_x(setor.nome)}</strong>
             <span class="se-badge">${cnt} colaborador${cnt !== 1 ? 'es' : ''}</span>
           </div>
           <div class="se-card-head-right">
-            <button class="btn btn-ghost btn-sm"
-              onclick="SetoresEquipesMod.editarSetor('${setor.id}')" title="Editar setor">
+            <span class="se-chevron-wrap" style="${chevronStyle}">${_SVG.chevron}</span>
+            <button class="btn btn-ghost btn-sm" title="Editar setor"
+              onclick="event.stopPropagation();SetoresEquipesMod.editarSetor('${setor.id}')">
               ${_SVG.editar}
             </button>
-            <button class="btn btn-ghost btn-sm se-btn-danger"
-              onclick="SetoresEquipesMod.excluirSetor('${setor.id}')" title="Excluir setor">
+            <button class="btn btn-ghost btn-sm se-btn-danger" title="Excluir setor"
+              onclick="event.stopPropagation();SetoresEquipesMod.excluirSetor('${setor.id}')">
               ${_SVG.excluir}
             </button>
           </div>
         </div>
-        <div class="se-equipes">
+        <div class="se-equipes" style="${bodyStyle}">
           ${equipeRows}
           <button class="se-add-equipe"
             onclick="SetoresEquipesMod.novaEquipe('${setor.id}')">
@@ -153,5 +193,5 @@ var SetoresCards = (() => {
            stat(alunos.length,  'Colaboradores alocados');
   }
 
-  return { renderSetor, renderVazio, renderStats };
+  return { renderSetor, renderVazio, renderStats, toggleSetor };
 })();
