@@ -59,18 +59,27 @@ var SetoresCards = (() => {
    * @param {string} setorId
    */
   function toggleSetor(setorId) {
-    _expandido[setorId] = !_expandido[setorId];
-    const card = document.getElementById(`setor-${setorId}`);
-    const body = card?.querySelector('.se-equipes');
-    if (!card || !body) return;
+    const abrindo = !_expandido[setorId];
 
-    if (_expandido[setorId]) {
+    // Fechar todos
+    Object.keys(_expandido).forEach(id => {
+      _expandido[id] = false;
+      const c = document.getElementById(`setor-${id}`);
+      const b = c?.querySelector('.se-equipes');
+      if (!c || !b) return;
+      b.style.maxHeight = b.scrollHeight + 'px';
+      requestAnimationFrame(() => { b.style.maxHeight = '0'; });
+      c.classList.remove('se-expanded');
+    });
+
+    // Abrir o selecionado (se estava fechado)
+    if (abrindo) {
+      _expandido[setorId] = true;
+      const card = document.getElementById(`setor-${setorId}`);
+      const body = card?.querySelector('.se-equipes');
+      if (!card || !body) return;
       card.classList.add('se-expanded');
       body.style.maxHeight = body.scrollHeight + 'px';
-    } else {
-      body.style.maxHeight = body.scrollHeight + 'px';
-      requestAnimationFrame(() => { body.style.maxHeight = '0'; });
-      card.classList.remove('se-expanded');
     }
   }
 
