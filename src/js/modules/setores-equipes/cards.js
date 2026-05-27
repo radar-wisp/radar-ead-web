@@ -61,12 +61,12 @@ var SetoresCards = (() => {
   function toggleSetor(setorId) {
     const abrindo = !_expandido[setorId];
 
-    // Fechar todos
-    Object.keys(_expandido).forEach(id => {
+    // Fechar todos os cards via DOM (independente do estado em memória)
+    document.querySelectorAll('.se-card').forEach(c => {
+      const b = c.querySelector('.se-equipes');
+      if (!b) return;
+      const id = c.id.replace('setor-', '');
       _expandido[id] = false;
-      const c = document.getElementById(`setor-${id}`);
-      const b = c?.querySelector('.se-equipes');
-      if (!c || !b) return;
       b.style.maxHeight = b.scrollHeight + 'px';
       requestAnimationFrame(() => { b.style.maxHeight = '0'; });
       c.classList.remove('se-expanded');
@@ -78,8 +78,11 @@ var SetoresCards = (() => {
       const card = document.getElementById(`setor-${setorId}`);
       const body = card?.querySelector('.se-equipes');
       if (!card || !body) return;
-      card.classList.add('se-expanded');
-      body.style.maxHeight = body.scrollHeight + 'px';
+      // Duplo rAF garante que a animação de fechar não cancela a de abrir
+      requestAnimationFrame(() => {
+        card.classList.add('se-expanded');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      });
     }
   }
 
