@@ -1013,7 +1013,11 @@ tbody tr.selected td { background:#f0f4ff }
   transition:background .1s;
 }
 .se-equipes .se-equipe-row:first-child { margin-top:4px; }
-.se-equipes .se-add-equipe { margin-bottom:4px; }
+
+/* Rodapé sempre visível — botão adicionar equipe */
+.se-card-footer {
+  border-top:1px solid var(--border);
+}
 .se-equipe-row:last-of-type { border-bottom:none; }
 .se-equipe-row:hover { background:var(--bg); }
 .se-equipe-icon { color:var(--text4); flex-shrink:0; }
