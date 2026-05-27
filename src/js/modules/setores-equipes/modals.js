@@ -121,8 +121,10 @@ var SetoresModals = (() => {
     sel.innerHTML =
       '<option value="">— Selecione um setor —</option>' +
       Storage.Setores.listar().map(s =>
-        `<option value="${_x(s.id)}" ${s.id === selectedId ? 'selected' : ''}>${_x(s.nome)}</option>`
+        `<option value="${_x(s.id)}">${_x(s.nome)}</option>`
       ).join('');
+    // Forçar valor após innerHTML para garantir pré-seleção em todos os browsers
+    if (selectedId) sel.value = selectedId;
   }
 
   // ── Fechar modais ─────────────────────────────────────────────
