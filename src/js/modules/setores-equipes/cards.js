@@ -60,19 +60,18 @@ var SetoresCards = (() => {
    */
   function toggleSetor(setorId) {
     _expandido[setorId] = !_expandido[setorId];
-    const card    = document.getElementById(`setor-${setorId}`);
-    const body    = card?.querySelector('.se-equipes');
-    const chevron = card?.querySelector('.se-chevron');
+    const card = document.getElementById(`setor-${setorId}`);
+    const body = card?.querySelector('.se-equipes');
     if (!card || !body) return;
 
     if (_expandido[setorId]) {
       card.classList.add('se-expanded');
       body.style.maxHeight = body.scrollHeight + 'px';
     } else {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      requestAnimationFrame(() => { body.style.maxHeight = '0'; });
       card.classList.remove('se-expanded');
-      body.style.maxHeight = '0';
     }
-    if (chevron) chevron.style.transform = _expandido[setorId] ? 'rotate(180deg)' : '';
   }
 
   // ── Renderização ──────────────────────────────────────────────
@@ -123,8 +122,10 @@ var SetoresCards = (() => {
         </div>
         <div class="se-equipes" style="${bodyStyle}">
           ${equipeRows}
+        </div>
+        <div class="se-card-footer">
           <button class="se-add-equipe"
-            onclick="SetoresEquipesMod.novaEquipe('${setor.id}')">
+            onclick="event.stopPropagation();SetoresEquipesMod.novaEquipe('${setor.id}')">
             ${_SVG.adicionar}
             Adicionar equipe
           </button>
