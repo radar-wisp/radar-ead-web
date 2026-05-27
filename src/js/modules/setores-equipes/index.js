@@ -60,7 +60,7 @@ var SetoresEquipesMod = (() => {
     }
 
     grid.innerHTML = setores
-      .map((s, i) => SetoresCards.renderSetor(s, i === 0))
+      .map(s => SetoresCards.renderSetor(s, false))
       .join('');
   }
 
