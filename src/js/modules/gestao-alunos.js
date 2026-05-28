@@ -468,7 +468,7 @@ var AlunosMod = (() => {
     if (tituloEl) tituloEl.textContent = 'Novo Aluno';
     if (subEl)    subEl.textContent    = '';
 
-    ['mal-nome', 'mal-email', 'mal-telefone', 'mal-cargo', 'mal-unidade', 'mal-senha']
+    ['mal-nome', 'mal-email', 'mal-cargo', 'mal-unidade', 'mal-senha']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 
     // Matrícula gerada automaticamente
@@ -502,7 +502,6 @@ var AlunosMod = (() => {
     _setVal('mal-nome',      al.nome);
     _setVal('mal-email',     al.email);
     _setVal('mal-matricula', al.matricula);
-    _setVal('mal-telefone',  al.telefone);
     _setVal('mal-cargo',     al.cargo);
     _setVal('mal-unidade',   al.unidade);
     _setVal('mal-senha',     al.senha);
@@ -573,16 +572,26 @@ var AlunosMod = (() => {
 
   /** Regras de validação por etapa */
   const _stepValidations = [
-    // Etapa 0: Nome e E-mail obrigatórios
+    // Etapa 0: Nome, E-mail e Cargo obrigatórios
     () => {
       const nome  = document.getElementById('mal-nome')?.value.trim();
       const email = document.getElementById('mal-email')?.value.trim();
+      const cargo = document.getElementById('mal-cargo')?.value.trim();
       if (!nome)  { _highlightError('mal-nome',  'Informe o nome completo.'); return false; }
       if (!email) { _highlightError('mal-email', 'Informe o e-mail.'); return false; }
+      if (!cargo) { _highlightError('mal-cargo', 'Informe o cargo.'); return false; }
       return true;
     },
-    // Etapa 1: Organização — sem campos obrigatórios
-    () => true,
+    // Etapa 1: Setor, Equipe e Unidade obrigatórios
+    () => {
+      const setor   = document.getElementById('mal-setor')?.value;
+      const equipe  = document.getElementById('mal-equipe')?.value;
+      const unidade = document.getElementById('mal-unidade')?.value.trim();
+      if (!setor)   { _highlightError('mal-setor',   'Selecione um setor.'); return false; }
+      if (!equipe)  { _highlightError('mal-equipe',  'Selecione uma equipe.'); return false; }
+      if (!unidade) { _highlightError('mal-unidade', 'Informe a unidade/filial.'); return false; }
+      return true;
+    },
     // Etapa 2: Senha obrigatória
     () => {
       const senha = document.getElementById('mal-senha')?.value.trim();
@@ -657,7 +666,6 @@ var AlunosMod = (() => {
     const dados = {
       nome, email,
       matricula:      document.getElementById('mal-matricula')?.value.trim() || '',
-      telefone:       document.getElementById('mal-telefone')?.value.trim()  || '',
       cargo:          document.getElementById('mal-cargo')?.value.trim()     || '',
       unidade:        document.getElementById('mal-unidade')?.value.trim()   || '',
       senha:          document.getElementById('mal-senha')?.value            || '123456',
