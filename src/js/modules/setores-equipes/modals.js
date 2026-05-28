@@ -64,12 +64,15 @@ var SetoresModals = (() => {
   }
 
   function _syncCorLabel() {
-    const cor = document.getElementById('mse-cor');
-    const lbl = document.getElementById('mse-cor-lbl');
-    if (cor && lbl) {
-      lbl.textContent = cor.value;
-      cor.oninput = () => { lbl.textContent = cor.value; };
-    }
+    selecionarCor(_val('mse-cor') || '#0002da');
+  }
+
+  function selecionarCor(cor) {
+    _set('mse-cor', cor);
+    document.getElementById('mse-cor-lbl').textContent = cor;
+    document.querySelectorAll('.se-cor-btn').forEach(b => {
+      b.classList.toggle('ativa', b.dataset.cor === cor.toLowerCase());
+    });
   }
 
   // ── EQUIPE ────────────────────────────────────────────────────
@@ -141,5 +144,6 @@ var SetoresModals = (() => {
     abrirEditarEquipe,
     salvarEquipe,
     fecharEquipe,
+    selecionarCor,
   };
 })();
