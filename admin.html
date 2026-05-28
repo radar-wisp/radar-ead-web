@@ -924,6 +924,136 @@ tbody tr.selected td { background:#f0f4ff }
   .ift-field { min-width:120px }
 }
 
+/* ── Tela Setores e Equipes ─────────────────────────────────── */
+.se-breadcrumb {
+  display:flex; align-items:center; gap:6px;
+  font-size:12px; color:var(--text4); margin-bottom:14px;
+}
+.se-breadcrumb a {
+  color:var(--text3); text-decoration:none; cursor:pointer;
+}
+.se-breadcrumb a:hover { color:var(--blue); }
+.se-breadcrumb-sep { color:var(--border2); }
+
+#se-stats {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; margin-bottom:20px;
+}
+#se-stats .stat {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 18px;
+}
+#se-stats .stat-val {
+  font-size:22px; font-weight:700; color:var(--text); line-height:1;
+}
+#se-stats .stat-val.blue { color:var(--blue); }
+#se-stats .stat-lbl { font-size:12px; color:var(--text4); margin-top:4px; }
+
+#se-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
+  gap:16px;
+}
+
+.se-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+}
+.se-card-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px;
+  background:var(--bg);
+  cursor:pointer; user-select:none;
+  transition:background .15s;
+}
+.se-card-head:hover { background:var(--blue-light); }
+.se-card-head-left {
+  display:flex; align-items:center; gap:8px; min-width:0;
+}
+.se-card-head-right { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.se-dot {
+  width:10px; height:10px; border-radius:50%; flex-shrink:0;
+}
+.se-card-title {
+  font-size:14px; font-weight:600; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.se-badge {
+  font-size:11px;
+  background:var(--blue-light); color:var(--blue);
+  border-radius:20px; padding:2px 8px; flex-shrink:0;
+}
+
+/* ── Chevron accordion ── */
+.se-chevron-wrap {
+  display:flex; align-items:center; color:var(--text4);
+  transition:transform .22s ease;
+}
+.se-expanded .se-card-head .se-chevron-wrap { transform:rotate(180deg); }
+
+/* ── Corpo colapsável ── */
+.se-equipes {
+  padding:0;
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .28s ease;
+  border-top:0 solid var(--border);
+}
+.se-expanded .se-equipes {
+  border-top:1px solid var(--border);
+}
+
+.se-equipe-row {
+  display:flex; align-items:center; gap:8px;
+  padding:7px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background .1s;
+}
+.se-equipes .se-equipe-row:first-child { margin-top:4px; }
+
+/* Rodapé sempre visível — botão adicionar equipe */
+.se-card-footer {
+  border-top:1px solid var(--border);
+}
+
+.se-equipe-icon { color:var(--text4); display:flex; }
+.se-equipe-nome { font-size:13px; color:var(--text2); flex:1; min-width:0; }
+.se-equipe-count { font-size:11px; color:var(--text4); white-space:nowrap; }
+.se-equipe-actions { display:flex; gap:2px; }
+.se-equipe-row:hover { background:var(--bg); }
+
+.se-add-equipe {
+  display:flex; align-items:center; gap:6px;
+  width:100%; padding:8px 16px;
+  background:none; border:none; cursor:pointer;
+  font-size:12px; color:var(--text4);
+  transition:color .15s, background .15s;
+}
+.se-add-equipe:hover { color:var(--blue); background:var(--blue-light); }
+
+.se-empty-eq {
+  padding:10px 16px 6px;
+  font-size:12px; color:var(--text4); font-style:italic;
+}
+
+.se-empty {
+  grid-column:1/-1; text-align:center; padding:48px 24px;
+  color:var(--text4);
+}
+.se-empty-icon { margin-bottom:12px; opacity:.4; }
+.se-empty h3 { margin:0 0 6px; font-size:16px; color:var(--text2); }
+.se-empty p  { margin:0 0 16px; font-size:13px; }
+
+.se-btn-danger:hover { color:var(--red) !important; }
+.se-cor-btn {
+  width:28px; height:28px; border-radius:50%; border:2px solid transparent;
+  cursor:pointer; transition:border-color .15s, transform .15s;
+  flex-shrink:0;
+}
+.se-cor-btn:hover { transform:scale(1.12); }
+.se-cor-btn.ativa { border-color:var(--text); transform:scale(1.12); }
+/* ── fim Tela Setores e Equipes ─────────────────────────────── */
+
 </style>
 </head>
 <body>
@@ -1039,6 +1169,10 @@ tbody tr.selected td { background:#f0f4ff }
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
         <span class="sb-item-label">Alunos</span>
         
+      </button>
+      <button class="sb-item sb-item-child" data-pg="setores-equipes">
+        <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="sb-item-label">Setores e Equipes</span>
       </button>
       <button class="sb-item" data-pg="acessos">
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -1907,6 +2041,41 @@ tbody tr.selected td { background:#f0f4ff }
 
       </div>
       <!-- ═══ FIM COLABORADORES / ALUNOS ═══════════════════════ -->
+
+
+<!-- ═══ SETORES E EQUIPES ════════════════════════════════════ -->
+      <div class="pg" id="pg-setores-equipes">
+
+        <nav class="se-breadcrumb">
+          <a onclick="Admin.go('dashboard')">Radar EAD</a>
+          <span class="se-breadcrumb-sep">›</span>
+          <a onclick="Admin.go('colaboradores')">Alunos</a>
+          <span class="se-breadcrumb-sep">›</span>
+          <span>Setores e Equipes</span>
+        </nav>
+
+        <div class="ph">
+          <div>
+            <h2>Setores e Equipes</h2>
+            <p>Gerencie setores, equipes e vínculos dos colaboradores.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="SetoresEquipesMod.novaEquipe()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nova Equipe
+            </button>
+            <button class="btn btn-primary" onclick="SetoresEquipesMod.novoSetor()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo Setor
+            </button>
+          </div>
+        </div>
+
+        <div id="se-stats"></div>
+        <div id="se-grid"></div>
+
+      </div>
+      <!-- ═══ FIM SETORES E EQUIPES ════════════════════════════════ -->
 
 
 <!-- ═══ CERTIFICADOS ════════════════════════════════════════════ -->
@@ -8859,6 +9028,70 @@ var PubMod = (() => {
 })();
 
 </script>
+
+<!-- ═══ MODAL: SETOR (criar/editar) ════════════════════════ -->
+<div class="modal-bg" id="modal-se-setor">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <h3 id="mse-titulo">Novo Setor</h3>
+      <button class="modal-close" onclick="SetoresModals.fecharSetor()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label class="lbl">Nome do setor <span style="color:var(--red)">*</span></label>
+        <input class="inp" id="mse-nome" placeholder="Ex: Comercial" maxlength="60"
+          onkeydown="if(event.key==='Enter') SetoresModals.salvarSetor()">
+      </div>
+      <div>
+        <label class="lbl">Cor identificadora</label>
+        <input type="hidden" id="mse-cor" value="#0002da">
+        <div style="display:flex;gap:10px;align-items:center">
+          <button type="button" class="se-cor-btn" data-cor="#0002da"
+            style="background:#0002da"
+            onclick="SetoresModals.selecionarCor('#0002da')"></button>
+          <button type="button" class="se-cor-btn" data-cor="#08ffff"
+            style="background:#08ffff"
+            onclick="SetoresModals.selecionarCor('#08ffff')"></button>
+          <span id="mse-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="SetoresModals.fecharSetor()">Cancelar</button>
+      <button class="btn btn-primary" onclick="SetoresModals.salvarSetor()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: EQUIPE (criar/editar) ════════════════════════ -->
+<div class="modal-bg" id="modal-se-equipe">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <h3 id="meq-titulo">Nova Equipe</h3>
+      <button class="modal-close" onclick="SetoresModals.fecharEquipe()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label class="lbl">Nome da equipe <span style="color:var(--red)">*</span></label>
+        <input class="inp" id="meq-nome" placeholder="Ex: Comercial Anápolis" maxlength="60"
+          onkeydown="if(event.key==='Enter') SetoresModals.salvarEquipe()">
+      </div>
+      <div>
+        <label class="lbl">Setor <span style="color:var(--red)">*</span></label>
+        <select class="inp" id="meq-setor"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="SetoresModals.fecharEquipe()">Cancelar</button>
+      <button class="btn btn-primary" onclick="SetoresModals.salvarEquipe()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script src="src/js/storage.js"></script>
 <script src="src/js/modules/curso-drawer.js"></script>
 <script src="src/js/modules/gestao-cursos.js"></script>
@@ -8868,6 +9101,9 @@ var PubMod = (() => {
 <script src="src/js/modules/gestao-alunos.js"></script>
 <script src="src/js/modules/controle-acessos.js"></script>
 <script src="src/js/modules/central-certificados.js"></script>
+<script src="src/js/modules/setores-equipes/cards.js"></script>
+<script src="src/js/modules/setores-equipes/modals.js"></script>
+<script src="src/js/modules/setores-equipes/index.js"></script>
 <script src="src/js/admin.js"></script>
 
 <!-- ═══ PORTAL MENU ═════════════════════════════════════════ -->
