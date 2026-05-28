@@ -600,13 +600,46 @@ var AlunosMod = (() => {
     },
   ];
 
+  /**
+   * Exibe erro inline abaixo do campo (borda vermelha + texto).
+   * Remove o erro automaticamente ao digitar/alterar o campo.
+   */
   function _highlightError(id, msg) {
     const el = document.getElementById(id);
     if (!el) return;
+
+    // Borda vermelha
     el.style.borderColor = 'var(--red)';
+
+    // Remove erro anterior do mesmo campo
+    const prev = el.parentNode.querySelector('.mal-field-error');
+    if (prev) prev.remove();
+
+    // Injeta mensagem abaixo do campo
+    const err = document.createElement('div');
+    err.className = 'mal-field-error';
+    err.textContent = msg;
+    el.insertAdjacentElement('afterend', err);
+
     el.focus();
-    el.addEventListener('input', () => { el.style.borderColor = ''; }, { once: true });
-    _toast(msg, 'e');
+
+    // Limpa ao interagir com o campo
+    const clean = () => {
+      el.style.borderColor = '';
+      err.remove();
+      el.removeEventListener('input',  clean);
+      el.removeEventListener('change', clean);
+    };
+    el.addEventListener('input',  clean, { once: true });
+    el.addEventListener('change', clean, { once: true });
+  }
+
+  /** Remove todos os erros inline do modal-aluno antes de validar */
+  function _clearErrors() {
+    document.querySelectorAll('#modal-aluno .mal-field-error')
+      .forEach(e => e.remove());
+    document.querySelectorAll('#modal-aluno input, #modal-aluno select')
+      .forEach(e => { e.style.borderColor = ''; });
   }
 
   /**
@@ -614,7 +647,7 @@ var AlunosMod = (() => {
    * @param {number} dir  +1 ou -1
    */
   function stepModal(dir) {
-    if (dir > 0 && !_stepValidations[_step]()) return;
+    if (dir > 0) { _clearErrors(); if (!_stepValidations[_step]()) return; }
     const next = _step + dir;
     if (next < 0 || next > 2) return;
     _goStep(next);
@@ -657,10 +690,11 @@ var AlunosMod = (() => {
   // ══════════════════════════════════════════════════════════════
 
   function salvar() {
+    _clearErrors();
+    // Re-validate all steps before saving
+    if (!_stepValidations[0]() || !_stepValidations[1]() || !_stepValidations[2]()) return;
     const nome  = document.getElementById('mal-nome')?.value.trim();
     const email = document.getElementById('mal-email')?.value.trim();
-    if (!nome)  { alert('Informe o nome do aluno.'); return; }
-    if (!email) { alert('Informe o e-mail.'); return; }
 
     const statusAcesso = document.getElementById('mal-status')?.value || 'ativo';
     const dados = {
