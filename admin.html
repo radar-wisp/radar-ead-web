@@ -200,7 +200,6 @@ input,select,textarea { font-family:var(--font) }
   font-size:10px; font-weight:700; background:var(--blue-light);
   color:var(--blue); padding:1px 6px; border-radius:99px;
 }
-.sb-item-child { padding-left:32px !important; font-size:12px; }
 .sb-item:hover { background:var(--sb-hov-bg); color:var(--sb-text-act) }
 .sb-item.active {
   background:var(--sb-act-bg); color:var(--sb-text-act); font-weight:600;
@@ -778,8 +777,6 @@ tbody tr.selected td { background:#f0f4ff }
   font-family:var(--font); transition:all .12s;
 }
 .gc-actions-btn:hover { background:var(--bg); color:var(--text2); border-color:var(--border2) }
-@keyframes slideInRight { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-
 /* .gc-menu renderizado via #gc-portal-menu (portal no body) */
 #gc-portal-menu {
   display:none; position:fixed; z-index:9000;
@@ -927,157 +924,6 @@ tbody tr.selected td { background:#f0f4ff }
   .ift-field { min-width:120px }
 }
 
-
-/* ── Tela Setores e Equipes ─────────────────────────────────── */
-.se-breadcrumb {
-  display:flex; align-items:center; gap:6px;
-  font-size:12px; color:var(--text4); margin-bottom:14px;
-}
-.se-breadcrumb a {
-  color:var(--text3); text-decoration:none; cursor:pointer;
-}
-.se-breadcrumb a:hover { color:var(--blue); }
-.se-breadcrumb-sep { color:var(--border2); }
-
-#se-stats {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:12px; margin-bottom:20px;
-}
-#se-stats .stat {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius); padding:14px 18px;
-}
-#se-stats .stat-val {
-  font-size:22px; font-weight:700; color:var(--text); line-height:1;
-}
-#se-stats .stat-val.blue { color:var(--blue); }
-#se-stats .stat-lbl { font-size:12px; color:var(--text4); margin-top:4px; }
-
-#se-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
-  gap:16px;
-}
-
-.se-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius); overflow:hidden;
-}
-.se-card-head {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 16px; border-bottom:1px solid var(--border);
-  background:var(--bg);
-}
-.se-card-head-left {
-  display:flex; align-items:center; gap:8px; min-width:0;
-}
-.se-card-head-right { display:flex; gap:4px; flex-shrink:0; }
-.se-dot {
-  width:10px; height:10px; border-radius:50%; flex-shrink:0;
-}
-.se-card-title {
-  font-size:14px; font-weight:600; color:var(--text);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.se-badge {
-  font-size:11px; color:var(--text4);
-  background:var(--blue-light); color:var(--blue);
-  border-radius:20px; padding:2px 8px; flex-shrink:0;
-}
-
-.se-equipes { padding:8px 0; }
-.se-equipe-row {
-  display:flex; align-items:center; gap:8px;
-  padding:7px 16px;
-  border-bottom:1px solid var(--border);
-  transition:background .1s;
-}
-.se-equipe-row:last-of-type { border-bottom:none; }
-.se-equipe-row:hover { background:var(--bg); }
-.se-equipe-icon { color:var(--text4); flex-shrink:0; }
-.se-equipe-nome {
-  flex:1; font-size:13px; color:var(--text2);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.se-equipe-count {
-  font-size:11px; color:var(--text4); flex-shrink:0;
-}
-.se-equipe-actions {
-  display:flex; gap:2px; opacity:0; transition:opacity .1s;
-}
-.se-equipe-row:hover .se-equipe-actions { opacity:1; }
-
-.se-add-equipe {
-  display:flex; align-items:center; gap:6px;
-  width:100%; padding:8px 16px;
-  font-size:12px; color:var(--text4);
-  background:none; border:none; cursor:pointer;
-  transition:color .1s, background .1s;
-}
-.se-add-equipe:hover { color:var(--blue); background:var(--blue-light); }
-
-.se-empty-eq {
-  font-size:12px; color:var(--text4);
-  padding:10px 16px; font-style:italic;
-}
-
-.se-empty {
-  grid-column:1/-1; text-align:center;
-  padding:64px 20px; color:var(--text4);
-}
-.se-empty-icon {
-  margin-bottom:16px; opacity:.3;
-}
-.se-empty h3 {
-  font-size:16px; font-weight:600; color:var(--text2); margin-bottom:6px;
-}
-.se-empty p { font-size:13px; margin-bottom:20px; }
-
-.se-btn-danger:hover { color:var(--red) !important; }
-/* ── fim Tela Setores e Equipes ─────────────────────────────── */
-
-.mc-pane .fg { margin-top:0 !important; }
-
-/* ── Stepper modal-aluno ──────────────────────────────────── */
-.mal-stepper {
-  display:flex; align-items:center;
-  padding:16px 24px; background:var(--bg);
-  border-bottom:1px solid var(--border);
-}
-.mal-step {
-  display:flex; align-items:center; gap:8px; flex-shrink:0;
-}
-.mal-step-circle {
-  width:26px; height:26px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:700;
-  background:var(--border); color:var(--text4);
-  transition:background .2s, color .2s;
-  flex-shrink:0;
-}
-.mal-step-label {
-  font-size:12px; font-weight:500; color:var(--text4);
-  transition:color .2s;
-}
-.mal-step.active .mal-step-circle {
-  background:var(--blue); color:#fff;
-}
-.mal-step.active .mal-step-label { color:var(--text); font-weight:600; }
-.mal-step.done .mal-step-circle {
-  background:var(--green); color:#fff;
-}
-.mal-step.done .mal-step-circle::before { content:'✓'; }
-.mal-step.done .mal-step-circle { font-size:0; }
-.mal-step.done .mal-step-circle::before { font-size:13px; }
-.mal-step.done .mal-step-label { color:var(--text3); }
-.mal-step-line {
-  flex:1; height:2px; background:var(--border); margin:0 8px;
-  transition:background .2s;
-}
-.mal-step-line.done { background:var(--green); }
-.mc-pane .fg { margin-top:0 !important; }
-/* ── fim Stepper ──────────────────────────────────────────── */
-
 </style>
 </head>
 <body>
@@ -1193,10 +1039,6 @@ tbody tr.selected td { background:#f0f4ff }
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
         <span class="sb-item-label">Alunos</span>
         
-      </button>
-      <button class="sb-item sb-item-child" data-pg="setores-equipes">
-        <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-        <span class="sb-item-label">Setores e Equipes</span>
       </button>
       <button class="sb-item" data-pg="acessos">
         <span class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -1539,24 +1381,6 @@ tbody tr.selected td { background:#f0f4ff }
           <div class="ift-field fixed" style="min-width:150px">
             <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
             <input class="ift-date" type="date" id="tm-filtro-data" title="Início a partir de" onchange="Turmas.renderTabela()">
-          </div>
-          <div class="ift-sep"></div>
-          <!-- Filtro responsável -->
-          <div class="ift-field fixed" style="min-width:160px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <input class="ift-input" type="text" id="tm-filtro-resp" placeholder="Responsável..." oninput="Turmas.renderTabela()">
-          </div>
-          <div class="ift-sep"></div>
-          <!-- Filtro status select (espelha chips) -->
-          <div class="ift-field fixed" style="min-width:150px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-            <select class="ift-select" id="tm-filtro-status-sel" onchange="Turmas.renderTabela()">
-              <option value="">Todos os status</option>
-              <option value="aberta">Aberta</option>
-              <option value="em_andamento">Em andamento</option>
-              <option value="encerrada">Encerrada</option>
-              <option value="cancelada">Cancelada</option>
-            </select>
           </div>
           <div class="ift-sep"></div>
           <!-- Limpar -->
@@ -1986,6 +1810,9 @@ tbody tr.selected td { background:#f0f4ff }
             <p>Gerencie colaboradores, equipes, setores e acessos</p>
           </div>
           <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="AlunosMod.abrirSetores()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Setores e Equipes
+            </button>
             <button class="btn btn-primary" onclick="AlunosMod.abrirModal()">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Aluno
             </button>
@@ -2080,46 +1907,6 @@ tbody tr.selected td { background:#f0f4ff }
 
       </div>
       <!-- ═══ FIM COLABORADORES / ALUNOS ═══════════════════════ -->
-
-      <!-- ═══ SETORES E EQUIPES ════════════════════════════════════ -->
-      <div class="pg" id="pg-setores-equipes">
-
-        <!-- Breadcrumb -->
-        <nav class="se-breadcrumb">
-          <a onclick="Admin.go('dashboard')">Radar EAD</a>
-          <span class="se-breadcrumb-sep">›</span>
-          <a onclick="Admin.go('colaboradores')">Alunos</a>
-          <span class="se-breadcrumb-sep">›</span>
-          <span>Setores e Equipes</span>
-        </nav>
-
-        <!-- Header -->
-        <div class="ph">
-          <div>
-            <h2>Setores e Equipes</h2>
-            <p>Gerencie setores, equipes e vínculos dos colaboradores.</p>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="SetoresEquipesMod.novaEquipe()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Nova Equipe
-            </button>
-            <button class="btn btn-primary" onclick="SetoresEquipesMod.novoSetor()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Novo Setor
-            </button>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div id="se-stats"></div>
-
-        <!-- Grid de Cards -->
-        <div id="se-grid"></div>
-
-      </div>
-      <!-- ═══ FIM SETORES E EQUIPES ════════════════════════════════ -->
-
 
 
 <!-- ═══ CERTIFICADOS ════════════════════════════════════════════ -->
@@ -2668,7 +2455,7 @@ tbody tr.selected td { background:#f0f4ff }
 
 <!-- ═══ MODAL: TURMA (criar/editar) ════════════════════════════ -->
 <div class="modal-bg" id="modal-turma">
-  <div class="modal" style="max-width:640px">
+  <div class="modal" style="max-width:600px">
     <div class="modal-head">
       <div>
         <h3 id="mt-titulo">Nova Turma</h3>
@@ -2681,20 +2468,21 @@ tbody tr.selected td { background:#f0f4ff }
     <div class="mc-tabs">
       <button class="mc-tab active" onclick="Turmas.tabModal(0,this)">Dados</button>
       <button class="mc-tab" onclick="Turmas.tabModal(1,this)">Alunos</button>
+      <button class="mc-tab" onclick="Turmas.tabModal(2,this)">Acesso</button>
     </div>
 
     <!-- Tab 0: Dados da turma -->
     <div class="mc-pane active" id="mt-pane-0">
-      <div class="form-row">
-        <div class="fg full">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="fg" style="grid-column:1/-1">
           <label>Nome da turma *</label>
           <input type="text" id="mt-nome" placeholder="Ex: Turma Janeiro 2025">
         </div>
-        <div class="fg full">
+        <div class="fg" style="grid-column:1/-1">
           <label>Curso vinculado *</label>
           <select id="mt-curso"></select>
         </div>
-        <div class="fg full">
+        <div class="fg" style="grid-column:1/-1">
           <label>Descrição</label>
           <textarea id="mt-desc" rows="2" placeholder="Objetivo ou observações da turma..."></textarea>
         </div>
@@ -2714,7 +2502,7 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Data de encerramento</label>
           <input type="date" id="mt-fim">
         </div>
-        <div class="fg">
+        <div class="fg" style="grid-column:1/-1">
           <label>Status</label>
           <select id="mt-status">
             <option value="aberta">Aberta</option>
@@ -2750,23 +2538,64 @@ tbody tr.selected td { background:#f0f4ff }
 
       <!-- Busca de alunos -->
       <div style="position:relative;margin-bottom:10px">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="mt-aluno-busca" placeholder="Buscar aluno..."
           oninput="Turmas.filtrarAlunos()"
           style="width:100%;padding:7px 12px 7px 32px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font);color:var(--text)">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text4)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
       </div>
 
       <!-- Lista de alunos com checkboxes -->
-      <div id="mt-alunos-lista" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm)"></div>
+      <div id="mt-alunos-lista" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm)">
+      </div>
       <div style="margin-top:10px;font-size:12px;color:var(--text3)">
         <span id="mt-alunos-count" style="font-weight:600;color:var(--blue)">0</span> aluno(s) selecionado(s)
       </div>
     </div>
 
+    <!-- Tab 2: Controle de acesso -->
+    <div class="mc-pane" id="mt-pane-2">
+      <div id="mt-config-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Acesso automático ao criar</div>
+            <div style="font-size:11px;color:var(--text4)">Libera o curso para os alunos ao salvar a turma</div>
+          </div>
+          <div id="mt-cfg-auto" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Bloquear após encerramento</div>
+            <div style="font-size:11px;color:var(--text4)">Remove acesso dos alunos quando a turma encerrar</div>
+          </div>
+          <div id="mt-cfg-bloquear" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Permitir entrada após início</div>
+            <div style="font-size:11px;color:var(--text4)">Novos alunos podem entrar mesmo após a data de início</div>
+          </div>
+          <div id="mt-cfg-entrada" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
+            <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </div>
+        </div>
+        <div style="padding:11px 0">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prazo de conclusão (dias)</div>
+          <div style="font-size:11px;color:var(--text4);margin-bottom:8px">0 = sem prazo definido</div>
+          <input type="number" id="mt-cfg-prazo" min="0" value="0"
+            style="width:120px;padding:7px 11px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font)">
+        </div>
+      </div>
+    </div>
+
     <div class="modal-foot">
-      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-turma').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="Turmas.salvar()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Salvar turma
@@ -2829,40 +2658,6 @@ tbody tr.selected td { background:#f0f4ff }
         Editar turma
       </button>
       <button class="btn btn-ghost" onclick="document.getElementById('modal-turma-dash').classList.remove('open')">Fechar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: CONFIRMAÇÃO (módulo Turmas) ══════════════════════ -->
-<div class="modal-bg" id="modal-tm-confirm">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-head">
-      <h3 id="tm-confirm-titulo">Confirmar ação</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-tm-confirm').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <p id="tm-confirm-msg" style="font-size:14px;color:var(--text2);line-height:1.6;margin:0 0 20px"></p>
-    <div class="modal-foot">
-      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-tm-confirm').classList.remove('open')">Cancelar</button>
-      <button id="tm-confirm-ok" class="btn btn-danger">Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: SELEÇÃO (módulo Turmas — setor/equipe) ═══════════ -->
-<div class="modal-bg" id="modal-tm-select">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-head">
-      <h3 id="tm-select-titulo">Selecionar</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-tm-select').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <select id="tm-select-opcoes" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:20px"></select>
-    <div class="modal-foot">
-      <button class="btn btn-ghost modal-close" onclick="document.getElementById('modal-tm-select').classList.remove('open')">Cancelar</button>
-      <button id="tm-select-ok" class="btn btn-primary">Confirmar</button>
     </div>
   </div>
 </div>
@@ -3228,87 +3023,6 @@ tbody tr.selected td { background:#f0f4ff }
   </div>
 </div>
 
-<!-- ═══ MODAL: SETOR (criar/editar) ═════════════════════════ -->
-<div class="modal-bg" id="modal-se-setor">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-head">
-      <h3 id="mse-titulo">Novo Setor</h3>
-      <button class="modal-close" onclick="SetoresModals.fecharSetor()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
-      <div>
-        <label class="lbl">Nome do setor <span style="color:var(--red)">*</span></label>
-        <input class="inp" id="mse-nome" placeholder="Ex: Comercial" maxlength="60"
-          onkeydown="if(event.key==='Enter') SetoresModals.salvarSetor()">
-      </div>
-      <div>
-        <label class="lbl">Cor identificadora</label>
-        <div style="display:flex;align-items:center;gap:10px">
-          <input type="color" id="mse-cor" value="#0002da"
-            style="width:38px;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
-          <span id="mse-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="SetoresModals.fecharSetor()">Cancelar</button>
-      <button class="btn btn-primary" onclick="SetoresModals.salvarSetor()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: EQUIPE (criar/editar) ════════════════════════ -->
-<div class="modal-bg" id="modal-se-equipe">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-head">
-      <h3 id="meq-titulo">Nova Equipe</h3>
-      <button class="modal-close" onclick="SetoresModals.fecharEquipe()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
-      <div>
-        <label class="lbl">Nome da equipe <span style="color:var(--red)">*</span></label>
-        <input class="inp" id="meq-nome" placeholder="Ex: Comercial Anápolis" maxlength="60"
-          onkeydown="if(event.key==='Enter') SetoresModals.salvarEquipe()">
-      </div>
-      <div>
-        <label class="lbl">Setor <span style="color:var(--red)">*</span></label>
-        <select class="inp" id="meq-setor"></select>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="SetoresModals.fecharEquipe()">Cancelar</button>
-      <button class="btn btn-primary" onclick="SetoresModals.salvarEquipe()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: VINCULAR TURMA ══════════════════════════════ -->
-<div class="modal-bg" id="modal-vincular-turma">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-head">
-      <div>
-        <h3>Vincular Turma</h3>
-        <div id="mvt-sub" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
-      </div>
-      <button class="modal-close" onclick="document.getElementById('modal-vincular-turma').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding:16px 20px">
-      <label class="lbl">Selecione a turma</label>
-      <select class="inp" id="mvt-turma" style="margin-top:6px"></select>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-vincular-turma').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="AlunosMod.confirmarVincularTurma()">Vincular</button>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ MODAL: ALUNO (criar/editar) ═══════════════════════════ -->
 <div class="modal-bg" id="modal-aluno">
   <div class="modal" style="max-width:620px">
@@ -3317,80 +3031,68 @@ tbody tr.selected td { background:#f0f4ff }
         <h3 id="mal-titulo">Novo Aluno</h3>
         <div id="mal-sub" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
       </div>
-      <button class="modal-close" onclick="document.getElementById('modal-aluno').classList.remove('open')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <button class="modal-close" onclick="document.getElementById('modal-aluno').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
-    <!-- Stepper -->
-    <div class="mal-stepper">
-      <div class="mal-step active" id="mal-step-0">
-        <div class="mal-step-circle">1</div>
-        <span class="mal-step-label">Dados Pessoais</span>
-      </div>
-      <div class="mal-step-line"></div>
-      <div class="mal-step" id="mal-step-1">
-        <div class="mal-step-circle">2</div>
-        <span class="mal-step-label">Organização</span>
-      </div>
-      <div class="mal-step-line"></div>
-      <div class="mal-step" id="mal-step-2">
-        <div class="mal-step-circle">3</div>
-        <span class="mal-step-label">Acesso</span>
-      </div>
+    <div class="mc-tabs">
+      <button class="mc-tab active" onclick="AlunosMod.tabModal(0,this)">Dados Pessoais</button>
+      <button class="mc-tab" onclick="AlunosMod.tabModal(1,this)">Organização</button>
+      <button class="mc-tab" onclick="AlunosMod.tabModal(2,this)">Acesso</button>
     </div>
 
-    <!-- Pane 0: Dados Pessoais -->
+    <!-- Tab 0: Dados Pessoais -->
     <div class="mc-pane active" id="mal-pane-0">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="fg" style="grid-column:1/-1">
-          <label>Nome completo <span style="color:var(--red)">*</span></label>
+          <label>Nome completo *</label>
           <input type="text" id="mal-nome" placeholder="Nome do colaborador">
         </div>
         <div class="fg">
-          <label>E-mail <span style="color:var(--red)">*</span></label>
+          <label>E-mail *</label>
           <input type="email" id="mal-email" placeholder="email@empresa.com">
         </div>
         <div class="fg">
           <label>Matrícula</label>
-          <input type="text" id="mal-matricula" placeholder="Gerada automaticamente" readonly
-            style="background:var(--bg);color:var(--text4);cursor:default">
+          <input type="text" id="mal-matricula" placeholder="Ex: 001234">
         </div>
-
         <div class="fg">
-          <label>Cargo <span style="color:var(--red)">*</span></label>
+          <label>Telefone</label>
+          <input type="text" id="mal-telefone" placeholder="(11) 99999-9999">
+        </div>
+        <div class="fg">
+          <label>Cargo</label>
           <input type="text" id="mal-cargo" placeholder="Ex: Técnico de Campo">
         </div>
       </div>
     </div>
 
-    <!-- Pane 1: Organização -->
+    <!-- Tab 1: Organização -->
     <div class="mc-pane" id="mal-pane-1">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="fg">
-          <label>Setor <span style="color:var(--red)">*</span></label>
+          <label>Setor</label>
           <select id="mal-setor" onchange="AlunosMod._loadEquipes()">
             <option value="">— Selecione —</option>
           </select>
         </div>
         <div class="fg">
-          <label>Equipe <span style="color:var(--red)">*</span></label>
+          <label>Equipe</label>
           <select id="mal-equipe">
             <option value="">— Selecione —</option>
           </select>
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label>Unidade / Filial <span style="color:var(--red)">*</span></label>
+          <label>Unidade / Filial</label>
           <input type="text" id="mal-unidade" placeholder="Ex: Sede SP, Filial RJ">
         </div>
       </div>
     </div>
 
-    <!-- Pane 2: Acesso -->
+    <!-- Tab 2: Acesso -->
     <div class="mc-pane" id="mal-pane-2">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="fg">
-          <label>Senha inicial <span style="color:var(--red)">*</span></label>
+          <label>Senha inicial *</label>
           <input type="text" id="mal-senha" placeholder="Senha de primeiro acesso">
         </div>
         <div class="fg">
@@ -3420,19 +3122,13 @@ tbody tr.selected td { background:#f0f4ff }
 
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-aluno').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-ghost" id="mal-btn-prev" onclick="AlunosMod.stepModal(-1)" style="display:none">
-        ← Anterior
-      </button>
-      <button class="btn btn-primary" id="mal-btn-next" onclick="AlunosMod.stepModal(1)">
-        Próximo →
-      </button>
-      <button class="btn btn-primary" id="mal-btn-salvar" onclick="AlunosMod.salvar()" style="display:none">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Salvar aluno
+      <button class="btn btn-primary" onclick="AlunosMod.salvar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar aluno
       </button>
     </div>
   </div>
 </div>
+
 
 <!-- ═══ MODAL: PERFIL DO ALUNO ══════════════════════════════════ -->
 <div class="modal-bg" id="modal-perfil-aluno">
@@ -3502,10 +3198,36 @@ tbody tr.selected td { background:#f0f4ff }
 
     <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost btn-sm" id="pa-btn-bloquear" onclick="AlunosMod.alternarBloqueio()"></button>
+      <button class="btn btn-ghost btn-sm" id="pa-btn-reset" onclick="AlunosMod.resetarSenhaModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Resetar senha
+      </button>
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-perfil-aluno').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
 
+
+<!-- ═══ MODAL: SETORES E EQUIPES ════════════════════════════════ -->
+<div class="modal-bg" id="modal-setores">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <h3>Setores e Equipes</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-setores').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-outline btn-sm" onclick="AlunosMod.criarSetor()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Setor
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="AlunosMod.criarEquipe()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nova Equipe
+      </button>
+    </div>
+    <div id="setores-equipes" style="max-height:420px;overflow-y:auto"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-setores').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ MODAL: LIBERAR / EDITAR ACESSO ════════════════════════ -->
 <div class="modal-bg" id="modal-acesso">
@@ -6728,7 +6450,603 @@ var Aval = (() => {
 
 </script>
 
+<script>
+/* ════════════════════════════════════════════════════════════════
+   Módulo: AlunosMod — Gestão de Alunos / Colaboradores
+   Integrado com Storage.Alunos, Storage.Setores, Storage.Equipes,
+   Storage.Cursos, Storage.Turmas, Storage.Progresso, Storage.Avaliacoes
+   Funcionalidades: stats, tabela IFT, modal criar/editar (3 tabs),
+   perfil completo (3 tabs), modal setores/equipes, ações individuais
+════════════════════════════════════════════════════════════════ */
 
+var AlunosMod = (() => {
+
+  let editId      = null;
+  let perfilId    = null;
+
+  /* ── Utils ─────────────────────────────────────────────────── */
+  const q   = s => document.querySelector(s);
+  const x   = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
+  function fmtRelative(iso) {
+    if (!iso) return 'Nunca';
+    const diff = Math.floor((Date.now() - new Date(iso)) / 60000);
+    if (diff < 1)    return 'Agora';
+    if (diff < 60)   return `${diff}min atrás`;
+    if (diff < 1440) return `${Math.floor(diff/60)}h atrás`;
+    return fmtDate(iso);
+  }
+
+  /* ── Status config ──────────────────────────────────────────── */
+  const ST_CFG = {
+    ativo:     { cls:'badge-green', label:'● Ativo'     },
+    pendente:  { cls:'badge-blue',  label:'◎ Pendente'  },
+    bloqueado: { cls:'badge-red',   label:'✕ Bloqueado' },
+    inativo:   { cls:'badge-gray',  label:'▣ Inativo'   },
+  };
+  function stBadge(al) {
+    const st = al.statusAcesso || (al.ativo ? 'ativo' : 'bloqueado');
+    const c = ST_CFG[st] || ST_CFG.ativo;
+    return `<span class="badge ${c.cls}">${c.label}</span>`;
+  }
+
+  /* ── Chips IFT ──────────────────────────────────────────────── */
+  const CHIP_CLS = { '':'', ativo:'active-pub', pendente:'active-rev', bloqueado:'active-exp', inativo:'active-ras' };
+
+  function setStatus(btn, value) {
+    document.querySelectorAll('.ift-chip[data-alst]').forEach(c => {
+      Object.values(CHIP_CLS).forEach(cls => { if(cls) c.classList.remove(cls); });
+    });
+    if (value && CHIP_CLS[value]) btn.classList.add(CHIP_CLS[value]);
+    const sel = document.getElementById('al-filtro-status');
+    if (sel) sel.value = value;
+    renderTabela(); _badge();
+  }
+
+  function resetFiltros() {
+    ['al-busca','al-filtro-status','al-filtro-setor','al-filtro-equipe'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+    const ord = document.getElementById('al-order'); if(ord) ord.value = 'recente';
+    document.querySelectorAll('.ift-chip[data-alst]').forEach(c => {
+      Object.values(CHIP_CLS).forEach(cls => { if(cls) c.classList.remove(cls); });
+    });
+    renderTabela(); _badge();
+  }
+
+  function _badge() {
+    const b = document.getElementById('al-badge'); if(!b) return;
+    let n=0;
+    ['al-busca','al-filtro-status','al-filtro-setor','al-filtro-equipe']
+      .forEach(id => { if(document.getElementById(id)?.value?.trim()) n++; });
+    b.textContent = n; b.classList.toggle('show', n>0);
+  }
+
+  /* ── Init ───────────────────────────────────────────────────── */
+  function init() {
+    renderStats();
+    renderTabela();
+    _popularFiltros();
+  }
+
+  /* ── Stats ──────────────────────────────────────────────────── */
+  function renderStats() {
+    const st = Storage.Alunos.stats();
+    const cursosAtivos = Storage.Cursos.listar().filter(c => c.status === 'publicado').length;
+    const totalResp    = Storage.Respostas ? Storage.Respostas.listar().length : 0;
+    const card = (lbl, val, sub, cls='') => `
+      <div class="stat">
+        <div class="stat-top">
+          <div><div class="stat-lbl">${lbl}</div><div class="stat-val ${cls}">${val}</div></div>
+          <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        </div>
+        <div class="stat-sub">${sub}</div>
+      </div>`;
+    const wrap = document.getElementById('al-stats');
+    if (wrap) wrap.innerHTML =
+      card('Total de Alunos', st.total,     'cadastrados') +
+      card('Ativos',          st.ativos,    'com acesso',       'blue') +
+      card('Pendentes',       st.pendentes, 'aguardando',       '') +
+      card('Bloqueados',      st.bloqueados,'sem acesso',       st.bloqueados > 0 ? 'red' : '') +
+      card('Cursos Ativos',   cursosAtivos, 'disponíveis',      '');
+  }
+
+  /* ── Popular filtros ────────────────────────────────────────── */
+  function _popularFiltros() {
+    const sS = document.getElementById('al-filtro-setor');
+    const sE = document.getElementById('al-filtro-equipe');
+    if (sS) {
+      const set = Storage.Setores.listar();
+      sS.innerHTML = '<option value="">Setor</option>' +
+        set.map(s => `<option value="${x(s.id)}">${x(s.nome)}</option>`).join('');
+    }
+    if (sE) {
+      const eq = Storage.Equipes.listar();
+      sE.innerHTML = '<option value="">Equipe</option>' +
+        eq.map(e => `<option value="${x(e.id)}">${x(e.nome)}</option>`).join('');
+    }
+  }
+
+  /* ── Tabela ─────────────────────────────────────────────────── */
+  function renderTabela() {
+    const busca   = (q('#al-busca')?.value||'').toLowerCase().trim();
+    const fStatus = q('#al-filtro-status')?.value || '';
+    const fSetor  = q('#al-filtro-setor')?.value  || '';
+    const fEquipe = q('#al-filtro-equipe')?.value || '';
+    const ordem   = q('#al-order')?.value          || 'recente';
+
+    let lista = Storage.Alunos.listar();
+
+    if (busca)   lista = lista.filter(a =>
+      a.nome?.toLowerCase().includes(busca) ||
+      a.email?.toLowerCase().includes(busca) ||
+      a.matricula?.toLowerCase().includes(busca));
+    if (fStatus) lista = lista.filter(a => (a.statusAcesso || (a.ativo?'ativo':'bloqueado')) === fStatus);
+    if (fSetor)  lista = lista.filter(a => a.setorId === fSetor);
+    if (fEquipe) lista = lista.filter(a => a.equipeId === fEquipe);
+
+    lista.sort((a, b) => {
+      if (ordem === 'az')        return (a.nome||'').localeCompare(b.nome||'');
+      if (ordem === 'za')        return (b.nome||'').localeCompare(a.nome||'');
+      if (ordem === 'progresso') return _progGeral(b.id) - _progGeral(a.id);
+      return new Date(b.criadoEm||0) - new Date(a.criadoEm||0);
+    });
+
+    const tbody = q('#al-tbody'), empty = q('#al-empty'), count = q('#al-count');
+    if (count) count.textContent = `${lista.length} aluno(s)`;
+    if (!lista.length) {
+      if (tbody) tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    const setores = Storage.Setores.listar();
+    const equipes = Storage.Equipes.listar();
+
+    tbody.innerHTML = lista.map(al => {
+      const setor  = al.setorId  ? setores.find(s => s.id === al.setorId)  : null;
+      const equipe = al.equipeId ? equipes.find(e => e.id === al.equipeId) : null;
+      const prog   = _progGeral(al.id);
+      const nCursos = _cursosDoAluno(al.id).length;
+
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--border)">
+              ${(al.nome?.[0]||'?').toUpperCase()}
+            </div>
+            <div style="min-width:0">
+              <div style="font-weight:600;font-size:13px;color:var(--text)">${x(al.nome)}</div>
+              <div style="font-size:11px;color:var(--text4)">${x(al.email)}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:12px;color:var(--text3)">${x(al.matricula||'—')}</td>
+        <td style="font-size:12px;color:var(--text3)">${x(al.cargo||'—')}</td>
+        <td>
+          ${setor  ? `<span class="badge badge-blue"  style="margin-bottom:3px;display:block;width:fit-content">${x(setor.nome)}</span>` : ''}
+          ${equipe ? `<span class="badge badge-green" style="display:block;width:fit-content">${x(equipe.nome)}</span>` : (!setor ? '<span style="color:var(--text4);font-size:12px">—</span>' : '')}
+        </td>
+        <td style="text-align:center;font-size:13px;font-weight:600">${nCursos}</td>
+        <td style="min-width:90px">
+          <div class="gc-prog-wrap">
+            <div class="gc-prog-bar"><div class="gc-prog-fill" style="width:${prog}%"></div></div>
+            <span class="gc-prog-lbl">${prog}%</span>
+          </div>
+        </td>
+        <td>${stBadge(al)}</td>
+        <td style="font-size:11px;color:var(--text4)">${fmtRelative(al.ultimoAcesso)}</td>
+        <td>
+          <div class="gc-actions">
+            <button class="gc-actions-btn" onclick="AlunosMod._menu(this)">
+              Ações <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="gc-menu">
+              <button onclick="AlunosMod.verPerfil('${al.id}');AlunosMod._cm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Visualizar perfil
+              </button>
+              <button onclick="AlunosMod.abrirEdit('${al.id}');AlunosMod._cm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar
+              </button>
+              <button onclick="AlunosMod.vincularTurma('${al.id}');AlunosMod._cm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Vincular turma
+              </button>
+              <hr class="sep">
+              <button onclick="AlunosMod.resetarSenha('${al.id}');AlunosMod._cm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Resetar senha
+              </button>
+              ${al.ativo
+                ? `<button onclick="AlunosMod.bloquear('${al.id}');AlunosMod._cm()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Bloquear
+                   </button>`
+                : `<button onclick="AlunosMod.ativar('${al.id}');AlunosMod._cm()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Ativar
+                   </button>`}
+              <hr class="sep">
+              <button class="danger" onclick="AlunosMod.excluir('${al.id}');AlunosMod._cm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                Excluir
+              </button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ── Helpers de cálculo ────────────────────────────────────── */
+  function _progGeral(alunoId) {
+    const cursos = Storage.Cursos.listar().filter(c => c.status === 'publicado');
+    if (!cursos.length) return 0;
+    const soma = cursos.reduce((acc, c) => acc + Storage.Progresso.pctCurso(alunoId, c.id), 0);
+    return Math.round(soma / cursos.length);
+  }
+
+  function _cursosDoAluno(alunoId) {
+    return Storage.Cursos.listar().filter(c => {
+      const rest = Storage.Restricoes.porCurso(c.id);
+      if (!rest.length) return c.status === 'publicado';
+      return rest.some(r =>
+        (r.tipo === 'colaborador' && r.refId === alunoId) ||
+        (r.tipo === 'setor' && r.refId === Storage.Alunos.obter(alunoId)?.setorId) ||
+        (r.tipo === 'equipe' && r.refId === Storage.Alunos.obter(alunoId)?.equipeId)
+      );
+    });
+  }
+
+  /* ── Menu ──────────────────────────────────────────────────── */
+  function _menu(btn) {
+    const m = btn.nextElementSibling, isOpen = m.classList.contains('open');
+    _cm();
+    if (!isOpen) { m.classList.add('open'); setTimeout(() => document.addEventListener('click', _cm, {once:true}), 10); }
+  }
+  function _cm() { document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open')); }
+
+  /* ── Ações individuais ──────────────────────────────────────── */
+  function bloquear(id) {
+    Storage.Alunos.bloquear(id); _toast('Aluno bloqueado.','i'); refresh();
+  }
+  function ativar(id) {
+    Storage.Alunos.ativar(id); _toast('Aluno ativado!','s'); refresh();
+  }
+  function resetarSenha(id) {
+    if (!confirm('Resetar a senha para "123456"?')) return;
+    Storage.Alunos.resetarSenha(id); _toast('Senha resetada para 123456.','i');
+  }
+  function excluir(id) {
+    if (!confirm('Excluir aluno permanentemente?')) return;
+    Storage.Alunos.atualizar(id, {}); // soft: apenas mantém compatibilidade
+    // Hard delete
+    try {
+      const lista = JSON.parse(localStorage.getItem('ead_alunos')||'[]');
+      localStorage.setItem('ead_alunos', JSON.stringify(lista.filter(a => a.id !== id)));
+    } catch(e) {}
+    _toast('Aluno excluído.','i'); refresh();
+  }
+  function vincularTurma(alunoId) {
+    const turmas = Storage.Turmas.listar();
+    if (!turmas.length) { _toast('Nenhuma turma disponível.','i'); return; }
+    const opts = turmas.map((t,i) => `${i+1}. ${t.nome}`).join('\n');
+    const resp = prompt(`Selecionar turma para o aluno:\n${opts}`);
+    const idx  = parseInt(resp) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= turmas.length) return;
+    Storage.Turmas.adicionarAluno(turmas[idx].id, alunoId);
+    _toast(`Aluno vinculado a "${turmas[idx].nome}"!`,'s');
+  }
+
+  /* ── Modal criar ────────────────────────────────────────────── */
+  function abrirModal() {
+    editId = null;
+    document.getElementById('mal-titulo').textContent = 'Novo Aluno';
+    document.getElementById('mal-sub').textContent = '';
+    ['mal-nome','mal-email','mal-matricula','mal-telefone','mal-cargo','mal-unidade','mal-senha'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+    document.getElementById('mal-status').value = 'ativo';
+    const prim = document.getElementById('mal-primeiro');
+    if (prim) { prim.classList.add('on'); prim.querySelector('span').style.left='21px'; prim.style.background='var(--blue)'; }
+
+    _popularSetoresModal();
+    tabModal(0, document.querySelector('#modal-aluno .mc-tab'));
+    document.getElementById('modal-aluno').classList.add('open');
+  }
+
+  /* ── Modal editar ───────────────────────────────────────────── */
+  function abrirEdit(id) {
+    const al = Storage.Alunos.obter(id); if (!al) return;
+    editId = id;
+    document.getElementById('mal-titulo').textContent = 'Editar Aluno';
+    document.getElementById('mal-sub').textContent = `Matriculado em ${fmtDate(al.criadoEm)}`;
+
+    const sv = (elId,v) => { const el=document.getElementById(elId); if(el) el.value=v||''; };
+    sv('mal-nome', al.nome); sv('mal-email', al.email); sv('mal-matricula', al.matricula);
+    sv('mal-telefone', al.telefone); sv('mal-cargo', al.cargo); sv('mal-unidade', al.unidade);
+    sv('mal-senha', al.senha); sv('mal-status', al.statusAcesso || (al.ativo ? 'ativo' : 'bloqueado'));
+    sv('mal-unidade', al.unidade);
+
+    const prim = document.getElementById('mal-primeiro');
+    if (prim) {
+      const on = al.primeiroAcesso !== false;
+      prim.classList.toggle('on', on);
+      prim.querySelector('span').style.left = on ? '21px' : '3px';
+      prim.style.background = on ? 'var(--blue)' : 'var(--border2)';
+    }
+
+    _popularSetoresModal(al.setorId, al.equipeId);
+    tabModal(0, document.querySelector('#modal-aluno .mc-tab'));
+    document.getElementById('modal-aluno').classList.add('open');
+  }
+
+  function _popularSetoresModal(setorId, equipeId) {
+    const sSe = document.getElementById('mal-setor');
+    const sEq = document.getElementById('mal-equipe');
+    const set = Storage.Setores.listar();
+    if (sSe) {
+      sSe.innerHTML = '<option value="">— Selecione —</option>' +
+        set.map(s => `<option value="${x(s.id)}" ${s.id===setorId?'selected':''}>${x(s.nome)}</option>`).join('');
+      sSe.onchange = () => _loadEquipes();
+    }
+    _loadEquipes(setorId, equipeId);
+  }
+
+  function _loadEquipes(setorId, selectedEquipeId) {
+    const sId = setorId || document.getElementById('mal-setor')?.value;
+    const sEq = document.getElementById('mal-equipe'); if (!sEq) return;
+    const eqs = sId ? Storage.Equipes.listarPorSetor(sId) : Storage.Equipes.listar();
+    sEq.innerHTML = '<option value="">— Selecione —</option>' +
+      eqs.map(e => `<option value="${x(e.id)}" ${e.id===selectedEquipeId?'selected':''}>${x(e.nome)}</option>`).join('');
+  }
+
+  /* ── Tabs do modal criar/editar ─────────────────────────────── */
+  function tabModal(idx, btn) {
+    document.querySelectorAll('#modal-aluno .mc-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+    document.querySelectorAll('#modal-aluno .mc-pane').forEach((p,i) => p.classList.toggle('active', i===idx));
+  }
+
+  /* ── Salvar aluno ───────────────────────────────────────────── */
+  function salvar() {
+    const nome  = document.getElementById('mal-nome')?.value.trim();
+    const email = document.getElementById('mal-email')?.value.trim();
+    if (!nome)  { alert('Informe o nome do aluno.'); return; }
+    if (!email) { alert('Informe o e-mail.'); return; }
+
+    const statusAcesso = document.getElementById('mal-status')?.value || 'ativo';
+    const dados = {
+      nome, email,
+      matricula:     document.getElementById('mal-matricula')?.value.trim() || '',
+      telefone:      document.getElementById('mal-telefone')?.value.trim()  || '',
+      cargo:         document.getElementById('mal-cargo')?.value.trim()     || '',
+      unidade:       document.getElementById('mal-unidade')?.value.trim()   || '',
+      senha:         document.getElementById('mal-senha')?.value            || '123456',
+      setorId:       document.getElementById('mal-setor')?.value            || null,
+      equipeId:      document.getElementById('mal-equipe')?.value           || null,
+      statusAcesso,
+      ativo:         statusAcesso !== 'bloqueado' && statusAcesso !== 'inativo',
+      primeiroAcesso: document.getElementById('mal-primeiro')?.classList.contains('on') ?? true,
+    };
+
+    if (editId) {
+      Storage.Alunos.atualizar(editId, dados);
+      _toast('Aluno atualizado!','s');
+    } else {
+      const r = Storage.Alunos.criar(dados);
+      if (!r) { alert('E-mail já cadastrado!'); return; }
+      _toast('Aluno cadastrado!','s');
+    }
+    document.getElementById('modal-aluno').classList.remove('open');
+    editId = null; refresh();
+  }
+
+  /* ── Perfil do aluno ────────────────────────────────────────── */
+  function verPerfil(id) {
+    const al = Storage.Alunos.obter(id); if (!al) return;
+    perfilId = id;
+    const setor  = al.setorId  ? Storage.Setores.obter(al.setorId)  : null;
+    const equipe = al.equipeId ? Storage.Equipes.obter(al.equipeId) : null;
+    const prog   = _progGeral(id);
+    const cursos = _cursosDoAluno(id);
+    const concluidos = cursos.filter(c => Storage.Progresso.cursoConcluido(id, c.id)).length;
+
+    // Header
+    document.getElementById('pa-avatar').textContent = (al.nome?.[0]||'?').toUpperCase();
+    document.getElementById('pa-nome').textContent   = al.nome;
+    document.getElementById('pa-cargo').textContent  = [al.cargo, setor?.nome].filter(Boolean).join(' · ') || 'Sem cargo definido';
+    document.getElementById('pa-ncursos').textContent = cursos.length;
+    document.getElementById('pa-prog').textContent   = prog + '%';
+    document.getElementById('pa-concl').textContent  = concluidos;
+    document.getElementById('pa-status-badge').innerHTML = stBadge(al);
+
+    // Botão bloquear/ativar
+    const btnBlq = document.getElementById('pa-btn-bloquear');
+    if (btnBlq) {
+      btnBlq.textContent = al.ativo ? '🔒 Bloquear' : '✓ Ativar';
+      btnBlq.onclick = al.ativo
+        ? () => { bloquear(id); verPerfil(id); }
+        : () => { ativar(id);  verPerfil(id); };
+    }
+
+    // Tab 0: Informações
+    const rv = (lbl, val) => `
+      <div style="padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--text4);margin-bottom:2px">${lbl}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${val||'—'}</div>
+      </div>`;
+    document.getElementById('pa-info-body').innerHTML =
+      rv('E-mail', x(al.email)) + rv('Matrícula', x(al.matricula)) +
+      rv('Telefone', x(al.telefone)) + rv('Cargo', x(al.cargo)) +
+      rv('Cadastro', fmtDate(al.criadoEm)) + rv('Último acesso', fmtRelative(al.ultimoAcesso));
+    document.getElementById('pa-org-body').innerHTML =
+      rv('Setor', setor ? x(setor.nome) : null) +
+      rv('Equipe', equipe ? x(equipe.nome) : null) +
+      rv('Unidade', x(al.unidade)) +
+      rv('1º acesso', al.primeiroAcesso ? 'Pendente' : 'Realizado') +
+      rv('Status', ST_CFG[al.statusAcesso||'ativo']?.label || '—');
+
+    // Progresso
+    document.getElementById('pa-prog-lbl').textContent = prog + '%';
+    document.getElementById('pa-prog-bar').style.width = prog + '%';
+
+    // Tab 1: Cursos
+    document.getElementById('pa-cursos-body').innerHTML = cursos.length
+      ? cursos.map(c => {
+          const pct  = Storage.Progresso.pctCurso(id, c.id);
+          const done = Storage.Progresso.cursoConcluido(id, c.id);
+          return `
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:500;color:var(--text)">${x(c.titulo)}</div>
+                <div style="font-size:11px;color:var(--text4)">${c.carga}h · ${c.categoria||'Geral'}</div>
+              </div>
+              <div style="min-width:100px">
+                <div class="gc-prog-wrap">
+                  <div class="gc-prog-bar"><div class="gc-prog-fill" style="width:${pct}%"></div></div>
+                  <span class="gc-prog-lbl">${pct}%</span>
+                </div>
+              </div>
+              ${done ? '<span class="badge badge-green" style="flex-shrink:0">✓</span>' : ''}
+            </div>`;
+        }).join('')
+      : '<div style="color:var(--text4);font-size:13px;padding:12px">Nenhum curso acessível.</div>';
+
+    // Tab 2: Histórico
+    const respostas = Storage.Respostas ? Storage.Respostas.listar().filter(r => r.alunoId === id) : [];
+    const progresso = Storage.Progresso.concluidas(id).length;
+    document.getElementById('pa-historico-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="padding:9px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;color:var(--text2)">
+          <strong>${progresso}</strong> aulas concluídas no total
+        </div>
+        <div style="padding:9px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;color:var(--text2)">
+          <strong>${respostas.length}</strong> avaliações realizadas
+          ${respostas.length ? ' · Média: <strong>' + Math.round(respostas.reduce((s,r)=>s+r.nota,0)/respostas.length) + '%</strong>' : ''}
+        </div>
+        <div style="padding:9px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;color:var(--text2)">
+          <strong>${concluidos}</strong> cursos concluídos
+        </div>
+        ${al.ultimoAcesso ? `<div style="padding:9px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px;color:var(--text4)">Último acesso: ${fmtRelative(al.ultimoAcesso)}</div>` : ''}
+      </div>`;
+
+    tabPerfil(0, document.querySelector('#modal-perfil-aluno .mc-tab'));
+    document.getElementById('modal-perfil-aluno').classList.add('open');
+  }
+
+  function tabPerfil(idx, btn) {
+    document.querySelectorAll('#modal-perfil-aluno .mc-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+    const panes = ['pa-pane-0','pa-pane-1','pa-pane-2'];
+    panes.forEach((id,i) => { const el=document.getElementById(id); if(el) el.style.display = i===idx?'block':'none'; });
+  }
+
+  function resetarSenhaModal() {
+    if (perfilId) resetarSenha(perfilId);
+  }
+  function alternarBloqueio() {
+    const al = perfilId ? Storage.Alunos.obter(perfilId) : null;
+    if (!al) return;
+    al.ativo ? bloquear(perfilId) : ativar(perfilId);
+    verPerfil(perfilId);
+  }
+
+  /* ── Setores e Equipes ──────────────────────────────────────── */
+  function abrirSetores() {
+    renderSetoresEquipes();
+    document.getElementById('modal-setores').classList.add('open');
+  }
+
+  function renderSetoresEquipes() {
+    const wrap = document.getElementById('setores-equipes'); if (!wrap) return;
+    const set = Storage.Setores.listar();
+    const eq  = Storage.Equipes.listar();
+    if (!set.length) { wrap.innerHTML = '<p style="color:var(--text4);font-size:13px">Nenhum setor cadastrado.</p>'; return; }
+    wrap.innerHTML = set.map(s => {
+      const eqs = eq.filter(e => e.setorId === s.id);
+      const cnt = Storage.Alunos.porSetor(s.id).length;
+      return `
+        <div class="setor-card" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div style="width:10px;height:10px;border-radius:50%;background:${s.cor||'#0002da'};flex-shrink:0"></div>
+            <strong style="font-size:13px;color:var(--text)">${x(s.nome)}</strong>
+            <span style="color:var(--text4);font-size:11px;margin-left:auto">${cnt} colaboradores</span>
+            <button class="btn btn-danger btn-sm" onclick="AlunosMod.delSetor('${s.id}')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            </button>
+          </div>
+          ${eqs.map(e => `
+            <div class="equipe-row">
+              <span style="font-size:12px;color:var(--text2)">${x(e.nome)}</span>
+              <span style="font-size:11px;color:var(--text4)">${Storage.Alunos.porEquipe(e.id).length} membros</span>
+              <button class="btn btn-danger btn-sm" onclick="AlunosMod.delEquipe('${e.id}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>`).join('')}
+          ${!eqs.length ? '<p style="color:var(--text4);font-size:12px;padding:4px 0">Sem equipes</p>' : ''}
+        </div>`;
+    }).join('');
+  }
+
+  function criarSetor() {
+    const n = prompt('Nome do setor:'); if (!n) return;
+    const cor = prompt('Cor hex (opcional):','#0002da') || '#0002da';
+    Storage.Setores.criar({ nome:n, cor });
+    renderSetoresEquipes(); _popularFiltros();
+    _toast('Setor criado!','s');
+  }
+  function criarEquipe() {
+    const set = Storage.Setores.listar();
+    if (!set.length) { _toast('Crie um setor primeiro.','i'); return; }
+    const n = prompt('Nome da equipe:'); if (!n) return;
+    const opts = set.map((s,i) => `${i+1}. ${s.nome}`).join('\n');
+    const idx  = parseInt(prompt(`Setor da equipe:\n${opts}`)) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= set.length) return;
+    Storage.Equipes.criar({ nome:n, setorId:set[idx].id });
+    renderSetoresEquipes(); _popularFiltros();
+    _toast('Equipe criada!','s');
+  }
+  function delSetor(id) {
+    if (!confirm('Excluir setor?')) return;
+    Storage.Setores.excluir(id); renderSetoresEquipes(); _popularFiltros(); _toast('Setor removido.','i');
+  }
+  function delEquipe(id) {
+    if (!confirm('Excluir equipe?')) return;
+    Storage.Equipes.excluir(id); renderSetoresEquipes(); _popularFiltros(); _toast('Equipe removida.','i');
+  }
+
+  /* ── Refresh e Toast ─────────────────────────────────────────── */
+  function refresh() { renderStats(); renderTabela(); _popularFiltros(); }
+
+  function _toast(msg, tipo='i') {
+    const s = document.getElementById('toasts'); if(!s) return;
+    const el = document.createElement('div');
+    el.className = `toast ${tipo}`;
+    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]||'ℹ️'}</span><span>${msg}</span>`;
+    s.appendChild(el); setTimeout(()=>el.remove(), 3500);
+  }
+
+  // Compatibilidade com admin.js legado
+  function toggleColab(id, ativo) { ativo ? ativar(id) : bloquear(id); }
+
+  return {
+    init, refresh, renderTabela, renderSetoresEquipes,
+    setStatus, resetFiltros,
+    abrirModal, abrirEdit, salvar, tabModal,
+    verPerfil, tabPerfil, resetarSenhaModal, alternarBloqueio,
+    abrirSetores, criarSetor, criarEquipe, delSetor, delEquipe,
+    bloquear, ativar, resetarSenha, excluir, vincularTurma,
+    _menu, _cm, _loadEquipes, toggleColab,
+  };
+})();
+
+</script>
 
 <script>
 /* ════════════════════════════════════════════════════════════════
@@ -8542,7 +8860,6 @@ var PubMod = (() => {
 
 </script>
 <script src="src/js/storage.js"></script>
-<script src="src/js/utils.js"></script>
 <script src="src/js/modules/curso-drawer.js"></script>
 <script src="src/js/modules/gestao-cursos.js"></script>
 <script src="src/js/modules/gestao-turmas.js"></script>
@@ -8551,9 +8868,6 @@ var PubMod = (() => {
 <script src="src/js/modules/gestao-alunos.js"></script>
 <script src="src/js/modules/controle-acessos.js"></script>
 <script src="src/js/modules/central-certificados.js"></script>
-<script src="src/js/modules/setores-equipes/cards.js"></script>
-<script src="src/js/modules/setores-equipes/modals.js"></script>
-<script src="src/js/modules/setores-equipes/index.js"></script>
 <script src="src/js/admin.js"></script>
 
 <!-- ═══ PORTAL MENU ═════════════════════════════════════════ -->
