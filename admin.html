@@ -1060,6 +1060,13 @@ tbody tr.selected td { background:#f0f4ff }
 .se-empty p { font-size:13px; margin-bottom:20px; }
 
 .se-btn-danger:hover { color:var(--red) !important; }
+.se-cor-btn {
+  width:28px; height:28px; border-radius:50%; border:2px solid transparent;
+  cursor:pointer; transition:border-color .15s, transform .15s;
+  flex-shrink:0;
+}
+.se-cor-btn:hover { transform:scale(1.12); }
+.se-cor-btn.ativa { border-color:var(--text); transform:scale(1.12); }
 /* ── fim Tela Setores e Equipes ─────────────────────────────── */
 
 .mc-pane .fg { margin-top:0 !important; }
@@ -3271,9 +3278,14 @@ tbody tr.selected td { background:#f0f4ff }
       </div>
       <div>
         <label class="lbl">Cor identificadora</label>
-        <div style="display:flex;align-items:center;gap:10px">
-          <input type="color" id="mse-cor" value="#0002da"
-            style="width:38px;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
+        <input type="hidden" id="mse-cor" value="#0002da">
+        <div style="display:flex;gap:10px;align-items:center">
+          <button type="button" class="se-cor-btn" data-cor="#0002da"
+            style="background:#0002da"
+            onclick="SetoresModals.selecionarCor('#0002da')"></button>
+          <button type="button" class="se-cor-btn" data-cor="#08ffff"
+            style="background:#08ffff"
+            onclick="SetoresModals.selecionarCor('#08ffff')"></button>
           <span id="mse-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
         </div>
       </div>
