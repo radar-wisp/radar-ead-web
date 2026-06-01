@@ -193,13 +193,6 @@ var Admin = (() => {
   }
 
 
-  function renderMateriais(cursoId) {
-    const lista=cursoId?Storage.Materiais.listarPorCurso(cursoId):Storage.Materiais.listar(), wrap=q('#mat-lista'), cursos=Storage.Cursos.listar();
-    if(!lista.length){wrap.innerHTML=`<div class="empty"><div class="ei"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><p>Nenhum material.</p></div>`;return;}
-    wrap.innerHTML=`<table><thead><tr><th>Nome</th><th>Curso</th><th>Tipo</th><th>Tamanho</th><th>Adicionado</th><th></th></tr></thead><tbody>${lista.map(m=>{const c=cursos.find(c=>c.id===m.cursoId);return`<tr><td><strong>${x(m.nome)}</strong></td><td>${x(c?.titulo||'—')}</td><td>${badge(m.tipo,'badge-blue')}</td><td style="color:var(--text3)">${m.tamanho||'—'}</td><td style="color:var(--text3)">${fmtDate(m.criadoEm)}</td><td><button class="btn btn-sm btn-danger" onclick="Admin.delMaterial('${m.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>️</button></td></tr>`;}).join('')}</tbody></table>`;
-  }
-
-
   /* ── Acessos ── */
   function acessos() {
     if (typeof AcessosMod !== 'undefined') AcessosMod.init();
@@ -241,15 +234,8 @@ var Admin = (() => {
   function x(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function fmtDate(iso){ if(!iso)return'—'; return new Date(iso).toLocaleDateString('pt-BR'); }
   function fmtDateShort(iso){ if(!iso)return'—'; const d=new Date(iso),diff=Math.floor((Date.now()-d)/60000); if(diff<1)return'Agora'; if(diff<60)return diff+'min'; if(diff<1440)return Math.floor(diff/60)+'h'; return d.toLocaleDateString('pt-BR',{day:'numeric',month:'short'}); }
-  function formatBytes(b){ if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
   function badge(txt,cls){ return`<span class="badge ${cls}">${txt}</span>`; }
-  function statusBadge(status){
-    const cfg={publicado:{cls:'badge-green',label:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span> Publicado'},rascunho:{cls:'badge-amber',label:' Rascunho'},revisao:{cls:'badge-blue',label:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;flex-shrink:0"></span> Revisão'},arquivado:{cls:'badge-gray',label:'<span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:currentColor;opacity:.6;flex-shrink:0"></span> Arquivado'},expirado:{cls:'badge-red',label:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Expirado'}};
-    const s=cfg[status]||{cls:'badge-gray',label:status||'Indefinido'};
-    return badge(s.label,s.cls);
-  }
   function tipoBadge(tipo){ return{video:'badge-amber',texto:'badge-blue',pdf:'badge-red',link:'badge-green'}[tipo]||'badge-gray'; }
-  function tdEmpty(cols,msg){ return`<tr><td colspan="${cols}" style="text-align:center;padding:28px;color:var(--text3)">${msg}</td></tr>`; }
   function toast(msg,tipo='i'){ const s=document.getElementById('toasts'),el=document.createElement('div');el.className=`toast ${tipo}`;el.innerHTML=`<span>${{s:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>',e:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',i:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}[tipo]||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}</span><span>${msg}</span>`;s.appendChild(el);setTimeout(()=>el.remove(),3000); }
 
   function delMaterial(id) {
