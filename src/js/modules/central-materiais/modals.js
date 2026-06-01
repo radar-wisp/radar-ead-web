@@ -147,7 +147,7 @@ var MatModals = (() => {
     if (tituloEl) tituloEl.textContent = 'Novo Material';
     if (subEl)    subEl.textContent    = '';
 
-    ['mm-nome', 'mm-desc', 'mm-responsavel', 'mm-url', 'mm-url-texto'].forEach(id => {
+    ['mm-nome', 'mm-responsavel', 'mm-url', 'mm-url-texto'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -165,6 +165,8 @@ var MatModals = (() => {
     if (prev) prev.style.display = 'none';
 
     _popularSelectCursoModal();
+    _carregarModulos('');
+    _carregarAulas('');
     _renderConfigModal({});
     setUploadMode('file');
     tabModal(0, document.querySelector('#modal-material .mc-tab'));
@@ -188,7 +190,6 @@ var MatModals = (() => {
     if (subEl)    subEl.textContent    = `Criado em ${_fmtDate(m.criadoEm)}`;
 
     _setVal('mm-nome',        m.nome);
-    _setVal('mm-desc',        m.descricao);
     _setVal('mm-responsavel', m.responsavel);
     _setVal('mm-tipo',        m.tipo);
     _setVal('mm-categoria',   m.categoria);
@@ -197,6 +198,7 @@ var MatModals = (() => {
 
     _popularSelectCursoModal(m.cursoId);
     _carregarModulos(m.cursoId, m.moduloId);
+    _carregarAulas(m.moduloId, m.aulaId);
     _renderConfigModal(m.config || {});
 
     if (m.tipo === 'link') {
@@ -246,7 +248,12 @@ var MatModals = (() => {
   function _carregarModulos(cursoId, selectedId) {
     const sel = document.getElementById('mm-modulo');
     if (!sel) return;
-    const mods = cursoId ? Storage.Modulos.listarPorCurso(cursoId) : [];
+    let mods = cursoId ? Storage.Modulos.listarPorCurso(cursoId) : [];
+    // Fallback: módulos embutidos no curso (mesmo padrão usado em gestao-cursos).
+    if (cursoId && !mods.length) {
+      const curso = Storage.Cursos.obter(cursoId);
+      if (curso?.modulos?.length) mods = curso.modulos;
+    }
     sel.disabled = !cursoId || mods.length === 0;
     sel.innerHTML =
       '<option value="">' +
@@ -254,6 +261,29 @@ var MatModals = (() => {
       '</option>' +
       mods.map(m =>
         `<option value="${_x(m.id)}" ${m.id === selectedId ? 'selected' : ''}>${_x(m.titulo)}</option>`
+      ).join('');
+    // Encadeia o select de aula ao módulo selecionado.
+    sel.onchange = () => _carregarAulas(sel.value);
+    // Sem módulo pré-selecionado (ex.: troca de curso) → limpa aulas.
+    if (!selectedId) _carregarAulas('');
+  }
+
+  /**
+   * Popula o <select> de aulas conforme o módulo selecionado.
+   * @param {string} moduloId
+   * @param {string} [selectedId]
+   */
+  function _carregarAulas(moduloId, selectedId) {
+    const sel = document.getElementById('mm-aula');
+    if (!sel) return;
+    const aulas = moduloId ? Storage.Aulas.listarPorModulo(moduloId) : [];
+    sel.disabled = !moduloId || aulas.length === 0;
+    sel.innerHTML =
+      '<option value="">' +
+      (!moduloId ? 'Selecione um módulo primeiro' : aulas.length === 0 ? 'Nenhuma aula cadastrada' : 'Selecione uma aula...') +
+      '</option>' +
+      aulas.map(a =>
+        `<option value="${_x(a.id)}" ${a.id === selectedId ? 'selected' : ''}>${_x(a.titulo)}</option>`
       ).join('');
   }
 
@@ -439,12 +469,13 @@ var MatModals = (() => {
 
     const dados = {
       nome,
-      descricao:   document.getElementById('mm-desc')?.value.trim()        || '',
+      descricao:   _original ? (_original.descricao || '') : '',
       tipo,
       categoria:   document.getElementById('mm-categoria')?.value           || '',
       tags:        '',
       cursoId:     document.getElementById('mm-curso')?.value               || '',
       moduloId:    document.getElementById('mm-modulo')?.value              || '',
+      aulaId:      document.getElementById('mm-aula')?.value                || '',
       responsavel: document.getElementById('mm-responsavel')?.value.trim()  || '',
       status:      document.getElementById('mm-status')?.value              || 'ativo',
       url:         _url,
