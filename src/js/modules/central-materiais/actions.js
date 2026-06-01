@@ -24,13 +24,16 @@ var MatActions = (() => {
   }
 
   function toggleSelAll(checkbox) {
-    Storage.Materiais.listar().forEach(m => {
-      checkbox.checked ? MatState.select(m.id) : MatState.deselect(m.id);
+    // Opera apenas sobre as linhas visíveis (respeita o filtro aplicado),
+    // mantendo o estado de seleção coerente com o que está na tela.
+    document.querySelectorAll('#mat-tbody tr').forEach(row => {
+      const id = row.id.replace('mrow-', '');
+      if (!id) return;
+      checkbox.checked ? MatState.select(id) : MatState.deselect(id);
+      const ch = row.querySelector('.row-check');
+      if (ch) ch.checked = checkbox.checked;
+      row.classList.toggle('selected', checkbox.checked);
     });
-    document.querySelectorAll('.row-check').forEach(ch => ch.checked = checkbox.checked);
-    document.querySelectorAll('#mat-tbody tr').forEach(r =>
-      r.classList.toggle('selected', checkbox.checked)
-    );
     MatState.syncLoteUI();
   }
 
@@ -76,7 +79,14 @@ var MatActions = (() => {
   function duplicar(id) {
     const m = Storage.Materiais.obter(id);
     if (!m) return;
-    Storage.Materiais.criar({ ...m, id: undefined, nome: '[Cópia] ' + m.nome, criadoEm: undefined });
+    Storage.Materiais.criar({
+      ...m,
+      id:          undefined,
+      nome:        '[Cópia] ' + m.nome,
+      criadoEm:    undefined,
+      config:      { ...(m.config || {}) },
+      cursosVinc:  [...(m.cursosVinc || [])],
+    });
     _toast('Material duplicado!', 's');
     MatMod.refresh();
   }
