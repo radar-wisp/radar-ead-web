@@ -1779,15 +1779,15 @@ var Wizard = (() => {
   }
 
   function _persistirCurso(dadosCurso) {
-    // EadStorage é o alias seguro — window.Storage é a Web Storage API nativa
-    const EadStorage = (typeof window !== 'undefined' && window.Storage && window.Storage.Cursos)
-      ? window.Storage : null;
+    // Storage é declarado por storage.js (var Storage = ...) carregado antes deste script.
+    // NÃO usar window.Storage — no browser, window.Storage é a Web Storage API nativa,
+    // que sempre existe mas não tem .Cursos, causando fallback incorreto para localStorage direto.
     try {
-      if (EadStorage) {
-        const novo = EadStorage.Cursos.criar(dadosCurso);
+      if (typeof Storage !== 'undefined' && Storage.Cursos) {
+        const novo = Storage.Cursos.criar(dadosCurso);
         console.log('[Wizard] Curso criado:', novo?.id, novo?.titulo);
       } else {
-        console.warn('[Wizard] EadStorage não disponível, escrita direta');
+        console.warn('[Wizard] Storage.Cursos não disponível, escrita direta');
         const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
         const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
         lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
@@ -1811,10 +1811,9 @@ var Wizard = (() => {
     const dados = _buildCursoObj('publicado');
     if (_editId) {
       // Modo edição — atualizar curso existente
-      const EadStorage = (typeof window !== 'undefined' && window.Storage?.Cursos) ? window.Storage : null;
       try {
-        if (EadStorage) {
-          EadStorage.Cursos.atualizar(_editId, dados);
+        if (typeof Storage !== 'undefined' && Storage.Cursos) {
+          Storage.Cursos.atualizar(_editId, dados);
         } else {
           const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
           const idx = lista.findIndex(c => c.id === _editId);
