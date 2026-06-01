@@ -1,4 +1,4 @@
-[ARCHITECTURE.md](https://github.com/user-attachments/files/27769767/ARCHITECTURE.md)
+[ARCHITECTURE.md](https://github.com/user-attachments/files/28476139/ARCHITECTURE.md)
 # Radar Internet — EAD Platform
 ## Documento de Arquitetura Técnica v1.0
 
