@@ -1,4 +1,4 @@
-[README-modules-index.md](https://github.com/user-attachments/files/28476039/README-modules-index.md)
+[README-modules-index (1).md](https://github.com/user-attachments/files/28476150/README-modules-index.1.md)
 # Módulos — Radar Internet EAD Platform
 
 **Projeto:** Radar Internet — EAD Platform
@@ -133,5 +133,5 @@ Ao criar a documentação detalhada de um novo módulo, use o
 
 | Versão | Data | Mudança |
 |---|---|---|
-| 2.0.0 | 2025 | Refatoração dos módulos monolíticos em pastas (state/utils/table/modals/actions/index) |
+| 2.0.0 | 2026 | Refatoração dos módulos monolíticos em pastas (state/utils/table/modals/actions/index) |
 | 1.0.0 | 2025-05 | Extração do código inline de `admin.html` para módulos isolados |
