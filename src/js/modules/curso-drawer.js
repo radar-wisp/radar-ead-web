@@ -56,7 +56,7 @@ var CursoDrawer = (() => {
 
   /**
    * Fecha o drawer e limpa o iframe.
-   * Dispara renderTabela() para refletir alterações salvas.
+   * Dispara refresh() para refletir alterações salvas (tabela + indicadores).
    */
   function fechar() {
     const drawer = document.getElementById('curso-editor-drawer');
@@ -70,9 +70,9 @@ var CursoDrawer = (() => {
     // Limpa o iframe para liberar memória e evitar estado residual
     if (iframe) iframe.src = '';
 
-    // Atualiza a tabela de cursos após o fechamento
-    if (typeof Cursos !== 'undefined' && typeof Cursos.renderTabela === 'function') {
-      Cursos.renderTabela();
+    // Atualiza tabela, indicadores e atividades após o fechamento
+    if (typeof Cursos !== 'undefined' && typeof Cursos.refresh === 'function') {
+      Cursos.refresh();
     }
   }
 
