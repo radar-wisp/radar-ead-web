@@ -3,7 +3,7 @@
  * Responsabilidade única: operações que mutam o Storage.
  */
 
-/* global Storage, EadUtils, CursosState */
+/* global Storage, EadUtils, CursosState, CursosUtils, CursoDrawer */
 
 var CursosActions = (() => {
   'use strict';
