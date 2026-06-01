@@ -1,4 +1,4 @@
-[README-gestao-cursos.md](https://github.com/user-attachments/files/28476082/README-gestao-cursos.md)
+[README-gestao-cursos (1).md](https://github.com/user-attachments/files/28476159/README-gestao-cursos.1.md)
 # Módulo: Gestão de Cursos
 
 **Versão:** 2.0.0
@@ -262,5 +262,5 @@ log de atividades (`ead_atividades`).
 
 | Versão | Data | Mudança |
 |---|---|---|
-| 2.0.0 | 2025 | Refatoração do arquivo único em pasta (state/utils/table/stats/actions/modals/index) — contratos públicos mantidos |
+| 2.0.0 | 2026 | Refatoração do arquivo único em pasta (state/utils/table/stats/actions/modals/index) — contratos públicos mantidos |
 | 1.0.0 | 2025-05 | Extração do código inline de `admin.html` para módulo isolado |
