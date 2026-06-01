@@ -1352,7 +1352,7 @@ tbody tr.selected td { background:#f0f4ff }
             <p>Administre, publique e monitore todos os treinamentos</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn btn-primary" onclick="window.location.href='novo-curso.html'">
+            <button class="btn btn-primary" onclick="CursoDrawer.abrirNovo()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Novo Curso
             </button>
@@ -9292,6 +9292,17 @@ var CursoDrawer = (() => {
     document.body.style.overflow = 'hidden';
   }
 
+  function abrirNovo() {
+    const drawer = document.getElementById('curso-editor-drawer');
+    const iframe = document.getElementById('curso-editor-iframe');
+    const titulo = document.getElementById('drawer-titulo');
+    if (!drawer || !iframe) return;
+    if (titulo) titulo.textContent = 'Novo Curso';
+    iframe.src = 'novo-curso.html';
+    drawer.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
   function fechar() {
     const drawer = document.getElementById('curso-editor-drawer');
     const iframe = document.getElementById('curso-editor-iframe');
@@ -9314,16 +9325,18 @@ var CursoDrawer = (() => {
     }
   });
 
-  return { abrir, fechar };
+  return { abrir, abrirNovo, fechar };
 })();
 
 // Redireciona para aba Cursos quando vindo do wizard via hash
 window.addEventListener('DOMContentLoaded', () => {
   if (window.location.hash === '#cursos') {
     history.replaceState(null, '', window.location.pathname);
-    // Aguarda o Admin inicializar (boot é chamado em admin.js)
+    // Aguarda o app estar visível (sessão validada + showApp() executado)
+    // antes de chamar Admin.go — evita race condition com boot()
     const tryGo = () => {
-      if (typeof Admin !== 'undefined' && typeof Admin.go === 'function') {
+      const appAtivo = document.getElementById('appWrap')?.classList.contains('active');
+      if (appAtivo && typeof Admin !== 'undefined' && typeof Admin.go === 'function') {
         Admin.go('cursos');
       } else {
         setTimeout(tryGo, 80);
