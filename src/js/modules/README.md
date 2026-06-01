@@ -1,235 +1,137 @@
-[README.md](https://github.com/user-attachments/files/28232930/README.md)
-# Módulo: Gestão de Cursos
+[README-modules-index.md](https://github.com/user-attachments/files/28476039/README-modules-index.md)
+# Módulos — Radar Internet EAD Platform
 
-**Versão:** 1.0.0  
-**Projeto:** Radar Internet — EAD Platform  
+**Projeto:** Radar Internet — EAD Platform
+**Local:** `src/js/modules/`
 **Status:** Produção
 
 ---
 
 ## Visão Geral
 
-O módulo de Gestão de Cursos é responsável por toda a interface administrativa de gerenciamento de cursos dentro do painel `admin.html`. Ele é **completamente desacoplado** dos demais módulos, comunicando-se apenas através das interfaces públicas definidas em `storage.js`.
+Este diretório reúne os módulos de UI do painel administrativo (`admin.html`).
+Cada módulo é **autocontido** e se comunica com o resto do sistema apenas
+através das interfaces públicas de `src/js/storage.js` (persistência) e do
+roteador `src/js/admin.js` (navegação). Nenhum módulo acessa `localStorage`
+diretamente — exceto logs auxiliares pontuais.
+
+> **Princípio de migração:** quando o backend mudar (Fase 2), apenas
+> `storage.js` precisa ser reescrito. Os módulos não tocam na camada de dados.
+> Detalhes em `docs/ARCHITECTURE.md`.
 
 ---
 
-## Arquitetura do Módulo
+## Mapa dos Módulos
+
+| Diretório | Objeto global | Rota (`Admin.go(...)`) | Responsabilidade |
+|---|---|---|---|
+| `gestao-cursos/` | `window.Cursos` | `cursos` | Listagem, filtros, ações em lote e edição de cursos |
+| `gestao-turmas/` | `window.Turmas` | `turmas` | Turmas, vínculo de alunos por setor/equipe |
+| `central-materiais/` | `window.MatMod` | `materiais` | Materiais de apoio: upload, vínculo, lote |
+| `central-certificados/` | `window.CertMod` | `certificados` | Emissão, validação e modelos de certificados |
+| `controle-acessos/` | `window.AcessosMod` | `acessos` | Restrições e liberações de acesso a cursos |
+| `sistema-avaliacoes/` | `window.Aval` | `avaliacoes` | Avaliações e editor de questões |
+| `alunos/` | `window.AlunosMod` | `colaboradores` | Cadastro, perfil e filtros de alunos/colaboradores |
+| `setores-equipes/` | `window.SetoresEquipesMod` | `setores-equipes` | Gestão de setores e equipes |
+| `curso-drawer.js` | `window.CursoDrawer` | — | Drawer lateral que carrega o wizard `novo-curso.html` |
+
+`curso-drawer.js` é o único módulo de arquivo único; é um sub-módulo de
+`gestao-cursos` (abre/fecha o painel de edição) e fica na raiz por ser
+compartilhável.
+
+---
+
+## Padrão de Arquitetura
+
+Todos os módulos em pasta seguem a mesma divisão em arquivos. Cada arquivo
+expõe um objeto interno (ex.: `CursosState`, `CursosTable`) e o `index.js`
+monta a fachada pública (ex.: `window.Cursos`).
+
+| Arquivo | Papel |
+|---|---|
+| `state.js` | Estado interno do módulo (seleção em lote, IDs em edição) |
+| `utils.js` | Helpers e configuração visual do módulo |
+| `validators.js` | Validação de formulários (apenas onde há cadastro complexo) |
+| `table.js` | Stats, filtros, renderização da tabela e menus de linha |
+| `stats.js` | Cards de indicadores e feed de atividades (quando separado) |
+| `render.js` | Renderização especializada (ex.: visualizador/impressão) |
+| `cards.js` | Renderização em grade de cards (alternativa a `table.js`) |
+| `modals.js` | Modais de criação/edição e fluxos de wizard |
+| `actions.js` | Ações sobre os dados (publicar, arquivar, excluir, lote…) |
+| `index.js` | **Fachada** — orquestra os arquivos acima e expõe a API pública |
+
+Nem todo módulo tem todos os arquivos. Por exemplo, `setores-equipes` usa
+`cards.js` no lugar de `table.js`, e `controle-acessos` não tem `state.js`.
+
+---
+
+## Ordem de Carregamento
+
+A ordem dos `<script>` no `admin.html` é **obrigatória**: as dependências
+internas precisam existir antes do `index.js` que as orquestra. O padrão é:
 
 ```
-src/js/modules/
-├── gestao-cursos.js      ← Módulo principal (window.Cursos)
-├── curso-drawer.js       ← Sub-módulo do drawer de edição (window.CursoDrawer)
-└── README.md             ← Este arquivo
+storage.js  →  utils.js  →  (dependências internas do módulo)  →  index.js
 ```
 
----
-
-## Dependências Externas
-
-| Dependência | Fonte | Uso |
-|---|---|---|
-| `window.Storage` | `src/js/storage.js` | Toda persistência de dados |
-| `window.PortalMenu` | `admin.html` inline | Menu dropdown flutuante |
-| `window.Admin.go()` | `src/js/admin.js` | Navegação entre páginas |
-| `window.IFT` | `admin.html` inline | Toolbar de filtros |
-
----
-
-## API Pública (`window.Cursos`)
-
-### Ciclo de Vida
-
-| Função | Descrição |
-|---|---|
-| `init()` | Ponto de entrada. Chamado por `Admin.go('cursos')`. Inicializa estado e renderiza tudo. |
-| `refresh()` | Re-renderiza stats, tabela, atividades e atualiza o dashboard. |
-
-### Renderização
-
-| Função | Descrição |
-|---|---|
-| `renderTabela()` | Lê filtros e redesenha o tbody. Sem side-effects. |
-| `renderStats()` | Atualiza os 5 cards de indicadores. |
-| `renderAtividades()` | Atualiza o feed de atividades recentes. |
-
-### Seleção em Lote
-
-| Função | Descrição |
-|---|---|
-| `toggleSel(id, checked)` | Adiciona/remove um curso da seleção. |
-| `toggleSelAll(checkbox)` | Seleciona ou deseleciona todos. |
-
-### Ações em Lote
-
-| Função | Descrição |
-|---|---|
-| `publicarLote()` | Publica todos os cursos selecionados. |
-| `arquivarLote()` | Arquiva todos os cursos selecionados. |
-| `excluirLote()` | Exclui (com cascade) todos os cursos selecionados. |
-
-### Ações Individuais
-
-| Função | Parâmetros | Descrição |
-|---|---|---|
-| `publicarCurso(id)` | `id: string` | Publica e loga atividade. |
-| `despublicarCurso(id)` | `id: string` | Volta para rascunho. |
-| `arquivarCurso(id)` | `id: string` | Arquiva e loga atividade. |
-| `excluirCurso(id)` | `id: string` | Exclui com cascade (confirm). |
-| `duplicarCurso(id)` | `id: string` | Duplica curso, módulos e aulas. |
-| `visualizar(id)` | `id: string` | Abre modal de visualização rápida. |
-| `abrirEdit(id)` | `id: string` | Abre drawer de edição (wizard). |
-
-### Utilitários
-
-| Função | Descrição |
-|---|---|
-| `toggleMenu(btn)` | Abre/fecha o menu de ações de uma linha. |
-| `closeMenus()` | Fecha todos os menus abertos. |
-| `exportar()` | Gera e baixa CSV com BOM UTF-8. |
-
----
-
-## API Pública (`window.CursoDrawer`)
-
-| Função | Descrição |
-|---|---|
-| `abrir(id)` | Abre o drawer lateral carregando `novo-curso.html?edit=<id>` no iframe. |
-| `fechar()` | Fecha o drawer, limpa o iframe e dispara `renderTabela()`. |
-
-### Comunicação com o Wizard
-
-O wizard (`novo-curso.html`) comunica conclusão via:
-
-```javascript
-window.parent.postMessage('wizard:concluido', '*');
-```
-
-O `CursoDrawer` escuta e fecha automaticamente.
-
----
-
-## Fluxo de Dados
-
-```
-Admin.go('cursos')
-    └─→ Cursos.init()
-            ├─→ Storage.Cursos.listar()     ← leitura
-            ├─→ renderStats()               ← DOM write
-            ├─→ renderTabela()              ← DOM write
-            └─→ renderAtividades()          ← DOM write
-
-[Usuário clica "Publicar"]
-    └─→ Cursos.publicarCurso(id)
-            ├─→ Storage.Cursos.publicar(id) ← escrita
-            ├─→ _logAtividade(...)          ← localStorage
-            └─→ refresh()                   ← re-renderiza tudo
-```
-
----
-
-## Estrutura de Estado Interno
-
-```javascript
-// Privado ao módulo (não acessível externamente)
-let _selecionados = new Set();  // IDs selecionados para ação em lote
-let _cursoEditId  = null;       // ID do curso sendo editado (legado)
-let _matEdit      = [];         // Materiais em edição (legado)
-```
-
----
-
-## Integração com o HTML (admin.html)
-
-### Carregamento dos scripts
+A regra geral por módulo é:
 
 ```html
-<!-- Ordem obrigatória -->
-<script src="src/js/storage.js"></script>
-<script src="src/js/modules/curso-drawer.js"></script>
-<script src="src/js/modules/gestao-cursos.js"></script>
-<script src="src/js/admin.js"></script>
+<script src="src/js/modules/<modulo>/state.js"></script>
+<script src="src/js/modules/<modulo>/utils.js"></script>
+<script src="src/js/modules/<modulo>/table.js"></script>
+<script src="src/js/modules/<modulo>/modals.js"></script>
+<script src="src/js/modules/<modulo>/actions.js"></script>
+<script src="src/js/modules/<modulo>/index.js"></script>
 ```
 
-### Elementos DOM esperados
+Variações por módulo (consulte o cabeçalho de cada `index.js` para a ordem
+exata): `gestao-cursos` insere `stats.js` antes de `actions.js`;
+`alunos` insere `validators.js` e `perfil.js`; `central-certificados` insere
+`render.js`. O `curso-drawer.js` é carregado **antes** do bloco de
+`gestao-cursos`.
 
-| ID | Descrição |
+---
+
+## Ciclo de Vida Comum
+
+Toda fachada expõe ao menos:
+
+| Função | Descrição |
 |---|---|
-| `#gc-stats` | Container dos 5 cards de estatísticas |
-| `#gc-toolbar` | Barra de filtros (IFT) |
-| `#gc-tabela` / `#gc-tbody` | Tabela de cursos |
-| `#gc-empty` | Estado vazio |
-| `#gc-result-count` | Contagem de resultados |
-| `#gc-search` | Campo de busca |
-| `#gc-filtro-status` | Select de status (hidden) |
-| `#gc-filtro-cat` | Select de categoria |
-| `#gc-filtro-fmt` | Select de formato |
-| `#gc-filtro-data` | Input de data mínima |
-| `#gc-order` | Select de ordenação |
-| `#gc-sel-count` | Label de seleção em lote |
-| `#ift-lote-row` | Painel de ações em lote |
-| `#gc-atividades` | Feed de atividades recentes |
-| `#modal-curso-view` | Modal de visualização rápida |
-| `#curso-editor-drawer` | Drawer de edição |
-| `#curso-editor-iframe` | Iframe do wizard |
-| `#drawer-titulo` | Título do drawer |
+| `init()` | Ponto de entrada. Chamado pelo roteador em `admin.js` ao navegar para a rota. Inicializa estado e renderiza tudo. |
+| `refresh()` | Re-renderiza stats, tabela e painéis após uma ação. |
+
+O roteador em `src/js/admin.js` (objeto `renders`) decide qual `init()`
+chamar a cada `Admin.go(rota)`.
 
 ---
 
-## Migrações Futuras
+## Documentação Detalhada por Módulo
 
-### Fase 2: REST API
+A API pública completa de cada módulo está documentada no cabeçalho do
+respectivo `index.js`. README detalhado é criado sob demanda, conforme o
+módulo recebe manutenção. Atualmente:
 
-Quando migrar para backend, **apenas** a camada de dados (`storage.js`) precisa mudar. Este módulo não acessa `localStorage` diretamente — exceto o log de atividades (`ead_atividades`).
+- `gestao-cursos/README.md` — referência completa (API, fluxo de dados, DOM, checklist).
 
-```javascript
-// O log de atividades precisa ser migrado para:
-// POST /api/v1/atividades { tipo, cursoId, ts }
-// GET  /api/v1/atividades?limit=10
-
-// Localizar em gestao-cursos.js:
-// _logAtividade() → POST /api/v1/atividades
-// renderAtividades() → GET /api/v1/atividades
-```
+Ao criar a documentação detalhada de um novo módulo, use o
+`gestao-cursos/README.md` como template.
 
 ---
 
-## Checklist de Testes
+## Convenções
 
-```
-[ ] Listar cursos (tabela vazia, com dados)
-[ ] Filtrar por busca de texto
-[ ] Filtrar por status (todos os 5 chips)
-[ ] Filtrar por categoria
-[ ] Filtrar por formato
-[ ] Filtrar por data de publicação
-[ ] Ordenar (5 opções)
-[ ] Limpar filtros
-[ ] Selecionar individual → painel lote aparece
-[ ] Selecionar tudo → painel lote aparece
-[ ] Publicar em lote
-[ ] Arquivar em lote
-[ ] Excluir em lote (cascade de módulos/aulas)
-[ ] Menu dropdown de ações (por linha)
-[ ] Visualizar (modal de detalhes)
-[ ] Editar (abre drawer com iframe)
-[ ] Publicar individual
-[ ] Despublicar
-[ ] Arquivar individual
-[ ] Excluir individual
-[ ] Duplicar (verifica cópia criada)
-[ ] Exportar CSV (abre download)
-[ ] Stats cards atualizam após ações
-[ ] Feed de atividades registra ações
-[ ] Dashboard (ds-cursos, ds-publicados) atualiza
-[ ] Fechar drawer com Escape
-[ ] Fechar drawer com botão ×
-[ ] Wizard concluído fecha drawer automaticamente
-```
+- Sem acesso direto a `localStorage` (use `window.Storage`).
+- A API pública (`window.<Modulo>`) é o contrato com o `admin.html` (handlers
+  `onclick`) e o `admin.js`. **Não** alterar assinaturas sem atualizar os dois.
+- Funções prefixadas com `_` são privadas por convenção.
 
 ---
 
-## Histórico de Versões
+## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| 1.0.0 | 2025-05 | Extração do código inline de admin.html para módulo isolado |
+| 2.0.0 | 2025 | Refatoração dos módulos monolíticos em pastas (state/utils/table/modals/actions/index) |
+| 1.0.0 | 2025-05 | Extração do código inline de `admin.html` para módulos isolados |
