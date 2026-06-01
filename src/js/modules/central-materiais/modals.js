@@ -276,7 +276,17 @@ var MatModals = (() => {
   function _carregarAulas(moduloId, selectedId) {
     const sel = document.getElementById('mm-aula');
     if (!sel) return;
-    const aulas = moduloId ? Storage.Aulas.listarPorModulo(moduloId) : [];
+    let aulas = moduloId ? Storage.Aulas.listarPorModulo(moduloId) : [];
+    // Fallback: aulas embutidas no módulo (mesmo padrão dos módulos embutidos no curso).
+    if (moduloId && !aulas.length) {
+      let mod = Storage.Modulos.obter(moduloId);
+      if (!mod) {
+        const cursoId = document.getElementById('mm-curso')?.value;
+        const curso   = cursoId ? Storage.Cursos.obter(cursoId) : null;
+        mod = curso?.modulos?.find(m => m.id === moduloId) || null;
+      }
+      if (mod?.aulas?.length) aulas = mod.aulas;
+    }
     sel.disabled = !moduloId || aulas.length === 0;
     sel.innerHTML =
       '<option value="">' +
