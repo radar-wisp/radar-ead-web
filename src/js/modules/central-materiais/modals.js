@@ -330,6 +330,12 @@ var MatModals = (() => {
       zip: 'zip', rar: 'zip', pptx: 'pptx', ppt: 'pptx', quiz: 'quiz',
     };
     const tipo = tipoMap[ext] || 'outro';
+
+    // Libera object URL anterior (se houver) antes de substituir o arquivo.
+    if (_fileAtual?.url && _fileAtual.url.startsWith('blob:')) {
+      URL.revokeObjectURL(_fileAtual.url);
+    }
+
     _fileAtual = { nome: file.name, tamanho: _fmtBytes(file.size), tipo, url: null };
 
     // Preenche campos automaticamente se estiverem vazios
@@ -412,6 +418,25 @@ var MatModals = (() => {
 
     const getTogOn = id => document.getElementById(id)?.classList.contains('on') ?? false;
 
+    // Material original (apenas em edição) — usado para preservar arquivo já enviado.
+    const _original = _editId ? Storage.Materiais.obter(_editId) : null;
+
+    // Resolve url/tamanho preservando o arquivo existente ao editar sem reupload.
+    let _url, _tamanho;
+    if (_uploadMode === 'link') {
+      _url     = document.getElementById('mm-url')?.value.trim() || '#';
+      _tamanho = '';
+    } else if (_fileAtual) {
+      _url     = _fileAtual.url || '#simulado';
+      _tamanho = _fileAtual.tamanho;
+    } else if (_original) {
+      _url     = _original.url || '#simulado';
+      _tamanho = _original.tamanho || '';
+    } else {
+      _url     = '#simulado';
+      _tamanho = '';
+    }
+
     const dados = {
       nome,
       descricao:   document.getElementById('mm-desc')?.value.trim()        || '',
@@ -422,10 +447,8 @@ var MatModals = (() => {
       moduloId:    document.getElementById('mm-modulo')?.value              || '',
       responsavel: document.getElementById('mm-responsavel')?.value.trim()  || '',
       status:      document.getElementById('mm-status')?.value              || 'ativo',
-      url: _uploadMode === 'link'
-        ? (document.getElementById('mm-url')?.value.trim() || '#')
-        : (_fileAtual?.url || '#simulado'),
-      tamanho: _uploadMode === 'file' && _fileAtual ? _fileAtual.tamanho : '',
+      url:         _url,
+      tamanho:     _tamanho,
       config: {
         obrigatorio:              getTogOn('mmcfg-obrig'),
         permitirDownload:         getTogOn('mmcfg-dl'),
