@@ -41,7 +41,7 @@ var CursosModals = (() => {
         thumb.style.background = `url('${c.capa}') center/cover no-repeat`;
         thumb.textContent = '';
       } else {
-        thumb.style.background = 'var(--blue-l)';
+        thumb.style.background = 'var(--blue-light)';
         thumb.textContent = (c.titulo?.[0] || '?').toUpperCase();
       }
     }
