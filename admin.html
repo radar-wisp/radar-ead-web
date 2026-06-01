@@ -2883,10 +2883,6 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Nome do material *</label>
           <input type="text" id="mm-nome" placeholder="Ex: Apostila NR10 — Módulo 1">
         </div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>Descrição curta</label>
-          <textarea id="mm-desc" rows="2" placeholder="Descreva o conteúdo do material..."></textarea>
-        </div>
         <div class="fg">
           <label>Tipo *</label>
           <select id="mm-tipo">
@@ -2926,6 +2922,12 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Módulo (opcional)</label>
           <select id="mm-modulo">
             <option value="">Selecione um módulo...</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Aula</label>
+          <select id="mm-aula" disabled>
+            <option value="">Selecione um módulo primeiro</option>
           </select>
         </div>
         <div class="fg">
