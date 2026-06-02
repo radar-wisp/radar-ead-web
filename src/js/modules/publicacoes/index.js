@@ -35,7 +35,6 @@ var PubMod = (() => {
     PubTable.renderTabela();
     PubStats.renderAguardando();
     PubStats.renderVencimentos();
-    PubStats.renderComunicadosLista();
     PubStats.popularFiltroCurso();
   }
 
@@ -45,7 +44,6 @@ var PubMod = (() => {
     PubTable.renderTabela();
     PubStats.renderAguardando();
     PubStats.renderVencimentos();
-    PubStats.renderComunicadosLista();
   }
 
   // ── API pública (nomes preservados para não quebrar admin.html) ──
