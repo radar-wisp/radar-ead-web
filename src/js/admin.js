@@ -51,14 +51,13 @@ var Admin = (() => {
       relatorios:     'Relatórios',
       certificados:   'Certificados',
       configuracoes:  'Configurações',
-      publicacao:     'Publicação',
     };
     q('#topTitle').textContent = titles[p] || p;
     renders[p]?.();
   }
 
   const renders = {
-    dashboard, cursos, materiais, acessos, colaboradores, publicacao,
+    dashboard, cursos, materiais, acessos, colaboradores,
     'setores-equipes': () => { if (typeof SetoresEquipesMod !== 'undefined') SetoresEquipesMod.init(); },
     // Módulos futuros — stub que mostra "em breve"
     turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
@@ -211,13 +210,10 @@ var Admin = (() => {
   function delSetor(id){ if(!confirm('Excluir setor?'))return; Storage.Setores.excluir(id); renderSetoresEquipes(); }
   function delEquipe(id){ if(!confirm('Excluir equipe?'))return; Storage.Equipes.excluir(id); renderSetoresEquipes(); }
 
-  /* ── Publicação ── */
-  function publicacao() {
-    if (typeof PubMod !== 'undefined') PubMod.init();
-  }
-  function publicar(id){ if(typeof PubMod!=='undefined') PubMod.publicar_legado(id); else {Storage.Cursos.publicar(id); toast('Publicado!','s'); renders[pg]?.();} }
-  function arquivar(id){ if(typeof PubMod!=='undefined') PubMod.arquivar_legado(id); else {Storage.Cursos.arquivar(id); toast('Arquivado.','i'); renders[pg]?.();} }
-  function openValidade(cId){ if(typeof PubMod!=='undefined') PubMod.openValidade_legado(cId); else {const c=Storage.Cursos.obter(cId),v=prompt('Data:',c?.validadeAte?c.validadeAte.split('T')[0]:'');if(v===null)return;Storage.Cursos.atualizar(cId,{validadeAte:v?new Date(v).toISOString():null});toast('Validade atualizada!','s');renders[pg]?.();} }
+  /* ── Ações de estado de curso (usadas no dashboard) ── */
+  function publicar(id){ Storage.Cursos.publicar(id); toast('Publicado!','s'); renders[pg]?.(); }
+  function arquivar(id){ Storage.Cursos.arquivar(id); toast('Arquivado.','i'); renders[pg]?.(); }
+  function openValidade(cId){ const c=Storage.Cursos.obter(cId),v=prompt('Data:',c?.validadeAte?c.validadeAte.split('T')[0]:'');if(v===null)return;Storage.Cursos.atualizar(cId,{validadeAte:v?new Date(v).toISOString():null});toast('Validade atualizada!','s');renders[pg]?.(); }
 
   /* ── Modais ── */
   function bindModals() {
