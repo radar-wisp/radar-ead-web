@@ -44,7 +44,7 @@ var AlunosMod = (() => {
   }
 
   function resetFiltros() {
-    ['al-busca', 'al-filtro-status', 'al-filtro-setor', 'al-filtro-equipe', 'al-order']
+    ['al-busca', 'al-filtro-status', 'al-filtro-setor', 'al-order']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.querySelectorAll('#al-filter-chips .al-chip')
       .forEach(c => c.classList.remove(...Object.values(CHIP_CLS), 'active'));
