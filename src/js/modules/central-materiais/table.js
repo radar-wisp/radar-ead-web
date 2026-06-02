@@ -113,7 +113,7 @@ var MatTable = (() => {
     if (!sel) return;
     const cursos = Storage.Cursos.listar();
     sel.innerHTML =
-      '<option value="">Curso</option>' +
+      '<option value="">Todos os cursos</option>' +
       cursos.map(c => `<option value="${_x(c.id)}">${_x(c.titulo)}</option>`).join('');
   }
 
