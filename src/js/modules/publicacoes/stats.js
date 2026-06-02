@@ -40,47 +40,67 @@ var PubStats = (() => {
       cur.map(c => `<option value="${x(c.id)}">${x(c.titulo)}</option>`).join('');
   }
 
-  /* ── Painéis laterais ───────────────────────────────────────── */
+  /* ── Tabela: Aguardando publicação (agendado + rascunho) ────── */
   function renderAguardando() {
-    const wrap = document.getElementById('pub-aguardando'); if (!wrap) return;
+    const tbody = document.getElementById('pub-aguardando'); if (!tbody) return;
+    const count = document.getElementById('pub-aguardando-count');
+    const empty = document.getElementById('pub-aguardando-empty');
     const agend = Storage.Publicacoes.listar().filter(p => p.status === 'agendado')
-      .sort((a, b) => new Date(a.dataAgendada) - new Date(b.dataAgendada)).slice(0, 5);
-    const rascs = Storage.Publicacoes.listar().filter(p => p.status === 'rascunho').slice(0, 3);
+      .sort((a, b) => new Date(a.dataAgendada) - new Date(b.dataAgendada));
+    const rascs = Storage.Publicacoes.listar().filter(p => p.status === 'rascunho');
     const items = [...agend, ...rascs];
-    if (!items.length) { wrap.innerHTML = '<div style="font-size:12px;color:var(--text4)">Nenhum conteúdo aguardando.</div>'; return; }
-    wrap.innerHTML = items.map(p => `
-      <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(p.titulo || '—')}</div>
-          <div style="font-size:10px;color:var(--text4)">${p.status === 'agendado' ? fmtDate(p.dataAgendada) : 'Rascunho'}</div>
-        </div>
-        <button onclick="PubMod.publicar('${p.id}')"
-          style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap">
-          Publicar
-        </button>
-      </div>`).join('');
+    if (count) count.textContent = `${items.length} aguardando`;
+    if (!items.length) {
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = items.map(p => `
+      <tr>
+        <td>
+          <div style="font-weight:600;font-size:13px;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(p.titulo || '—')}</div>
+        </td>
+        <td>${PubUtils.tipoBadge(p.tipo)}</td>
+        <td>${PubUtils.stBadge(p.status)}</td>
+        <td style="font-size:11px;color:var(--text4)">${p.status === 'agendado' ? fmtDate(p.dataAgendada) : '—'}</td>
+        <td style="text-align:right">
+          <button onclick="PubMod.publicar('${p.id}')"
+            style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">
+            Publicar
+          </button>
+        </td>
+      </tr>`).join('');
   }
 
+  /* ── Tabela: Vencidos (status expirado) ─────────────────────── */
   function renderVencimentos() {
-    const wrap = document.getElementById('pub-vencimentos'); if (!wrap) return;
-    const agora = new Date(); const em7 = new Date(); em7.setDate(em7.getDate() + 7);
-    const prox = Storage.Publicacoes.listar()
-      .filter(p => p.status === 'publicado' && p.dataExpiracao &&
-        new Date(p.dataExpiracao) > agora && new Date(p.dataExpiracao) <= em7)
-      .sort((a, b) => new Date(a.dataExpiracao) - new Date(b.dataExpiracao)).slice(0, 5);
-    if (!prox.length) { wrap.innerHTML = '<div style="font-size:12px;color:var(--text4)">Nenhum vencimento nos próximos 7 dias.</div>'; return; }
-    wrap.innerHTML = prox.map(p => {
-      const diff = Math.ceil((new Date(p.dataExpiracao) - agora) / 86400000);
-      const cor = diff <= 1 ? 'var(--red)' : diff <= 3 ? 'var(--amber)' : 'var(--text4)';
-      return `
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
-          <div style="width:6px;height:6px;border-radius:50%;background:${cor};margin-top:4px;flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(p.titulo || '—')}</div>
-            <div style="font-size:10px;color:${cor}">${diff === 1 ? 'amanhã' : diff + ' dias'}</div>
-          </div>
-        </div>`;
-    }).join('');
+    const tbody = document.getElementById('pub-vencimentos'); if (!tbody) return;
+    const count = document.getElementById('pub-vencimentos-count');
+    const empty = document.getElementById('pub-vencimentos-empty');
+    const VIS_LABELS = { todos: 'Todos', turma: 'Turma', setor: 'Setor', equipe: 'Equipe', colaborador: 'Individual' };
+    const lista = Storage.Publicacoes.listar()
+      .filter(p => p.status === 'expirado')
+      .sort((a, b) => new Date(b.dataExpiracao || 0) - new Date(a.dataExpiracao || 0));
+    if (count) count.textContent = `${lista.length} vencida(s)`;
+    if (!lista.length) {
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = lista.map(p => `
+      <tr>
+        <td>
+          <div style="font-weight:600;font-size:13px;color:var(--text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(p.titulo || '—')}</div>
+        </td>
+        <td>${PubUtils.tipoBadge(p.tipo)}</td>
+        <td style="font-size:12px;color:var(--text3)">${VIS_LABELS[p.visibilidade] || 'Todos'}</td>
+        <td style="font-size:11px;color:var(--text4)">${fmtDate(p.dataPublicacao)}</td>
+        <td><div class="gc-validade expirado-txt" style="font-size:12px">${p.dataExpiracao ? fmtDate(p.dataExpiracao) : '—'}</div></td>
+        <td style="font-size:12px;color:var(--text4)">${x(p.responsavel || 'Admin')}</td>
+        <td>${PubUtils.actionMenu(p)}</td>
+      </tr>`).join('');
   }
 
   function renderComunicadosLista() {
