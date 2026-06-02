@@ -37,8 +37,6 @@ var Storage = (() => {
     RESTRICOES: 'ead_restricoes',  // → tabela: restricoes (PK composta)
     TURMAS:     'ead_turmas',      // → tabela: turmas
     CERTIFICADOS: 'ead_certificados', // → tabela: certificados
-    PUBLICACOES:  'ead_publicacoes',  // → tabela: publicacoes
-    COMUNICADOS:  'ead_comunicados',  // → tabela: comunicados
     MODELOS_CERT: 'ead_modelos_cert',  // → tabela: modelos_certificado
     LOG_ACESSOS: 'ead_log_acessos', // → tabela: log_acessos
     AVALIACOES: 'ead_avaliacoes', // → tabela: avaliacoes
@@ -1346,171 +1344,6 @@ var Storage = (() => {
   };
 
 
-  // ════════════════════════════════════════════════════════════════
-  // PUBLICAÇÕES — controle de publicação de qualquer conteúdo
-  // MIGRAÇÃO: GET/POST/PUT/DELETE /api/v1/publicacoes
-  // ════════════════════════════════════════════════════════════════
-
-  /**
-   * @typedef {Object} Publicacao
-   * @property {string}  id
-   * @property {'curso'|'material'|'avaliacao'|'comunicado'} tipo
-   * @property {string}  refId          FK → id do conteúdo referenciado
-   * @property {string}  titulo         cópia do título para exibição rápida
-   * @property {string}  cursoId        FK → Curso.id (contexto, opcional)
-   * @property {string}  turmaId        FK → Turma.id  (opcional)
-   * @property {'rascunho'|'agendado'|'publicado'|'expirado'|'arquivado'} status
-   * @property {string}  dataPublicacao ISO 8601
-   * @property {string}  dataAgendada   ISO 8601 (se agendado)
-   * @property {string}  dataExpiracao  ISO 8601 (opcional)
-   * @property {string}  visibilidade   'todos'|'turma'|'setor'|'equipe'|'colaborador'
-   * @property {string}  visRefId       ID do alvo de visibilidade
-   * @property {boolean} liberarAuto
-   * @property {boolean} ocultarAposPrazo
-   * @property {boolean} bloquearAposVencimento
-   * @property {boolean} notificarUsuarios
-   * @property {string}  responsavel
-   * @property {string}  criadoEm
-   */
-
-  const Publicacoes = {
-    listar: () => get(K.PUBLICACOES),
-
-    obter: id => get(K.PUBLICACOES).find(p => p.id === id) || null,
-
-    porTipo: tipo => get(K.PUBLICACOES).filter(p => p.tipo === tipo),
-
-    criar: d => {
-      const lista = get(K.PUBLICACOES);
-      const p = {
-        id: uid(), criadoEm: now(),
-        status: 'rascunho', visibilidade: 'todos', visRefId: '',
-        liberarAuto: true, ocultarAposPrazo: false,
-        bloquearAposVencimento: true, notificarUsuarios: false,
-        responsavel: 'Admin',
-        dataPublicacao: null, dataAgendada: null, dataExpiracao: null,
-        ...d,
-      };
-      lista.push(p); set(K.PUBLICACOES, lista); return p;
-    },
-
-    atualizar: (id, d) =>
-      set(K.PUBLICACOES, get(K.PUBLICACOES).map(p => p.id === id ? { ...p, ...d } : p)),
-
-    excluir: id => set(K.PUBLICACOES, get(K.PUBLICACOES).filter(p => p.id !== id)),
-
-    publicar: id => set(K.PUBLICACOES, get(K.PUBLICACOES).map(p =>
-      p.id === id ? { ...p, status: 'publicado', dataPublicacao: now() } : p
-    )),
-
-    agendar: (id, dataAgendada) => set(K.PUBLICACOES, get(K.PUBLICACOES).map(p =>
-      p.id === id ? { ...p, status: 'agendado', dataAgendada } : p
-    )),
-
-    despublicar: id => set(K.PUBLICACOES, get(K.PUBLICACOES).map(p =>
-      p.id === id ? { ...p, status: 'rascunho', dataPublicacao: null } : p
-    )),
-
-    arquivar: id => set(K.PUBLICACOES, get(K.PUBLICACOES).map(p =>
-      p.id === id ? { ...p, status: 'arquivado' } : p
-    )),
-
-    /** Processa agendamentos vencidos e expirações. */
-    sincronizar: () => {
-      const agora = new Date();
-      set(K.PUBLICACOES, get(K.PUBLICACOES).map(p => {
-        if (p.status === 'agendado' && p.dataAgendada && new Date(p.dataAgendada) <= agora)
-          return { ...p, status: 'publicado', dataPublicacao: p.dataAgendada };
-        if (p.status === 'publicado' && p.dataExpiracao && new Date(p.dataExpiracao) < agora)
-          return { ...p, status: 'expirado' };
-        return p;
-      }));
-    },
-
-    /** Cria publicações automáticas para todos os cursos publicados ainda sem entrada. */
-    sincronizarCursos: () => {
-      const existentes = new Set(
-        get(K.PUBLICACOES).filter(p => p.tipo === 'curso').map(p => p.refId)
-      );
-      Cursos.listar().forEach(c => {
-        if (existentes.has(c.id)) return;
-        const st = c.status === 'publicado' ? 'publicado'
-                 : c.status === 'arquivado' ? 'arquivado' : 'rascunho';
-        Publicacoes.criar({
-          tipo: 'curso', refId: c.id, titulo: c.titulo,
-          status: st, dataPublicacao: c.publicadoEm || null,
-          dataExpiracao: c.validadeAte || null,
-          criadoEm: c.criadoEm,
-        });
-      });
-    },
-
-    stats: () => {
-      Publicacoes.sincronizar();
-      const lista = get(K.PUBLICACOES);
-      const agora = new Date(); const em7 = new Date(); em7.setDate(em7.getDate()+7);
-      return {
-        total:      lista.length,
-        ativas:     lista.filter(p => p.status === 'publicado').length,
-        agendadas:  lista.filter(p => p.status === 'agendado').length,
-        rascunhos:  lista.filter(p => p.status === 'rascunho').length,
-        expiradas:  lista.filter(p => p.status === 'expirado').length,
-        arquivadas: lista.filter(p => p.status === 'arquivado').length,
-        vencendo7:  lista.filter(p =>
-          p.status === 'publicado' && p.dataExpiracao &&
-          new Date(p.dataExpiracao) > agora && new Date(p.dataExpiracao) <= em7
-        ).length,
-      };
-    },
-  };
-
-  // ════════════════════════════════════════════════════════════════
-  // COMUNICADOS
-  // ════════════════════════════════════════════════════════════════
-
-  /**
-   * @typedef {Object} Comunicado
-   * @property {string}  id
-   * @property {string}  titulo
-   * @property {string}  mensagem
-   * @property {'normal'|'importante'|'urgente'} prioridade
-   * @property {'rascunho'|'publicado'|'expirado'|'arquivado'} status
-   * @property {string}  dataPublicacao
-   * @property {string}  dataExpiracao  (opcional)
-   * @property {string}  responsavel
-   * @property {string}  criadoEm
-   */
-
-  const Comunicados = {
-    listar: () => get(K.COMUNICADOS),
-
-    obter: id => get(K.COMUNICADOS).find(c => c.id === id) || null,
-
-    criar: d => {
-      const lista = get(K.COMUNICADOS);
-      const c = {
-        id: uid(), criadoEm: now(), status: 'rascunho',
-        prioridade: 'normal', responsavel: 'Admin',
-        dataPublicacao: null, dataExpiracao: null,
-        ...d,
-      };
-      lista.push(c); set(K.COMUNICADOS, lista); return c;
-    },
-
-    atualizar: (id, d) =>
-      set(K.COMUNICADOS, get(K.COMUNICADOS).map(c => c.id === id ? { ...c, ...d } : c)),
-
-    excluir: id => set(K.COMUNICADOS, get(K.COMUNICADOS).filter(c => c.id !== id)),
-
-    publicar: id => set(K.COMUNICADOS, get(K.COMUNICADOS).map(c =>
-      c.id === id ? { ...c, status: 'publicado', dataPublicacao: now() } : c
-    )),
-
-    arquivar: id => set(K.COMUNICADOS, get(K.COMUNICADOS).map(c =>
-      c.id === id ? { ...c, status: 'arquivado' } : c
-    )),
-  };
-
   // ── ATIVIDADES ────────────────────────────────────────────────────
   // MIGRAÇÃO: substituir por POST/GET /api/v1/atividades
   const MAX_ATIVIDADES = 50;
@@ -1547,8 +1380,6 @@ var Storage = (() => {
     Restricoes,
     LogAcessos,
     Certificados,
-    Publicacoes,
-    Comunicados,
     Turmas,
     Avaliacoes,
     Questoes,
