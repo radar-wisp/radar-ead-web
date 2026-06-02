@@ -7,7 +7,7 @@
  * @module MatTable
  */
 
-/* global Storage, MatUtils, MatState */
+/* global Storage, MatUtils, MatState, PortalMenu */
 
 var MatTable = (() => {
   'use strict';
@@ -18,39 +18,6 @@ var MatTable = (() => {
   const _tipoBadge  = MatUtils.tipoBadge;
   const _statusBadge = MatUtils.statusBadge;
   const TIPO_CFG    = MatUtils.TIPO_CFG;
-
-  // ── Estilo do menu de ações (scoped ao módulo) ────────────────
-  // Reaproveita os mesmos tokens do #gc-portal-menu para manter o
-  // dropdown da Central de Materiais visualmente consistente com os
-  // demais menus de ação do sistema. Não altera regras globais.
-  (function _injectMenuStyle() {
-    if (typeof document === 'undefined') return;
-    if (document.getElementById('cm-actions-menu-style')) return;
-    const css = `
-      .gc-actions { position:relative; display:inline-block; }
-      .cm-menu {
-        display:none; position:absolute; top:calc(100% + 4px); right:0; z-index:9000;
-        background:var(--surface); border:1px solid var(--border);
-        border-radius:var(--radius-sm); box-shadow:0 8px 24px rgba(0,2,60,.14);
-        min-width:185px; padding:4px;
-      }
-      .cm-menu.open { display:block; animation:popIn .12s ease; }
-      .cm-menu button {
-        display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
-        border-radius:5px; font-size:12px; color:var(--text2); background:none;
-        border:none; cursor:pointer; text-align:left; transition:background .1s;
-        font-family:var(--font);
-      }
-      .cm-menu button:hover { background:var(--blue-l); color:var(--blue); }
-      .cm-menu button.danger { color:var(--red); }
-      .cm-menu button.danger:hover { background:var(--red-l,#fee2e2); }
-      .cm-menu hr { border:none; border-top:1px solid var(--border); margin:3px 0; }
-    `;
-    const el = document.createElement('style');
-    el.id = 'cm-actions-menu-style';
-    el.textContent = css;
-    (document.head || document.documentElement).appendChild(el);
-  })();
 
   // ── Chips de filtro de status ─────────────────────────────────
 
@@ -247,7 +214,7 @@ var MatTable = (() => {
             Ações
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
-          <div class="gc-menu cm-menu">
+          <div class="gc-menu" hidden>
             <button onclick="MatMod.visualizar('${m.id}');MatMod._closeMenus()">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               Visualizar
@@ -286,18 +253,41 @@ var MatTable = (() => {
   }
 
   // ── Menu dropdown ─────────────────────────────────────────────
+  // Renderizado via PortalMenu (#gc-portal-menu, no body) — mesmo
+  // mecanismo dos demais módulos — para não ser recortado pelo
+  // overflow do .tbl-wrap e ficar visualmente idêntico aos outros.
 
   function _menu(btn) {
-    const menu   = btn.nextElementSibling;
-    const isOpen = menu.classList.contains('open');
+    const tpl = btn.nextElementSibling; // template oculto (.gc-menu[hidden])
+    if (typeof PortalMenu !== 'undefined' && tpl) {
+      const isOpen = btn.dataset.menuOpen === '1';
+      _closeMenus();
+      if (isOpen) return;
+      btn.dataset.menuOpen = '1';
+      PortalMenu.open(btn, tpl.innerHTML);
+      const pm = document.getElementById('gc-portal-menu');
+      if (pm) {
+        const obs = new MutationObserver(() => {
+          if (pm.style.display === 'none') { btn.dataset.menuOpen = '0'; obs.disconnect(); }
+        });
+        obs.observe(pm, { attributes: true, attributeFilter: ['style'] });
+      }
+      return;
+    }
+    // Fallback (sem PortalMenu): comportamento inline anterior.
+    if (!tpl) return;
+    tpl.hidden = false;
+    const isOpen = tpl.classList.contains('open');
     _closeMenus();
     if (!isOpen) {
-      menu.classList.add('open');
+      tpl.classList.add('open');
       setTimeout(() => document.addEventListener('click', _closeMenus, { once: true }), 10);
     }
   }
 
   function _closeMenus() {
+    if (typeof PortalMenu !== 'undefined') PortalMenu.close();
+    document.querySelectorAll('[data-menu-open="1"]').forEach(b => { b.dataset.menuOpen = '0'; });
     document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
   }
 
