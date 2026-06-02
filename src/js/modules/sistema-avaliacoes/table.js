@@ -228,7 +228,14 @@ var AvalTable = (() => {
   // ══════════════════════════════════════════════════════════════
 
   function _menu(btn) {
-    const m      = btn.nextElementSibling;
+    const m = btn.nextElementSibling; // .gc-menu (template de itens)
+    // Usa o mesmo portal de Gestão de Cursos: dropdown no body, sem clip.
+    if (typeof PortalMenu !== 'undefined' && m) {
+      PortalMenu.open(btn, m.innerHTML);
+      return;
+    }
+    // Fallback (caso o portal não esteja disponível)
+    if (!m) return;
     const isOpen = m.classList.contains('open');
     _cm();
     if (!isOpen) {
@@ -238,6 +245,7 @@ var AvalTable = (() => {
   }
 
   function _cm() {
+    if (typeof PortalMenu !== 'undefined') PortalMenu.close();
     document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
   }
 
