@@ -18,7 +18,7 @@ var AvalUtils = (() => {
 
   /** Escapa HTML para evitar XSS */
   function x(s) {
-    if (!s) return '';
+    if (s == null) return '';
     return String(s)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -34,7 +34,9 @@ var AvalUtils = (() => {
   /** Formata data ISO 8601 para pt-BR. */
   function fmtDate(iso) {
     if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('pt-BR', {
+    const d = new Date(iso);
+    if (isNaN(d)) return '—';
+    return d.toLocaleDateString('pt-BR', {
       day: '2-digit', month: '2-digit', year: '2-digit',
     });
   }
