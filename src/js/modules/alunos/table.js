@@ -88,11 +88,8 @@ var AlunosTable = (() => {
 
   function popularFiltros() {
     const sS = document.getElementById('al-filtro-setor');
-    const sE = document.getElementById('al-filtro-equipe');
     if (sS) sS.innerHTML = '<option value="">Setor</option>' +
       Storage.Setores.listar().map(s => `<option value="${_x(s.id)}">${_x(s.nome)}</option>`).join('');
-    if (sE) sE.innerHTML = '<option value="">Equipe</option>' +
-      Storage.Equipes.listar().map(e => `<option value="${_x(e.id)}">${_x(e.nome)}</option>`).join('');
   }
 
   // ── Tabela ────────────────────────────────────────────────────
@@ -104,7 +101,6 @@ var AlunosTable = (() => {
     const busca  = (q('#al-busca')?.value       || '').toLowerCase().trim();
     const fSt    = q('#al-filtro-status')?.value || '';
     const fSe    = q('#al-filtro-setor')?.value  || '';
-    const fEq    = q('#al-filtro-equipe')?.value || '';
     const ordem  = q('#al-order')?.value         || 'recente';
 
     let lista = Storage.Alunos.listar();
@@ -115,7 +111,6 @@ var AlunosTable = (() => {
     );
     if (fSt) lista = lista.filter(a => (a.statusAcesso || (a.ativo ? 'ativo' : 'bloqueado')) === fSt);
     if (fSe) lista = lista.filter(a => a.setorId  === fSe);
-    if (fEq) lista = lista.filter(a => a.equipeId === fEq);
 
     lista.sort((a, b) => {
       if (ordem === 'az')        return (a.nome || '').localeCompare(b.nome || '');
