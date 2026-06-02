@@ -133,11 +133,11 @@ var AvalActions = (() => {
       if (empty) empty.style.display = 'block';
     } else {
       if (empty) empty.style.display = 'none';
-      tbody.innerHTML = respostas
+      if (tbody) tbody.innerHTML = respostas
         .sort((a, b) => new Date(b.concluidoEm) - new Date(a.concluidoEm))
         .map(r => {
           const aluno = Storage.Alunos.obter(r.alunoId);
-          const nome  = aluno ? _x(aluno.nome) : 'Aluno ' + r.alunoId.slice(0, 6);
+          const nome  = aluno ? _x(aluno.nome) : 'Aluno ' + String(r.alunoId || '').slice(0, 6);
           const stCls = r.aprovado ? 'badge-green' : 'badge-red';
           const stLbl = r.aprovado ? '✓ Aprovado'  : '✕ Reprovado';
           return `<tr>
