@@ -24,6 +24,9 @@ var AvalTable = (() => {
     arquivada:  'active-exp',
   };
 
+  // IDs dos campos de filtro (fonte única — usado por reset e badge)
+  const FILTRO_IDS = ['av-busca', 'av-filtro-status', 'av-filtro-curso', 'av-filtro-turma', 'av-filtro-data'];
+
   function setStatus(btn, value) {
     document.querySelectorAll('.ift-chip[data-avst]').forEach(c => {
       Object.values(CHIP_CLS).forEach(cls => { if (cls) c.classList.remove(cls); });
@@ -36,7 +39,7 @@ var AvalTable = (() => {
   }
 
   function resetFiltros() {
-    ['av-busca', 'av-filtro-status', 'av-filtro-curso', 'av-filtro-turma', 'av-filtro-data'].forEach(id => {
+    FILTRO_IDS.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -51,8 +54,7 @@ var AvalTable = (() => {
     const b = document.getElementById('av-badge');
     if (!b) return;
     let n = 0;
-    ['av-busca', 'av-filtro-status', 'av-filtro-curso', 'av-filtro-turma', 'av-filtro-data']
-      .forEach(id => { if (document.getElementById(id)?.value?.trim()) n++; });
+    FILTRO_IDS.forEach(id => { if (document.getElementById(id)?.value?.trim()) n++; });
     b.textContent = n;
     b.classList.toggle('show', n > 0);
   }
@@ -143,7 +145,7 @@ var AvalTable = (() => {
     }
     if (empty) empty.style.display = 'none';
 
-    tbody.innerHTML = lista.map(av => _renderLinha(av)).join('');
+    if (tbody) tbody.innerHTML = lista.map(av => _renderLinha(av)).join('');
   }
 
   /**
