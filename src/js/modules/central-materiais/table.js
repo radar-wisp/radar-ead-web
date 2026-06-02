@@ -37,11 +37,10 @@ var MatTable = (() => {
       .cm-menu.open { display:block; animation:popIn .12s ease; }
       .cm-menu button {
         display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
-        border-radius:5px; font-size:12px; line-height:1.2; color:var(--text2);
-        background:none; border:none; cursor:pointer; text-align:left;
-        white-space:nowrap; transition:background .1s; font-family:var(--font);
+        border-radius:5px; font-size:12px; color:var(--text2); background:none;
+        border:none; cursor:pointer; text-align:left; transition:background .1s;
+        font-family:var(--font);
       }
-      .cm-menu button svg { flex:0 0 auto; }
       .cm-menu button:hover { background:var(--blue-l); color:var(--blue); }
       .cm-menu button.danger { color:var(--red); }
       .cm-menu button.danger:hover { background:var(--red-l,#fee2e2); }
