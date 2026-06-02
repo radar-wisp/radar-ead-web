@@ -60,7 +60,9 @@ var Aval = (() => {
     _setCorreta:   AvalModals._setCorreta,
     _setAlt:       AvalModals._setAlt,
     _addAlt:       AvalModals._addAlt,
+    _remAlt:       AvalModals._remAlt,
     _remQuestao:   AvalModals._remQuestao,
+    _toggleQuestao:AvalModals._toggleQuestao,
 
     // Ações
     salvar:       AvalActions.salvar,
