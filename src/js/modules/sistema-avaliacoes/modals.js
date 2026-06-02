@@ -209,7 +209,7 @@ var AvalModals = (() => {
   function addQuestao(tipo) {
     const nova = {
       _lid:        _uid(),
-      _aberta:     true,  // questão recém-criada inicia expandida; demais iniciam recolhidas
+      _aberta:     false, // toda questão inicia recolhida; expande/recolhe por clique manual
       avaliacaoId: AvalState.editId || '_novo_',
       tipo,
       pergunta:    '',
