@@ -421,6 +421,13 @@ input,select,textarea,.sel-sm {
 input:focus,select:focus,textarea:focus {
   border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,2,218,.08);
 }
+/* Rádios e checkboxes não devem herdar o width:100% da regra acima
+   (isso quebrava o layout flex das alternativas, empurrando os campos
+   de texto e o botão de excluir para fora do modal). */
+input[type=radio],input[type=checkbox] {
+  width:auto; flex:0 0 auto; padding:0; border:none; background:none;
+}
+input[type=radio]:focus,input[type=checkbox]:focus { box-shadow:none }
 input::placeholder { color:var(--text4) }
 textarea { resize:vertical; min-height:70px }
 select {
