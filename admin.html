@@ -802,6 +802,26 @@ tbody tr.selected td { background:#f0f4ff }
 #gc-portal-menu button.danger:hover { background:var(--red-l,#fee2e2) }
 #gc-portal-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
 
+/* Menu de Ações inline (Avaliações, Certificados, Publicações):
+   oculto por padrão, abre como dropdown ao receber a classe .open. */
+.gc-menu {
+  display:none; position:absolute; top:calc(100% + 4px); right:0; z-index:9000;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); box-shadow:0 8px 24px rgba(0,2,60,.14);
+  min-width:185px; padding:4px; animation:popIn .12s ease;
+}
+.gc-menu.open { display:block }
+.gc-menu button {
+  display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px;
+  border-radius:5px; font-size:12px; color:var(--text2); background:none;
+  border:none; cursor:pointer; text-align:left; transition:background .1s;
+  font-family:var(--font);
+}
+.gc-menu button:hover { background:var(--blue-l); color:var(--blue) }
+.gc-menu button.danger { color:var(--red) }
+.gc-menu button.danger:hover { background:var(--red-l,#fee2e2) }
+.gc-menu .sep { border:none; border-top:1px solid var(--border); margin:3px 0 }
+
 /* Stats cards do módulo */
 #gc-stats .stat-val { font-size:22px }
 
