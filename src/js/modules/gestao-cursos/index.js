@@ -98,6 +98,9 @@ var Cursos = (() => {
     setPerPage: CursosTable.setPerPage,
     _goPage:    CursosTable.goPage,
 
+    // Chevron das tabelas de status
+    toggleCard: CursosTable.toggleCard,
+
     // Utilitários
     exportar: CursosActions.exportar,
   };
