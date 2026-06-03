@@ -36,5 +36,11 @@ var CursosState = (() => {
     if (loteRow) loteRow.classList.toggle('show', n > 0);
   }
 
-  return { clearCache, getCache, setCache, select, deselect, clearSel, hasSel, selSize, selList, syncLoteUI };
+  return {
+    clearCache, getCache, setCache, select, deselect, clearSel, hasSel, selSize, selList, syncLoteUI,
+    // Paginação (quebra de página)
+    page:          1,     // Página atual
+    perPage:       25,    // Itens por página (25 / 50 / 75 / 100)
+    lastFilterSig: null,  // Assinatura dos filtros p/ resetar página ao mudar
+  };
 })();
