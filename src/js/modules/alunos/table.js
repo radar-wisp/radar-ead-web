@@ -101,6 +101,16 @@ var AlunosTable = (() => {
 
   // ── Tabela ────────────────────────────────────────────────────
 
+  // Tabelas por status. Cada uma é independente (chevron + paginação própria).
+  const BUCKETS = [
+    { key: 'pendente',  label: 'Pendentes'  },
+    { key: 'ativo',     label: 'Ativos'     },
+    { key: 'inativo',   label: 'Inativos'   },
+    { key: 'bloqueado', label: 'Bloqueados' },
+  ];
+
+  const _statusOf = a => a.statusAcesso || (a.ativo ? 'ativo' : 'bloqueado');
+
   function render() {
     AlunosState.progCache = new Map();
 
@@ -116,7 +126,7 @@ var AlunosTable = (() => {
       a.email?.toLowerCase().includes(busca) ||
       a.matricula?.toLowerCase().includes(busca)
     );
-    if (fSt) lista = lista.filter(a => (a.statusAcesso || (a.ativo ? 'ativo' : 'bloqueado')) === fSt);
+    if (fSt) lista = lista.filter(a => _statusOf(a) === fSt);
     if (fSe) lista = lista.filter(a => a.setorId  === fSe);
 
     lista.sort((a, b) => {
@@ -126,38 +136,65 @@ var AlunosTable = (() => {
       return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
     });
 
-    const tbody = q('#al-tbody');
-    const empty = q('#al-empty');
-    const count = q('#al-count');
-    if (count) count.textContent = `${lista.length} aluno(s)`;
-    if (!lista.length) {
+    // Reseta a página de todas as tabelas sempre que os filtros mudam.
+    const sig = JSON.stringify([busca, fSt, fSe, ordem]);
+    if (AlunosState.lastFilterSig !== sig) {
+      BUCKETS.forEach(b => { AlunosState.pages[b.key] = 1; });
+      AlunosState.lastFilterSig = sig;
+    }
+
+    const setores = Storage.Setores.listar();
+    const equipes = Storage.Equipes.listar();
+    BUCKETS.forEach(b => {
+      const itens = lista.filter(a => _statusOf(a) === b.key);
+      _renderBucket(b.key, itens, setores, equipes);
+    });
+    AlunosState.progCache = null;
+  }
+
+  function _renderBucket(key, itens, setores, equipes) {
+    const tbody = document.getElementById('al-tbody-' + key);
+    const empty = document.getElementById('al-empty-' + key);
+    const count = document.getElementById('al-count-' + key);
+    if (count) count.textContent = `${itens.length} aluno(s)`;
+
+    if (!itens.length) {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
-      _renderPager(0, 1, 1);
-      AlunosState.progCache = null;
+      _renderPager(key, 0, 1, 1);
       return;
     }
     if (empty) empty.style.display = 'none';
 
-    // ── Paginação (quebra de página) ──────────────────────────
-    // Reseta para a página 1 sempre que os filtros mudam.
-    const sig = JSON.stringify([busca, fSt, fSe, ordem]);
-    if (AlunosState.lastFilterSig !== sig) {
-      AlunosState.page = 1;
-      AlunosState.lastFilterSig = sig;
-    }
     const perPage    = AlunosState.perPage || 25;
-    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
-    if (AlunosState.page > totalPages) AlunosState.page = totalPages;
-    if (AlunosState.page < 1)          AlunosState.page = 1;
-    const ini    = (AlunosState.page - 1) * perPage;
-    const pagina = lista.slice(ini, ini + perPage);
+    const totalPages = Math.max(1, Math.ceil(itens.length / perPage));
+    let page = AlunosState.pages[key] || 1;
+    if (page > totalPages) page = totalPages;
+    if (page < 1)          page = 1;
+    AlunosState.pages[key] = page;
 
-    const setores = Storage.Setores.listar();
-    const equipes = Storage.Equipes.listar();
+    const ini    = (page - 1) * perPage;
+    const pagina = itens.slice(ini, ini + perPage);
     tbody.innerHTML = pagina.map(al => _renderLinha(al, setores, equipes)).join('');
-    _renderPager(lista.length, perPage, AlunosState.page);
-    AlunosState.progCache = null;
+    _renderPager(key, itens.length, perPage, page);
+  }
+
+  // ── Chevron (expandir / recolher) ────────────────────────────────
+
+  function toggleCard(key) {
+    const card = document.getElementById('al-card-' + key);
+    if (!card) return;
+    _setCollapsed(key, card.dataset.collapsed !== '1');
+  }
+
+  function _setCollapsed(key, collapsed) {
+    const card = document.getElementById('al-card-' + key);
+    if (!card) return;
+    card.dataset.collapsed = collapsed ? '1' : '0';
+    const body = card.querySelector('.al-card-body');
+    const chev = card.querySelector('.al-chevron');
+    if (body) body.style.display = collapsed ? 'none' : '';
+    if (chev) chev.style.transform = collapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
   }
 
   // ── Paginação ─────────────────────────────────────────────────
@@ -175,8 +212,8 @@ var AlunosTable = (() => {
     return pages;
   }
 
-  function _renderPager(total, perPage, page) {
-    const pager = document.getElementById('al-pager');
+  function _renderPager(key, total, perPage, page) {
+    const pager = document.getElementById('al-pager-' + key);
     if (!pager) return;
     if (!total) { pager.innerHTML = ''; return; }
     const totalPages = Math.max(1, Math.ceil(total / perPage));
@@ -188,7 +225,7 @@ var AlunosTable = (() => {
 
     const btn = (lbl, p, dis, active) =>
       `<button class="al-pg-btn${active ? ' active' : ''}"${dis ? ' disabled' : ''}` +
-      `${dis ? '' : ` onclick="AlunosMod._goPage(${p})"`}>${lbl}</button>`;
+      `${dis ? '' : ` onclick="AlunosMod._goPage('${key}',${p})"`}>${lbl}</button>`;
 
     const nums = _pageList(page, totalPages).map(p =>
       p === '…' ? '<span class="al-pg-dots">…</span>' : btn(p, p, false, p === page)
@@ -203,15 +240,15 @@ var AlunosTable = (() => {
       `</div>`;
   }
 
-  function goPage(p) {
-    AlunosState.page = p;
+  function goPage(key, p) {
+    AlunosState.pages[key] = p;
     render();
-    document.getElementById('al-tbody')?.scrollIntoView({ block: 'nearest' });
+    document.getElementById('al-tbody-' + key)?.scrollIntoView({ block: 'nearest' });
   }
 
   function setPerPage(val) {
     AlunosState.perPage = parseInt(val, 10) || 25;
-    AlunosState.page = 1;
+    BUCKETS.forEach(b => { AlunosState.pages[b.key] = 1; });
     render();
   }
 
@@ -260,5 +297,5 @@ var AlunosTable = (() => {
     </tr>`;
   }
 
-  return { render, renderStats, popularFiltros, progGeral, cursosDoAluno, stBadge, goPage, setPerPage };
+  return { render, renderStats, popularFiltros, progGeral, cursosDoAluno, stBadge, goPage, setPerPage, toggleCard };
 })();
