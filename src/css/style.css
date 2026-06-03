@@ -607,3 +607,16 @@ tbody tr:hover{background:#FAFBFE}
   .stats{grid-template-columns:1fr 1fr}
   .content{padding:16px}
 }
+
+/* ══════════════════════════════════════
+   PAGINAÇÃO (quebra de página — alunos)
+══════════════════════════════════════ */
+.al-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--border)}
+.al-pager:empty{display:none}
+.al-pg-info{font-size:12px;color:var(--text4)}
+.al-pg-ctrls{display:flex;align-items:center;gap:4px}
+.al-pg-btn{min-width:30px;height:30px;padding:0 8px;border:1px solid var(--border);background:var(--card,#fff);color:var(--text2);border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.al-pg-btn:hover:not(:disabled):not(.active){background:var(--blue-light);color:var(--blue)}
+.al-pg-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);cursor:default}
+.al-pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.al-pg-dots{padding:0 4px;color:var(--text4);font-size:12px}
