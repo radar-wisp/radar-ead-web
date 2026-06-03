@@ -66,6 +66,10 @@ var MatMod = (() => {
     setStatus:    MatTable.setStatus,
     resetFiltros: MatTable.resetFiltros,
 
+    // Paginação (quebra de página)
+    _goPage:      MatTable.goPage,
+    setPerPage:   MatTable.setPerPage,
+
     // Modal
     abrirModal:   MatModals.abrirModal,
     abrirEdit:    MatModals.abrirEdit,
