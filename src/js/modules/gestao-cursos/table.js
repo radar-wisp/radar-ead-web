@@ -65,10 +65,82 @@ var CursosTable = (() => {
     if (!lista.length) {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
+      _renderPager(0, 1, 1);
       return;
     }
     if (empty) empty.style.display = 'none';
-    tbody.innerHTML = lista.map(c => _renderLinha(c, agora)).join('');
+
+    // ── Paginação (quebra de página) ──────────────────────────
+    // Reseta para a página 1 sempre que os filtros mudam.
+    const sig = JSON.stringify([busca, fStatus, fCat, fFmt, fData, ordem]);
+    if (CursosState.lastFilterSig !== sig) {
+      CursosState.page = 1;
+      CursosState.lastFilterSig = sig;
+    }
+    const perPage    = Math.min(CursosState.perPage || 25, 100);
+    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
+    if (CursosState.page > totalPages) CursosState.page = totalPages;
+    if (CursosState.page < 1)          CursosState.page = 1;
+    const ini    = (CursosState.page - 1) * perPage;
+    const pagina = lista.slice(ini, ini + perPage);
+
+    tbody.innerHTML = pagina.map(c => _renderLinha(c, agora)).join('');
+    _renderPager(lista.length, perPage, CursosState.page);
+  }
+
+  // ── Paginação ───────────────────────────────────────────────────
+
+  function _pageList(page, totalPages) {
+    const pages = [];
+    if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); return pages; }
+    pages.push(1);
+    if (page > 3) pages.push('…');
+    const start = Math.max(2, page - 1);
+    const end   = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('…');
+    pages.push(totalPages);
+    return pages;
+  }
+
+  function _renderPager(total, perPage, page) {
+    const pager = document.getElementById('gc-pager');
+    if (!pager) return;
+    if (!total) { pager.innerHTML = ''; return; }
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const ini = (page - 1) * perPage + 1;
+    const fim = Math.min(page * perPage, total);
+    const info = `<span class="al-pg-info">${ini}–${fim} de ${total}</span>`;
+
+    if (totalPages <= 1) { pager.innerHTML = info; return; }
+
+    const btn = (lbl, p, dis, active) =>
+      `<button class="al-pg-btn${active ? ' active' : ''}"${dis ? ' disabled' : ''}` +
+      `${dis ? '' : ` onclick="Cursos._goPage(${p})"`}>${lbl}</button>`;
+
+    const nums = _pageList(page, totalPages).map(p =>
+      p === '…' ? '<span class="al-pg-dots">…</span>' : btn(p, p, false, p === page)
+    ).join('');
+
+    pager.innerHTML =
+      info +
+      `<div class="al-pg-ctrls">` +
+        btn('‹', page - 1, page <= 1, false) +
+        nums +
+        btn('›', page + 1, page >= totalPages, false) +
+      `</div>`;
+  }
+
+  function goPage(p) {
+    CursosState.page = p;
+    render();
+    document.getElementById('gc-tbody')?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function setPerPage(val) {
+    CursosState.perPage = Math.min(parseInt(val, 10) || 25, 100);
+    CursosState.page = 1;
+    render();
   }
 
   function _renderLinha(c, agora) {
@@ -181,5 +253,5 @@ var CursosTable = (() => {
     document.querySelectorAll('[data-menu-open="1"]').forEach(b => { b.dataset.menuOpen = '0'; });
   }
 
-  return { render, popularFiltroCategoria, toggleMenu, closeMenus };
+  return { render, popularFiltroCategoria, toggleMenu, closeMenus, goPage, setPerPage };
 })();
