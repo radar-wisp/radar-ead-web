@@ -1414,19 +1414,6 @@ tbody tr.selected td { background:#f0f4ff }
             </select>
           </div>
 
-          <!-- Status -->
-          <div class="ift-field">
-            <label class="ift-label">Status</label>
-            <select class="ift-select" id="gc-filtro-status" onchange="Cursos.renderTabela()">
-              <option value="">Todos</option>
-              <option value="publicado">Publicado</option>
-              <option value="rascunho">Rascunho</option>
-              <option value="revisao">Revisão</option>
-              <option value="arquivado">Arquivado</option>
-              <option value="expirado">Expirado</option>
-            </select>
-          </div>
-
           <!-- Data -->
           <div class="ift-field fixed">
             <label class="ift-label">Publicado a partir de</label>
@@ -1486,44 +1473,133 @@ tbody tr.selected td { background:#f0f4ff }
           </div>
 
         </div>
-        <!-- Tabela principal -->
-        <div class="card" style="margin-bottom:14px">
-          <div class="card-head" style="padding:10px 16px">
+        <!-- ── Tabela: Publicados ──────────────────────────── -->
+        <div class="card gc-card" id="gc-card-publicado" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="Cursos.toggleCard('publicado')">
             <div class="card-title">
+              <svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              Cursos cadastrados
+              Publicados
             </div>
-            <span id="gc-result-count" style="font-size:12px;color:var(--text4)"></span>
+            <span id="gc-count-publicado" style="font-size:12px;color:var(--text4)"></span>
           </div>
-          <div class="tbl-wrap">
-            <table id="gc-tabela">
-              <thead>
-                <tr>
-                  <th style="width:32px;padding:8px 10px">
-                    <input type="checkbox" id="gc-sel-all" onchange="Cursos.toggleSelAll(this)"
-                      style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer">
-                  </th>
-                  <th>Curso</th>
-                  <th>Categoria</th>
-                  <th style="text-align:center">Carga</th>
-                  <th style="text-align:center">Aulas</th>
-                  <th style="text-align:center">Colaboradores</th>
-                  <th style="text-align:center">Progresso</th>
-                  <th>Status</th>
-                  <th>Publicado</th>
-                  <th>Atualizado</th>
-                  <th style="width:80px"></th>
-                </tr>
-              </thead>
-              <tbody id="gc-tbody"></tbody>
-            </table>
+          <div class="gc-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:32px;padding:8px 10px">
+                      <input type="checkbox" id="gc-sel-all-publicado" onchange="Cursos.toggleSelAll(this,'publicado')"
+                        style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer">
+                    </th>
+                    <th>Curso</th>
+                    <th>Categoria</th>
+                    <th style="text-align:center">Carga</th>
+                    <th style="text-align:center">Aulas</th>
+                    <th style="text-align:center">Colaboradores</th>
+                    <th style="text-align:center">Progresso</th>
+                    <th>Status</th>
+                    <th>Publicado</th>
+                    <th>Atualizado</th>
+                    <th style="width:80px"></th>
+                  </tr>
+                </thead>
+                <tbody id="gc-tbody-publicado"></tbody>
+              </table>
+            </div>
+            <div id="gc-empty-publicado" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum curso publicado</div>
+              <div style="font-size:12px">Cursos com status "Publicado" aparecem aqui</div>
+            </div>
+            <div id="gc-pager-publicado" class="al-pager"></div>
           </div>
-          <div id="gc-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum curso encontrado</div>
-            <div style="font-size:12px">Tente ajustar os filtros ou crie um novo curso</div>
+        </div>
+
+        <!-- ── Tabela: Rascunhos ───────────────────────────── -->
+        <div class="card gc-card" id="gc-card-rascunho" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="Cursos.toggleCard('rascunho')">
+            <div class="card-title">
+              <svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Rascunhos
+            </div>
+            <span id="gc-count-rascunho" style="font-size:12px;color:var(--text4)"></span>
           </div>
-          <div id="gc-pager" class="al-pager"></div>
+          <div class="gc-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:32px;padding:8px 10px">
+                      <input type="checkbox" id="gc-sel-all-rascunho" onchange="Cursos.toggleSelAll(this,'rascunho')"
+                        style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer">
+                    </th>
+                    <th>Curso</th>
+                    <th>Categoria</th>
+                    <th style="text-align:center">Carga</th>
+                    <th style="text-align:center">Aulas</th>
+                    <th style="text-align:center">Colaboradores</th>
+                    <th style="text-align:center">Progresso</th>
+                    <th>Status</th>
+                    <th>Publicado</th>
+                    <th>Atualizado</th>
+                    <th style="width:80px"></th>
+                  </tr>
+                </thead>
+                <tbody id="gc-tbody-rascunho"></tbody>
+              </table>
+            </div>
+            <div id="gc-empty-rascunho" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum rascunho</div>
+              <div style="font-size:12px">Cursos com status "Rascunho" aparecem aqui</div>
+            </div>
+            <div id="gc-pager-rascunho" class="al-pager"></div>
+          </div>
+        </div>
+
+        <!-- ── Tabela: Arquivados ──────────────────────────── -->
+        <div class="card gc-card" id="gc-card-arquivado" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="Cursos.toggleCard('arquivado')">
+            <div class="card-title">
+              <svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              Arquivados
+            </div>
+            <span id="gc-count-arquivado" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="gc-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:32px;padding:8px 10px">
+                      <input type="checkbox" id="gc-sel-all-arquivado" onchange="Cursos.toggleSelAll(this,'arquivado')"
+                        style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer">
+                    </th>
+                    <th>Curso</th>
+                    <th>Categoria</th>
+                    <th style="text-align:center">Carga</th>
+                    <th style="text-align:center">Aulas</th>
+                    <th style="text-align:center">Colaboradores</th>
+                    <th style="text-align:center">Progresso</th>
+                    <th>Status</th>
+                    <th>Publicado</th>
+                    <th>Atualizado</th>
+                    <th style="width:80px"></th>
+                  </tr>
+                </thead>
+                <tbody id="gc-tbody-arquivado"></tbody>
+              </table>
+            </div>
+            <div id="gc-empty-arquivado" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/></svg>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum curso arquivado</div>
+              <div style="font-size:12px">Cursos com status "Arquivado" aparecem aqui</div>
+            </div>
+            <div id="gc-pager-arquivado" class="al-pager"></div>
+          </div>
         </div>
 
 
@@ -3819,7 +3895,7 @@ var IFT = (() => {
   function init() { /* chips removidos — select nativo usado */ }
 
   function reset() {
-    ['gc-search','gc-filtro-cat','gc-filtro-fmt','gc-filtro-data','gc-filtro-status'].forEach(id => {
+    ['gc-search','gc-filtro-cat','gc-filtro-fmt','gc-filtro-data'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
