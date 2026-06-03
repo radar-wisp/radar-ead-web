@@ -75,5 +75,16 @@ var AlunosValidators = (() => {
     return steps[0]() && steps[1]() && steps[2]();
   }
 
-  return { highlightError, clearErrors, validateStep, validateAll };
+  // Edição: registros existentes podem não ter todos os campos (cargo,
+  // unidade, setor, equipe). Exige apenas o essencial de identificação,
+  // para que dados antigos continuem editáveis.
+  function validateEdit() {
+    const nome  = document.getElementById('mal-nome')?.value.trim();
+    const email = document.getElementById('mal-email')?.value.trim();
+    if (!nome)  { highlightError('mal-nome',  'Informe o nome completo.'); return false; }
+    if (!email) { highlightError('mal-email', 'Informe o e-mail.');        return false; }
+    return true;
+  }
+
+  return { highlightError, clearErrors, validateStep, validateAll, validateEdit };
 })();
