@@ -57,6 +57,10 @@ var AlunosPerfil = (() => {
     // Pane 2: Histórico
     document.getElementById('pa-historico-body').innerHTML = _renderHistorico(id);
 
+    // Pane 3: Turmas
+    const turmasBody = document.getElementById('pa-turmas-body');
+    if (turmasBody) turmasBody.innerHTML = _renderTurmas(id);
+
     tabPerfil(0);
     document.getElementById('modal-perfil-aluno')?.classList.add('open');
   }
@@ -135,15 +139,60 @@ var AlunosPerfil = (() => {
     }).join('');
   }
 
+  function _renderTurmas(alunoId) {
+    const turmas = (Storage.Turmas.listar() || [])
+      .filter(t => (t.alunos || []).includes(alunoId));
+    if (!turmas.length) {
+      return '<p style="color:var(--text4);font-size:13px">Aluno não vinculado a nenhuma turma.</p>';
+    }
+    const cursos = Storage.Cursos.listar();
+    return turmas.map(t => {
+      const curso = cursos.find(c => c.id === t.cursoId);
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${_x(t.nome)}</div>
+            <div style="font-size:11px;color:var(--text4)">${_x(curso?.titulo || 'Sem curso vinculado')}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="flex-shrink:0;color:var(--red)"
+            onclick="AlunosMod.desvincularTurma('${_x(t.id)}')">Desvincular</button>
+        </div>`;
+    }).join('');
+  }
+
   // ── Tabs ─────────────────────────────────────────────────────
 
   function tabPerfil(idx, btn) {
     document.querySelectorAll('#modal-perfil-aluno .mc-tab')
       .forEach((t, i) => t.classList.toggle('active', i === idx));
-    ['pa-pane-0', 'pa-pane-1', 'pa-pane-2'].forEach((id, i) => {
+    ['pa-pane-0', 'pa-pane-1', 'pa-pane-2', 'pa-pane-3'].forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) el.style.display = i === idx ? '' : 'none';
     });
+  }
+
+  // ── Desvincular turma ─────────────────────────────────────────
+
+  function desvincularTurma(turmaId) {
+    const alunoId = AlunosState.perfilId;
+    if (!alunoId || !turmaId) return;
+    const t = Storage.Turmas.obter(turmaId);
+    if (!confirm(`Desvincular aluno da turma "${t?.nome || ''}"?`)) return;
+
+    Storage.Turmas.removerAluno(turmaId, alunoId);
+    _toast('Aluno desvinculado da turma.', 'i');
+
+    // Atualiza aba Turmas, contagem de cursos do header e aba Cursos
+    const turmasBody = document.getElementById('pa-turmas-body');
+    if (turmasBody) turmasBody.innerHTML = _renderTurmas(alunoId);
+
+    const cursos = AlunosTable.cursosDoAluno(alunoId);
+    _setText('pa-ncursos', cursos.length);
+    const cursosBody = document.getElementById('pa-cursos-body');
+    if (cursosBody) cursosBody.innerHTML = _renderCursos(alunoId, cursos);
+
+    // Reflete na tabela principal (coluna "Cursos")
+    AlunosTable.render();
   }
 
   // ── Ações do perfil ───────────────────────────────────────────
@@ -170,5 +219,5 @@ var AlunosPerfil = (() => {
     _toast(novoAtivo ? 'Aluno ativado.' : 'Aluno bloqueado.', 'i');
   }
 
-  return { verPerfil, tabPerfil, resetarSenhaModal, alternarBloqueio };
+  return { verPerfil, tabPerfil, resetarSenhaModal, alternarBloqueio, desvincularTurma };
 })();
