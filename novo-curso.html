@@ -715,7 +715,7 @@ input,select,textarea { font-family:var(--font) }
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span id="autosave-status" style="font-size:11px;color:var(--text4)"></span>
-      <button class="btn btn-ghost btn-sm" onclick="history.back()">Cancelar</button>
+      <button class="btn btn-ghost btn-sm" onclick="Wizard.cancelar()">Cancelar</button>
     </div>
   </header>
 
@@ -987,7 +987,7 @@ input,select,textarea { font-family:var(--font) }
             </div>
             <div class="field" style="margin:0">
               <label>Prazo de conclusão (dias)</label>
-              <input type="number" id="f-prazo" placeholder="Ex: 30" min="1">
+              <input type="number" id="f-prazo" placeholder="0 = sem prazo" min="0">
               <div style="font-size:11px;color:var(--text4);margin-top:4px;line-height:1.4">Dias corridos para concluir após o aluno iniciar o curso.</div>
             </div>
           </div>
@@ -1366,6 +1366,15 @@ var Wizard = (() => {
         const total = (state.acessos.setor.length + state.acessos.equipe.length + state.acessos.colab.length);
         if (!total) { blockError('restricoes-panel','Defina ao menos uma restrição de acesso.'); return false; }
       }
+      if (document.getElementById('tog-validade')?.classList.contains('on')) {
+        const di = val('f-data-inicio'), df = val('f-validade'), pz = val('f-prazo');
+        let ok = true;
+        if (!di) { markError('f-data-inicio','Informe a data inicial.'); ok = false; }
+        if (!df) { markError('f-validade','Informe a data final.'); ok = false; }
+        else if (di && df < di) { markError('f-validade','A data final deve ser após a inicial.'); ok = false; }
+        if (pz === '' || isNaN(pz) || +pz < 0) { markError('f-prazo','Informe o prazo (0 = sem prazo).'); ok = false; }
+        if (!ok) return false;
+      }
       return true;
     }
 
@@ -1568,6 +1577,15 @@ var Wizard = (() => {
   function addAccess() {} // não usado mais
 
   // ── Validade — sem label wrapping input ───────────────────
+  // ── Cancelar: volta para a Gestão de cursos ────────────────
+  function cancelar() {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage('wizard:cancelar', '*');
+    } else {
+      window.location.href = 'admin.html';
+    }
+  }
+
   function toggleValidade() {
     const tog = document.getElementById('tog-validade');
     const row = document.getElementById('val-toggle');
@@ -2519,7 +2537,7 @@ var Wizard = (() => {
   }
 
   return {
-    next, prev, jumpTo, saveDraft,
+    next, prev, jumpTo, saveDraft, cancelar,
     toggleTag, setVisib, addAccess, removeAccess,
     toggleCheck, toggleSwitch, toggleValidade,
     toggleAcc, acFilter, acOpen, acKey, acSelect,
