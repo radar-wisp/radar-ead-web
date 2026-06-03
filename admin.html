@@ -4796,7 +4796,7 @@ var CursoDrawer = (() => {
     if (!drawer || !iframe) return;
     const c = Storage.Cursos.obter(id);
     if (titulo) titulo.textContent = c ? 'Editar: ' + c.titulo : 'Editar Curso';
-    iframe.src = 'novo-curso.html?edit=' + encodeURIComponent(id);
+    iframe.src = 'novo-curso.html?v=' + Date.now() + '&edit=' + encodeURIComponent(id);
     drawer.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
@@ -4807,7 +4807,7 @@ var CursoDrawer = (() => {
     const titulo = document.getElementById('drawer-titulo');
     if (!drawer || !iframe) return;
     if (titulo) titulo.textContent = 'Novo Curso';
-    iframe.src = 'novo-curso.html';
+    iframe.src = 'novo-curso.html?v=' + Date.now();
     drawer.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
