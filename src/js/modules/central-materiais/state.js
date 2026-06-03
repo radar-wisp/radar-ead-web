@@ -12,6 +12,18 @@ var MatState = (() => {
   // Itens selecionados na tabela
   const _selecionados = new Set();
 
+  // ── Paginação (quebra de página) ──────────────────────────────
+  let _page          = 1;      // Página atual da tabela
+  let _perPage       = 25;     // Itens por página (25 / 50 / 75 / 100)
+  let _lastFilterSig = null;   // Assinatura dos filtros p/ resetar página
+
+  function getPage()       { return _page; }
+  function setPage(p)      { _page = p; }
+  function getPerPage()    { return _perPage; }
+  function setPerPage(n)   { _perPage = n; }
+  function getFilterSig()  { return _lastFilterSig; }
+  function setFilterSig(s) { _lastFilterSig = s; }
+
   function select(id)   { _selecionados.add(id); }
   function deselect(id) { _selecionados.delete(id); }
   function clearSel()   { _selecionados.clear(); }
@@ -30,5 +42,8 @@ var MatState = (() => {
     if (row) row.classList.toggle('show', n > 0);
   }
 
-  return { select, deselect, clearSel, hasSel, selSize, selList, syncLoteUI };
+  return {
+    select, deselect, clearSel, hasSel, selSize, selList, syncLoteUI,
+    getPage, setPage, getPerPage, setPerPage, getFilterSig, setFilterSig,
+  };
 })();
