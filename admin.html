@@ -1446,6 +1446,17 @@ tbody tr.selected td { background:#f0f4ff }
             </select>
           </div>
 
+          <!-- Itens por página (quebra de página) -->
+          <div class="ift-field fixed">
+            <label class="ift-label">Por página</label>
+            <select class="ift-select" id="gc-perpage" onchange="Cursos.setPerPage(this.value)">
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="75">75</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+
           <!-- Limpar -->
           <div class="ift-field fixed" style="justify-content:flex-end">
             <label class="ift-label">&nbsp;</label>
@@ -1512,6 +1523,7 @@ tbody tr.selected td { background:#f0f4ff }
             <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum curso encontrado</div>
             <div style="font-size:12px">Tente ajustar os filtros ou crie um novo curso</div>
           </div>
+          <div id="gc-pager" class="al-pager"></div>
         </div>
 
 
