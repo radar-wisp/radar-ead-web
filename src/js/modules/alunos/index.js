@@ -102,6 +102,9 @@ var AlunosMod = (() => {
     _goPage:    AlunosTable.goPage,
     setPerPage: AlunosTable.setPerPage,
 
+    // Chevron (expandir/recolher tabelas por status)
+    toggleCard: AlunosTable.toggleCard,
+
     // Ações individuais
     bloquear:               AlunosActions.bloquear,
     ativar:                 AlunosActions.ativar,
