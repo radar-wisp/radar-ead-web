@@ -96,6 +96,11 @@ var AlunosMod = (() => {
     tabPerfil:         AlunosPerfil.tabPerfil,
     resetarSenhaModal: AlunosPerfil.resetarSenhaModal,
     alternarBloqueio:  AlunosPerfil.alternarBloqueio,
+    desvincularTurma:  AlunosPerfil.desvincularTurma,
+
+    // Paginação (quebra de página)
+    _goPage:    AlunosTable.goPage,
+    setPerPage: AlunosTable.setPerPage,
 
     // Ações individuais
     bloquear:               AlunosActions.bloquear,
