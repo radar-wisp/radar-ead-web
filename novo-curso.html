@@ -193,6 +193,7 @@ input,select,textarea { font-family:var(--font) }
   color:var(--text2); margin-bottom:6px;
 }
 .field label .req { color:var(--red); margin-left:2px }
+.section-title .req { color:var(--red); margin-left:2px }
 .field input,.field select,.field textarea {
   width:100%; padding:9px 12px;
   border:1.5px solid var(--border2); border-radius:var(--r);
@@ -792,8 +793,9 @@ input,select,textarea { font-family:var(--font) }
           <!-- Linha 2: Formato + Carga + Nível -->
           <div class="grid-3" style="margin-top:16px">
             <div class="field">
-              <label>Formato</label>
+              <label>Formato <span class="req">*</span></label>
               <select id="f-formato">
+                <option value="">Selecione...</option>
                 <option value="ead">EAD (Online)</option>
                 <option value="hibrido">Híbrido</option>
                 <option value="presencial">Presencial</option>
@@ -804,8 +806,9 @@ input,select,textarea { font-family:var(--font) }
               <input type="number" id="f-carga" placeholder="Ex: 8" min="1">
             </div>
             <div class="field">
-              <label>Nível</label>
+              <label>Nível <span class="req">*</span></label>
               <select id="f-nivel">
+                <option value="">Selecione...</option>
                 <option value="basico">Básico</option>
                 <option value="intermediario">Intermediário</option>
                 <option value="avancado">Avançado</option>
@@ -815,12 +818,12 @@ input,select,textarea { font-family:var(--font) }
           <!-- Linha 3: Descrição + Capa -->
           <div class="grid-2" style="margin-top:16px">
             <div class="field">
-              <label>Descrição</label>
+              <label>Descrição <span class="req">*</span></label>
               <textarea id="f-desc" placeholder="Descreva o objetivo, conteúdo e benefícios do curso..." style="height:148px;resize:vertical"></textarea>
             </div>
             <div class="field">
-              <label>Imagem / Capa do Curso</label>
-              <div class="upload-zone" onclick="document.getElementById('f-capa-input').click()" style="height:148px">
+              <label>Imagem / Capa do Curso <span class="req">*</span></label>
+              <div class="upload-zone" id="f-capa-zone" onclick="document.getElementById('f-capa-input').click()" style="height:148px">
                 <input type="file" id="f-capa-input" accept="image/*" onclick="event.stopPropagation()" onchange="Wizard.previewCapa(this)">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 10px;display:block;color:var(--text4)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <div class="uz-title">Clique para selecionar a capa</div>
@@ -845,7 +848,7 @@ input,select,textarea { font-family:var(--font) }
         </div>
         <div class="form-card-body">
           <div class="field">
-            <label>Observação sobre o público-alvo</label>
+            <label>Observação sobre o público-alvo <span class="req">*</span></label>
             <textarea id="f-publico-obs" placeholder="Descreva pré-requisitos, perfil esperado ou outros detalhes..." style="min-height:100px"></textarea>
           </div>
         </div>
@@ -865,9 +868,9 @@ input,select,textarea { font-family:var(--font) }
         <div class="form-card-body">
 
           <!-- Visibilidade -->
-          <div class="section-title">Visibilidade</div>
-          <div class="check-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
-            <label class="check-row checked" id="vis-todos" onclick="Wizard.setVisib('todos')">
+          <div class="section-title">Visibilidade <span class="req">*</span></div>
+          <div class="check-group" id="vis-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+            <label class="check-row" id="vis-todos" onclick="Wizard.setVisib('todos')">
               <div class="radio-box"><div class="radio-inner"></div></div>
               <span class="check-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
               <div>
@@ -887,7 +890,7 @@ input,select,textarea { font-family:var(--font) }
 
           <!-- Accordion de restrições -->
           <div id="restricoes-panel" style="display:none">
-            <div class="section-title">Restrições de acesso</div>
+            <div class="section-title">Restrições de acesso <span class="req">*</span></div>
             <div class="acc-grid">
 
               <!-- Setor -->
@@ -1162,7 +1165,7 @@ var Wizard = (() => {
     nome: '', categoria: '', formato: 'ead', carga: '', nivel: 'basico',
     descricao: '', capa: null, capaName: '',
     publico: [], publicoObs: '',
-    visib: 'todos',
+    visib: '',
     acessos: { setor: [], equipe: [], colab: [] },
     validade: '', dataInicio: '', prazo: '',
     modulos: [],   // [{ id, titulo, status, aulas:[{id,titulo,tipo,durMin,status}] }]
@@ -1215,6 +1218,7 @@ var Wizard = (() => {
     if (currentStep === 2) {
       // Chips de acesso e validade toggle
       ['setor','equipe','colab'].forEach(t => renderChips(t));
+      _updateEquipeLock();
       const temVal = !!(state.dataInicio || state.validade || state.prazo);
       document.getElementById('tog-validade')?.classList.toggle('on', temVal);
       document.getElementById('val-toggle')?.classList.toggle('on', temVal);
@@ -1320,6 +1324,16 @@ var Wizard = (() => {
       el.focus();
     };
 
+    const blockError = (id, msg) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('field-error');
+      const hint = document.createElement('div');
+      hint.className = 'field-msg';
+      hint.textContent = msg;
+      el.appendChild(hint);
+    };
+
     if (step === 0) {
       const nome  = val('f-nome');
       const cat   = val('f-categoria');
@@ -1327,8 +1341,35 @@ var Wizard = (() => {
       let ok = true;
       if (!nome)                            { markError('f-nome',  'Informe o nome do curso.');    ok = false; }
       if (!cat)                             { markError('f-categoria','Selecione uma categoria.'); ok = false; }
+      if (!val('f-formato'))                { markError('f-formato','Selecione o formato.');       ok = false; }
       if (!carga || isNaN(carga) || +carga < 1) { markError('f-carga','Informe a carga horária válida.'); ok = false; }
+      if (!val('f-nivel'))                  { markError('f-nivel','Selecione o nível.');           ok = false; }
+      if (!val('f-desc'))                   { markError('f-desc','Informe a descrição do curso.'); ok = false; }
+      if (!state.capa)                      { blockError('f-capa-zone','Selecione a imagem/capa do curso.'); ok = false; }
       return ok;
+    }
+
+    if (step === 1) {
+      if (!val('f-publico-obs')) { markError('f-publico-obs','Informe a observação sobre o público-alvo.'); return false; }
+      return true;
+    }
+
+    if (step === 2) {
+      if (state.visib !== 'todos' && state.visib !== 'restrito') {
+        blockError('vis-group','Selecione a visibilidade do curso.');
+        return false;
+      }
+      if (state.visib === 'restrito') {
+        const total = (state.acessos.setor.length + state.acessos.equipe.length + state.acessos.colab.length);
+        if (!total) { blockError('restricoes-panel','Defina ao menos uma restrição de acesso.'); return false; }
+      }
+      return true;
+    }
+
+    if (step === 3) {
+      const semAula = state.modulos.find(m => !m.aulas || !m.aulas.length);
+      if (semAula) { alert(`O módulo "${semAula.titulo || 'sem título'}" precisa de ao menos uma aula.`); return false; }
+      return true;
     }
     return true;
   }
@@ -1352,15 +1393,56 @@ var Wizard = (() => {
   // ── Dados para autocomplete ────────────────────────────────
   // Fontes reais:
   //  • setor  → Setores e Equipes (Storage.Setores)
-  //  • equipe → Setores e Equipes (Storage.Equipes)
+  //  • equipe → Setores e Equipes (Storage.Equipes) — só do(s) setor(es) selecionado(s)
   //  • colab  → Alunos > Colaboradores cadastrados (Storage.Alunos)
+  function _setores() { try { return Storage.Setores.listar(); } catch(e){ return []; } }
+  function _equipes() { try { return Storage.Equipes.listar(); } catch(e){ return []; } }
+  function _alunos()  { try { return Storage.Alunos.listar();  } catch(e){ return []; } }
+  function _selSetorIds()  { return _setores().filter(s => state.acessos.setor.includes(s.nome)).map(s => s.id); }
+  function _selEquipeIds() { return _equipes().filter(e => state.acessos.equipe.includes(e.nome)).map(e => e.id); }
+
   function acOptions(tipo) {
-    try {
-      if (tipo === 'setor')  return Storage.Setores.listar().map(s => s.nome).filter(Boolean).sort();
-      if (tipo === 'equipe') return Storage.Equipes.listar().map(e => e.nome).filter(Boolean).sort();
-      if (tipo === 'colab')  return Storage.Alunos.listar().map(a => a.nome).filter(Boolean).sort();
-    } catch (e) { /* Storage indisponível */ }
+    if (tipo === 'setor')  return _setores().map(s => s.nome).filter(Boolean).sort();
+    if (tipo === 'equipe') {
+      const ids = _selSetorIds();
+      if (!ids.length) return []; // Equipe liberada só com setor vinculado
+      return _equipes().filter(e => ids.includes(e.setorId)).map(e => e.nome).filter(Boolean).sort();
+    }
+    if (tipo === 'colab') {
+      let lista = _alunos();
+      const sIds = _selSetorIds(), eIds = _selEquipeIds();
+      // Setor E Equipe preenchidos → só colaboradores vinculados
+      if (sIds.length && eIds.length) {
+        lista = lista.filter(a => sIds.includes(a.setorId) && eIds.includes(a.equipeId));
+      }
+      return lista.map(a => a.nome).filter(Boolean).sort();
+    }
     return [];
+  }
+
+  // Mantém estado coerente: equipe exige setor; remove equipes órfãs.
+  function _reconcileAccess() {
+    const ids = _selSetorIds();
+    const validEquipes = ids.length
+      ? _equipes().filter(e => ids.includes(e.setorId)).map(e => e.nome)
+      : [];
+    state.acessos.equipe = state.acessos.equipe.filter(n => validEquipes.includes(n));
+    _updateEquipeLock();
+  }
+
+  function _updateEquipeLock() {
+    const hasSetor = state.acessos.setor.length > 0;
+    const inp = document.getElementById('ac-equipe');
+    const acc = document.getElementById('acc-equipe');
+    if (inp) {
+      inp.disabled = !hasSetor;
+      inp.placeholder = hasSetor ? 'Buscar equipe...' : 'Selecione um setor primeiro';
+    }
+    if (acc) acc.style.opacity = hasSetor ? '' : '.55';
+    if (!hasSetor) {
+      const dd = document.getElementById('acd-equipe');
+      if (dd) { dd.classList.remove('open'); dd.innerHTML = ''; }
+    }
   }
   let _acFocused = {}; // índice focado por tipo
 
@@ -1407,6 +1489,7 @@ var Wizard = (() => {
   function acSelect(tipo, nome) {
     if (!nome || state.acessos[tipo].includes(nome)) return;
     state.acessos[tipo].push(nome);
+    if (tipo === 'setor') { _reconcileAccess(); renderChips('equipe'); }
     renderChips(tipo);
     const inp = document.getElementById('ac-' + tipo);
     if (inp) { inp.value = ''; inp.focus(); }
@@ -1437,6 +1520,7 @@ var Wizard = (() => {
 
   function removeAccess(tipo, nome) {
     state.acessos[tipo] = state.acessos[tipo].filter(n => n !== nome);
+    if (tipo === 'setor') { _reconcileAccess(); renderChips('equipe'); }
     renderChips(tipo);
   }
 
@@ -1673,7 +1757,6 @@ var Wizard = (() => {
 
       <div class="review-section">
         <h3>Público-alvo</h3>
-        <div class="review-row"><div class="rv-label">Perfis</div><div class="rv-val"><div class="review-tags">${pub}</div></div></div>
         <div class="review-row"><div class="rv-label">Observação</div><div class="rv-val" style="color:var(--text3)">${escHtml(state.publicoObs)||'—'}</div></div>
       </div>
 
@@ -1683,11 +1766,6 @@ var Wizard = (() => {
         <div class="review-row"><div class="rv-label">Restrições</div><div class="rv-val"><div class="review-tags">${acessoItems}</div></div></div>
         <div class="review-row"><div class="rv-label">Validade</div><div class="rv-val">${state.validade ? new Date(state.validade).toLocaleDateString('pt-BR') : 'Sem validade'}</div></div>
         <div class="review-row"><div class="rv-label">Prazo de conclusão</div><div class="rv-val">${state.prazo ? state.prazo + ' dias' : 'Sem prazo'}</div></div>
-      </div>
-
-      <div class="review-section">
-        <h3>Materiais (${state.materiais.length})</h3>
-        <div style="margin-top:6px">${matHtml}</div>
       </div>
 
       <div class="review-section">
@@ -1853,6 +1931,7 @@ var Wizard = (() => {
     // Visibilidade + chips de acesso (accordion)
     setVisib(state.visib || 'todos');
     ['setor','equipe','colab'].forEach(t => renderChips(t));
+    _updateEquipeLock();
 
     // Materiais — só renderiza se o elemento já existir no DOM
     // (pane-4 pode estar oculto; renderMateriais verifica internamente)
@@ -2148,7 +2227,8 @@ var Wizard = (() => {
     function addModulo() {
       state.modulos.push({
         id: _uid(), titulo: 'Novo Módulo', status: 'rascunho',
-        collapsed: false, aulas: [],
+        collapsed: false,
+        aulas: [{ id: _uid(), titulo: '', tipo: 'video', durMin: 0, status: 'rascunho' }],
       });
       render();
       // Focar no input do último módulo
@@ -2294,6 +2374,10 @@ var Wizard = (() => {
       state.modulos[mi].aulas.splice(ai + 1, 0, a); render();
     }
     function _delAula(mi, ai) {
+      if (state.modulos[mi]?.aulas.length <= 1) {
+        alert('Cada módulo precisa de ao menos uma aula. Exclua o módulo se necessário.');
+        return;
+      }
       state.modulos[mi].aulas.splice(ai, 1); render();
     }
     function _moverAula(fromMod, fromAula, toMod) {
