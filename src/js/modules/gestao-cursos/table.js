@@ -25,28 +25,33 @@ var CursosTable = (() => {
 
   // ── Tabela ──────────────────────────────────────────────────────
 
+  // Tabelas por status. Cada uma é independente (chevron + paginação própria).
+  const BUCKETS = [
+    { key: 'publicado', label: 'Publicados' },
+    { key: 'rascunho',  label: 'Rascunhos'  },
+    { key: 'arquivado', label: 'Arquivados' },
+  ];
+
   function render() {
     CursosState.clearCache();
     const agora = new Date();
 
-    const busca   = (document.querySelector('#gc-search')?.value     || '').toLowerCase().trim();
-    const fStatus = document.querySelector('#gc-filtro-status')?.value || '';
-    const fCat    = document.querySelector('#gc-filtro-cat')?.value    || '';
-    const fFmt    = document.querySelector('#gc-filtro-fmt')?.value    || '';
-    const fData   = document.querySelector('#gc-filtro-data')?.value   || '';
-    const ordem   = document.querySelector('#gc-order')?.value         || 'recente';
+    const busca = (document.querySelector('#gc-search')?.value || '').toLowerCase().trim();
+    const fCat  = document.querySelector('#gc-filtro-cat')?.value  || '';
+    const fFmt  = document.querySelector('#gc-filtro-fmt')?.value  || '';
+    const fData = document.querySelector('#gc-filtro-data')?.value || '';
+    const ordem = document.querySelector('#gc-order')?.value       || 'recente';
 
     let lista = Storage.Cursos.listar();
 
-    if (busca)   lista = lista.filter(c =>
+    if (busca) lista = lista.filter(c =>
       c.titulo?.toLowerCase().includes(busca) ||
       c.categoria?.toLowerCase().includes(busca) ||
       c.descricao?.toLowerCase().includes(busca)
     );
-    if (fCat)    lista = lista.filter(c => c.categoria === fCat);
-    if (fFmt)    lista = lista.filter(c => (c.formato || 'ead') === fFmt);
-    if (fData)   lista = lista.filter(c => c.publicadoEm && c.publicadoEm.slice(0, 10) >= fData);
-    if (fStatus) lista = lista.filter(c => CursosUtils.resolveStatus(c) === fStatus);
+    if (fCat)  lista = lista.filter(c => c.categoria === fCat);
+    if (fFmt)  lista = lista.filter(c => (c.formato || 'ead') === fFmt);
+    if (fData) lista = lista.filter(c => c.publicadoEm && c.publicadoEm.slice(0, 10) >= fData);
 
     lista.sort((a, b) => {
       if (ordem === 'az')         return (a.titulo || '').localeCompare(b.titulo || '');
@@ -56,36 +61,63 @@ var CursosTable = (() => {
       return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
     });
 
-    const tbody   = document.querySelector('#gc-tbody');
-    const empty   = document.querySelector('#gc-empty');
-    const counter = document.querySelector('#gc-result-count');
+    // Reseta a página de todas as tabelas sempre que os filtros mudam.
+    const sig = JSON.stringify([busca, fCat, fFmt, fData, ordem]);
+    if (CursosState.lastFilterSig !== sig) {
+      BUCKETS.forEach(b => { CursosState.pages[b.key] = 1; });
+      CursosState.lastFilterSig = sig;
+    }
 
-    if (counter) counter.textContent = `${lista.length} ${lista.length === 1 ? 'curso' : 'cursos'}`;
+    BUCKETS.forEach(b => {
+      const itens = lista.filter(c => (c.status || 'rascunho') === b.key);
+      _renderBucket(b.key, itens, agora);
+    });
+  }
 
-    if (!lista.length) {
+  function _renderBucket(key, itens, agora) {
+    const tbody = document.getElementById('gc-tbody-' + key);
+    const empty = document.getElementById('gc-empty-' + key);
+    const count = document.getElementById('gc-count-' + key);
+    if (count) count.textContent = `${itens.length} ${itens.length === 1 ? 'curso' : 'cursos'}`;
+
+    if (!itens.length) {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
-      _renderPager(0, 1, 1);
+      _renderPager(key, 0, 1, 1);
       return;
     }
     if (empty) empty.style.display = 'none';
 
     // ── Paginação (quebra de página) ──────────────────────────
-    // Reseta para a página 1 sempre que os filtros mudam.
-    const sig = JSON.stringify([busca, fStatus, fCat, fFmt, fData, ordem]);
-    if (CursosState.lastFilterSig !== sig) {
-      CursosState.page = 1;
-      CursosState.lastFilterSig = sig;
-    }
     const perPage    = Math.min(CursosState.perPage || 25, 100);
-    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
-    if (CursosState.page > totalPages) CursosState.page = totalPages;
-    if (CursosState.page < 1)          CursosState.page = 1;
-    const ini    = (CursosState.page - 1) * perPage;
-    const pagina = lista.slice(ini, ini + perPage);
+    const totalPages = Math.max(1, Math.ceil(itens.length / perPage));
+    let page = CursosState.pages[key] || 1;
+    if (page > totalPages) page = totalPages;
+    if (page < 1)          page = 1;
+    CursosState.pages[key] = page;
 
-    tbody.innerHTML = pagina.map(c => _renderLinha(c, agora)).join('');
-    _renderPager(lista.length, perPage, CursosState.page);
+    const ini    = (page - 1) * perPage;
+    const pagina = itens.slice(ini, ini + perPage);
+    if (tbody) tbody.innerHTML = pagina.map(c => _renderLinha(c, agora)).join('');
+    _renderPager(key, itens.length, perPage, page);
+  }
+
+  // ── Chevron (expandir / recolher) ────────────────────────────────
+
+  function toggleCard(key) {
+    const card = document.getElementById('gc-card-' + key);
+    if (!card) return;
+    _setCollapsed(key, card.dataset.collapsed !== '1');
+  }
+
+  function _setCollapsed(key, collapsed) {
+    const card = document.getElementById('gc-card-' + key);
+    if (!card) return;
+    card.dataset.collapsed = collapsed ? '1' : '0';
+    const body = card.querySelector('.gc-card-body');
+    const chev = card.querySelector('.gc-chevron');
+    if (body) body.style.display = collapsed ? 'none' : '';
+    if (chev) chev.style.transform = collapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
   }
 
   // ── Paginação ───────────────────────────────────────────────────
@@ -103,8 +135,8 @@ var CursosTable = (() => {
     return pages;
   }
 
-  function _renderPager(total, perPage, page) {
-    const pager = document.getElementById('gc-pager');
+  function _renderPager(key, total, perPage, page) {
+    const pager = document.getElementById('gc-pager-' + key);
     if (!pager) return;
     if (!total) { pager.innerHTML = ''; return; }
     const totalPages = Math.max(1, Math.ceil(total / perPage));
@@ -116,7 +148,7 @@ var CursosTable = (() => {
 
     const btn = (lbl, p, dis, active) =>
       `<button class="al-pg-btn${active ? ' active' : ''}"${dis ? ' disabled' : ''}` +
-      `${dis ? '' : ` onclick="Cursos._goPage(${p})"`}>${lbl}</button>`;
+      `${dis ? '' : ` onclick="Cursos._goPage('${key}',${p})"`}>${lbl}</button>`;
 
     const nums = _pageList(page, totalPages).map(p =>
       p === '…' ? '<span class="al-pg-dots">…</span>' : btn(p, p, false, p === page)
@@ -131,15 +163,15 @@ var CursosTable = (() => {
       `</div>`;
   }
 
-  function goPage(p) {
-    CursosState.page = p;
+  function goPage(key, p) {
+    CursosState.pages[key] = p;
     render();
-    document.getElementById('gc-tbody')?.scrollIntoView({ block: 'nearest' });
+    document.getElementById('gc-tbody-' + key)?.scrollIntoView({ block: 'nearest' });
   }
 
   function setPerPage(val) {
     CursosState.perPage = Math.min(parseInt(val, 10) || 25, 100);
-    CursosState.page = 1;
+    BUCKETS.forEach(b => { CursosState.pages[b.key] = 1; });
     render();
   }
 
@@ -163,7 +195,7 @@ var CursosTable = (() => {
 
     return `<tr class="${sel ? 'selected' : ''}" id="row-${c.id}">
       <td style="padding:8px 10px">
-        <input type="checkbox" class="row-check" ${sel ? 'checked' : ''}
+        <input type="checkbox" class="row-check" data-id="${c.id}" ${sel ? 'checked' : ''}
           onchange="Cursos.toggleSel('${c.id}',this.checked)">
       </td>
       <td>
@@ -253,5 +285,5 @@ var CursosTable = (() => {
     document.querySelectorAll('[data-menu-open="1"]').forEach(b => { b.dataset.menuOpen = '0'; });
   }
 
-  return { render, popularFiltroCategoria, toggleMenu, closeMenus, goPage, setPerPage };
+  return { render, popularFiltroCategoria, toggleMenu, closeMenus, goPage, setPerPage, toggleCard };
 })();
