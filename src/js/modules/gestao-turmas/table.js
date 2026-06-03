@@ -5,7 +5,7 @@
  * @module TurmasTable
  */
 
-/* global Storage, TurmasUtils, PortalMenu */
+/* global Storage, TurmasUtils, PortalMenu, TurmasState */
 /* exported TurmasTable */
 
 var TurmasTable = (() => {
@@ -170,10 +170,82 @@ var TurmasTable = (() => {
     if (!lista.length) {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
+      _renderPager(0, 1, 1);
       return;
     }
     if (empty) empty.style.display = 'none';
-    tbody.innerHTML = lista.map(t => _renderLinha(t)).join('');
+
+    // ── Paginação (quebra de página) ──────────────────────────
+    // Reseta para a página 1 sempre que os filtros mudam.
+    const sig = JSON.stringify([busca, fStatus, fCurso, fData, fResp]);
+    if (TurmasState.lastSig !== sig) {
+      TurmasState.page = 1;
+      TurmasState.lastSig = sig;
+    }
+    const perPage    = TurmasState.perPage || 25;
+    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
+    if (TurmasState.page > totalPages) TurmasState.page = totalPages;
+    if (TurmasState.page < 1)          TurmasState.page = 1;
+    const ini    = (TurmasState.page - 1) * perPage;
+    const pagina = lista.slice(ini, ini + perPage);
+
+    tbody.innerHTML = pagina.map(t => _renderLinha(t)).join('');
+    _renderPager(lista.length, perPage, TurmasState.page);
+  }
+
+  // ── Paginação ────────────────────────────────────────────────
+
+  function _pageList(page, totalPages) {
+    const pages = [];
+    if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); return pages; }
+    pages.push(1);
+    if (page > 3) pages.push('…');
+    const start = Math.max(2, page - 1);
+    const end   = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('…');
+    pages.push(totalPages);
+    return pages;
+  }
+
+  function _renderPager(total, perPage, page) {
+    const pager = document.getElementById('tm-pager');
+    if (!pager) return;
+    if (!total) { pager.innerHTML = ''; return; }
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const ini  = (page - 1) * perPage + 1;
+    const fim  = Math.min(page * perPage, total);
+    const info = `<span class="al-pg-info">${ini}–${fim} de ${total}</span>`;
+
+    if (totalPages <= 1) { pager.innerHTML = info; return; }
+
+    const btn = (lbl, p, dis, active) =>
+      `<button class="al-pg-btn${active ? ' active' : ''}"${dis ? ' disabled' : ''}` +
+      `${dis ? '' : ` onclick="Turmas._goPage(${p})"`}>${lbl}</button>`;
+
+    const nums = _pageList(page, totalPages).map(p =>
+      p === '…' ? '<span class="al-pg-dots">…</span>' : btn(p, p, false, p === page)
+    ).join('');
+
+    pager.innerHTML =
+      info +
+      `<div class="al-pg-ctrls">` +
+        btn('‹', page - 1, page <= 1, false) +
+        nums +
+        btn('›', page + 1, page >= totalPages, false) +
+      `</div>`;
+  }
+
+  function goPage(p) {
+    TurmasState.page = p;
+    renderTabela();
+    document.getElementById('tm-tbody')?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function setPerPage(val) {
+    TurmasState.perPage = parseInt(val, 10) || 25;
+    TurmasState.page = 1;
+    renderTabela();
   }
 
   // ── Stats ────────────────────────────────────────────────────
@@ -222,5 +294,7 @@ var TurmasTable = (() => {
     setStatus,
     resetFiltros,
     statusBadge,
+    goPage,
+    setPerPage,
   };
 })();
