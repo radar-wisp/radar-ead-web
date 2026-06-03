@@ -3,7 +3,7 @@
  * Responsabilidade: abrir, popular, navegar entre etapas e salvar.
  */
 
-/* global EadUtils, Storage, AlunosState, AlunosValidators */
+/* global EadUtils, Storage, AlunosState, AlunosValidators, AlunosMod */
 /* exported AlunosModals */
 
 var AlunosModals = (() => {
@@ -143,7 +143,15 @@ var AlunosModals = (() => {
 
   function salvar() {
     AlunosValidators.clearErrors();
-    if (!AlunosValidators.validateAll()) return;
+    const editando = !!AlunosState.editId;
+    if (editando) {
+      if (!AlunosValidators.validateEdit()) { goStep(0); return; }
+    } else if (!AlunosValidators.validateAll()) {
+      // Leva o usuário ao primeiro passo com erro (não falha em silêncio).
+      const falha = [0, 1, 2].find(i => !AlunosValidators.validateStep(i));
+      if (falha != null) goStep(falha);
+      return;
+    }
 
     const toggle     = document.getElementById('mal-primeiro');
     const primeiroAcesso = toggle?.classList.contains('on') ?? true;
@@ -174,6 +182,7 @@ var AlunosModals = (() => {
 
     document.getElementById('modal-aluno')?.classList.remove('open');
     AlunosState.editId = null;
+    if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
   return {
