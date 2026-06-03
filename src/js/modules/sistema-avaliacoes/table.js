@@ -5,7 +5,7 @@
  * @module AvalTable
  */
 
-/* global Storage, AvalUtils */
+/* global Storage, AvalUtils, AvalState */
 
 var AvalTable = (() => {
   'use strict';
@@ -46,6 +46,7 @@ var AvalTable = (() => {
     document.querySelectorAll('.ift-chip[data-avst]').forEach(c => {
       Object.values(CHIP_CLS).forEach(cls => { if (cls) c.classList.remove(cls); });
     });
+    AvalState.page = 1;
     renderTabela();
     _badge();
   }
@@ -141,11 +142,82 @@ var AvalTable = (() => {
     if (!lista.length) {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
+      _renderPager(0, 1, 1);
       return;
     }
     if (empty) empty.style.display = 'none';
 
-    if (tbody) tbody.innerHTML = lista.map(av => _renderLinha(av)).join('');
+    // ── Paginação (quebra de página) ──────────────────────────
+    // Reseta para a página 1 sempre que os filtros mudam.
+    const sig = JSON.stringify([busca, fStatus, fCurso, fTurma, fData]);
+    if (AvalState.lastFilterSig !== sig) {
+      AvalState.page = 1;
+      AvalState.lastFilterSig = sig;
+    }
+    const perPage    = AvalState.perPage || 25;
+    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
+    if (AvalState.page > totalPages) AvalState.page = totalPages;
+    if (AvalState.page < 1)          AvalState.page = 1;
+    const ini    = (AvalState.page - 1) * perPage;
+    const pagina = lista.slice(ini, ini + perPage);
+
+    if (tbody) tbody.innerHTML = pagina.map(av => _renderLinha(av)).join('');
+    _renderPager(lista.length, perPage, AvalState.page);
+  }
+
+  // ── Paginação ─────────────────────────────────────────────────
+
+  function _pageList(page, totalPages) {
+    const pages = [];
+    if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); return pages; }
+    pages.push(1);
+    if (page > 3) pages.push('…');
+    const start = Math.max(2, page - 1);
+    const end   = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('…');
+    pages.push(totalPages);
+    return pages;
+  }
+
+  function _renderPager(total, perPage, page) {
+    const pager = document.getElementById('av-pager');
+    if (!pager) return;
+    if (!total) { pager.innerHTML = ''; return; }
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const ini = (page - 1) * perPage + 1;
+    const fim = Math.min(page * perPage, total);
+    const info = `<span class="al-pg-info">${ini}–${fim} de ${total}</span>`;
+
+    if (totalPages <= 1) { pager.innerHTML = info; return; }
+
+    const btn = (lbl, p, dis, active) =>
+      `<button class="al-pg-btn${active ? ' active' : ''}"${dis ? ' disabled' : ''}` +
+      `${dis ? '' : ` onclick="Aval._goPage(${p})"`}>${lbl}</button>`;
+
+    const nums = _pageList(page, totalPages).map(p =>
+      p === '…' ? '<span class="al-pg-dots">…</span>' : btn(p, p, false, p === page)
+    ).join('');
+
+    pager.innerHTML =
+      info +
+      `<div class="al-pg-ctrls">` +
+        btn('‹', page - 1, page <= 1, false) +
+        nums +
+        btn('›', page + 1, page >= totalPages, false) +
+      `</div>`;
+  }
+
+  function goPage(p) {
+    AvalState.page = p;
+    renderTabela();
+    document.getElementById('av-tbody')?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function setPerPage(val) {
+    AvalState.perPage = parseInt(val, 10) || 25;
+    AvalState.page = 1;
+    renderTabela();
   }
 
   /**
@@ -252,5 +324,6 @@ var AvalTable = (() => {
   return {
     renderStats, renderTabela, _popularFiltros,
     setStatus, resetFiltros, _menu, _cm,
+    goPage, setPerPage,
   };
 })();
