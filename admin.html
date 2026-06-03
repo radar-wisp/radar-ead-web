@@ -2196,14 +2196,15 @@ tbody tr.selected td { background:#f0f4ff }
           </button>
         </div>
 
-        <!-- Tabela -->
-        <div class="card">
-          <div class="card-head" style="padding:10px 16px">
-            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores cadastrados</div>
-            <span id="al-count" style="font-size:12px;color:var(--text4)"></span>
+        <!-- Tabela: Pendentes -->
+        <div class="card al-card" id="al-card-pendente" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="AlunosMod.toggleCard('pendente')">
+            <div class="card-title"><svg class="al-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Pendentes</div>
+            <span id="al-count-pendente" style="font-size:12px;color:var(--text4)"></span>
           </div>
-          <div class="tbl-wrap">
-            <table>
+          <div class="al-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
               <thead>
                 <tr>
                   <th>Aluno</th>
@@ -2217,15 +2218,111 @@ tbody tr.selected td { background:#f0f4ff }
                   <th style="width:80px"></th>
                 </tr>
               </thead>
-              <tbody id="al-tbody"></tbody>
-            </table>
+                <tbody id="al-tbody-pendente"></tbody>
+              </table>
+            </div>
+            <div id="al-empty-pendente" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno pendente</div>
+            </div>
+            <div id="al-pager-pendente" class="al-pager"></div>
           </div>
-          <div id="al-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
-            <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-            <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno encontrado</div>
-            <div style="font-size:12px">Clique em "+ Novo Aluno" para começar</div>
+        </div>
+        <!-- Tabela: Ativos -->
+        <div class="card al-card" id="al-card-ativo" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="AlunosMod.toggleCard('ativo')">
+            <div class="card-title"><svg class="al-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Ativos</div>
+            <span id="al-count-ativo" style="font-size:12px;color:var(--text4)"></span>
           </div>
-          <div id="al-pager" class="al-pager"></div>
+          <div class="al-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Matrícula</th>
+                  <th>Cargo</th>
+                  <th>Setor / Equipe</th>
+                  <th style="text-align:center">Cursos</th>
+                  <th style="text-align:center">Progresso</th>
+                  <th>Status</th>
+                  <th>Último acesso</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+                <tbody id="al-tbody-ativo"></tbody>
+              </table>
+            </div>
+            <div id="al-empty-ativo" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno ativo</div>
+            </div>
+            <div id="al-pager-ativo" class="al-pager"></div>
+          </div>
+        </div>
+        <!-- Tabela: Inativos -->
+        <div class="card al-card" id="al-card-inativo" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="AlunosMod.toggleCard('inativo')">
+            <div class="card-title"><svg class="al-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Inativos</div>
+            <span id="al-count-inativo" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="al-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Matrícula</th>
+                  <th>Cargo</th>
+                  <th>Setor / Equipe</th>
+                  <th style="text-align:center">Cursos</th>
+                  <th style="text-align:center">Progresso</th>
+                  <th>Status</th>
+                  <th>Último acesso</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+                <tbody id="al-tbody-inativo"></tbody>
+              </table>
+            </div>
+            <div id="al-empty-inativo" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno inativo</div>
+            </div>
+            <div id="al-pager-inativo" class="al-pager"></div>
+          </div>
+        </div>
+        <!-- Tabela: Bloqueados -->
+        <div class="card al-card" id="al-card-bloqueado" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer" onclick="AlunosMod.toggleCard('bloqueado')">
+            <div class="card-title"><svg class="al-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Bloqueados</div>
+            <span id="al-count-bloqueado" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="al-card-body" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Matrícula</th>
+                  <th>Cargo</th>
+                  <th>Setor / Equipe</th>
+                  <th style="text-align:center">Cursos</th>
+                  <th style="text-align:center">Progresso</th>
+                  <th>Status</th>
+                  <th>Último acesso</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+                <tbody id="al-tbody-bloqueado"></tbody>
+              </table>
+            </div>
+            <div id="al-empty-bloqueado" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
+              <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno bloqueado</div>
+            </div>
+            <div id="al-pager-bloqueado" class="al-pager"></div>
+          </div>
         </div>
 
       </div>
