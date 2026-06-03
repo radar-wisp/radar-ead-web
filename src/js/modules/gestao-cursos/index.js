@@ -94,6 +94,10 @@ var Cursos = (() => {
     toggleMenu: CursosTable.toggleMenu,
     closeMenus: CursosTable.closeMenus,
 
+    // Paginação (quebra de página)
+    setPerPage: CursosTable.setPerPage,
+    _goPage:    CursosTable.goPage,
+
     // Utilitários
     exportar: CursosActions.exportar,
   };
