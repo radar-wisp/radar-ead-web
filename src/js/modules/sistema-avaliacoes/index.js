@@ -47,6 +47,10 @@ var Aval = (() => {
     _menu:        AvalTable._menu,
     _cm:          AvalTable._cm,
 
+    // Paginação (quebra de página)
+    _goPage:    AvalTable.goPage,
+    setPerPage: AvalTable.setPerPage,
+
     // Modal e editor de questões
     abrirModal:    AvalModals.abrirModal,
     abrirEdit:     AvalModals.abrirEdit,
