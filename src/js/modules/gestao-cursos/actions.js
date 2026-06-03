@@ -19,12 +19,18 @@ var CursosActions = (() => {
     CursosState.syncLoteUI();
   }
 
-  function toggleSelAll(checkbox) {
-    Storage.Cursos.listar().forEach(c => {
-      checkbox.checked ? CursosState.select(c.id) : CursosState.deselect(c.id);
+  function toggleSelAll(checkbox, key) {
+    const scope = key
+      ? document.getElementById('gc-tbody-' + key)
+      : document;
+    if (!scope) return;
+    scope.querySelectorAll('.row-check').forEach(ch => {
+      const id = ch.dataset.id;
+      if (!id) return;
+      checkbox.checked ? CursosState.select(id) : CursosState.deselect(id);
+      ch.checked = checkbox.checked;
+      ch.closest('tr')?.classList.toggle('selected', checkbox.checked);
     });
-    document.querySelectorAll('.row-check').forEach(ch => { ch.checked = checkbox.checked; });
-    document.querySelectorAll('#gc-tbody tr').forEach(r => { r.classList.toggle('selected', checkbox.checked); });
     CursosState.syncLoteUI();
   }
 
