@@ -11,7 +11,7 @@ var AlunosState = {
   progCache:       null,   // Map() de progresso por ciclo de render
   vincularAlunoId: null,   // ID do aluno aguardando vinculação de turma
   step:            0,      // Etapa atual do stepper (0–2)
-  page:            1,      // Página atual da tabela (quebra de página)
+  pages:           {},     // Página atual por tabela/status (quebra de página)
   perPage:         25,     // Itens por página (25 / 50 / 75 / 100)
   lastFilterSig:   null,   // Assinatura dos filtros p/ resetar página ao mudar
 };
