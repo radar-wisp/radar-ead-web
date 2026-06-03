@@ -62,6 +62,10 @@ var Turmas = (() => {
     resetFiltros:  TurmasTable.resetFiltros,
     filtrarAlunos: TurmasModals.renderListaAlunos,
 
+    // Paginação (quebra de página)
+    _goPage:       TurmasTable.goPage,
+    setPerPage:    TurmasTable.setPerPage,
+
     // Modais
     abrirModal:           TurmasModals.abrirModal,
     abrirEdit:            TurmasModals.abrirEdit,
