@@ -2056,6 +2056,17 @@ tbody tr.selected td { background:#f0f4ff }
           </div>
           <div class="ift-sep"></div>
 
+          <div class="ift-field fixed" style="min-width:120px">
+            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></span>
+            <select class="ift-select" id="al-perpage" onchange="AlunosMod.setPerPage(this.value)">
+              <option value="25">25 / página</option>
+              <option value="50">50 / página</option>
+              <option value="75">75 / página</option>
+              <option value="100">100 / página</option>
+            </select>
+          </div>
+          <div class="ift-sep"></div>
+
           <button class="ift-btn" onclick="AlunosMod.resetFiltros()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> <span id="al-badge" class="ift-active-badge"></span>
           </button>
@@ -2090,6 +2101,7 @@ tbody tr.selected td { background:#f0f4ff }
             <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum aluno encontrado</div>
             <div style="font-size:12px">Clique em "+ Novo Aluno" para começar</div>
           </div>
+          <div id="al-pager" class="al-pager"></div>
         </div>
 
       </div>
@@ -3265,6 +3277,7 @@ tbody tr.selected td { background:#f0f4ff }
       <button class="mc-tab active" onclick="AlunosMod.tabPerfil(0,this)">Informações</button>
       <button class="mc-tab" onclick="AlunosMod.tabPerfil(1,this)">Cursos</button>
       <button class="mc-tab" onclick="AlunosMod.tabPerfil(2,this)">Histórico</button>
+      <button class="mc-tab" onclick="AlunosMod.tabPerfil(3,this)">Turmas</button>
     </div>
 
     <div style="padding:20px 24px;max-height:420px;overflow-y:auto">
@@ -3297,6 +3310,11 @@ tbody tr.selected td { background:#f0f4ff }
         <div id="pa-historico-body"></div>
       </div>
 
+      <!-- Pane 3: Turmas -->
+      <div id="pa-pane-3" style="display:none">
+        <div id="pa-turmas-body"></div>
+      </div>
+
     </div>
 
     <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
@@ -3304,7 +3322,6 @@ tbody tr.selected td { background:#f0f4ff }
       <button class="btn btn-ghost btn-sm" id="pa-btn-reset" onclick="AlunosMod.resetarSenhaModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Resetar senha
       </button>
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-perfil-aluno').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
