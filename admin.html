@@ -4828,6 +4828,7 @@ var CursoDrawer = (() => {
   });
 
   window.addEventListener('message', e => {
+    if (e.data === 'wizard:cancelar') { fechar(); return; }
     if (e.data === 'wizard:concluido') {
       fechar();
       if (typeof Admin !== 'undefined') Admin.go('cursos');
