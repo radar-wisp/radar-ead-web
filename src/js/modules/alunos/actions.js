@@ -4,7 +4,7 @@
  * Sem HTML de renderização — apenas lógica de operação + feedback.
  */
 
-/* global EadUtils, Storage, AlunosState, PortalMenu */
+/* global EadUtils, Storage, AlunosState, PortalMenu, AlunosMod */
 /* exported AlunosActions */
 
 var AlunosActions = (() => {
@@ -47,11 +47,13 @@ var AlunosActions = (() => {
   function bloquear(id) {
     Storage.Alunos.atualizar(id, { ativo: false, statusAcesso: 'bloqueado' });
     _toast('Aluno bloqueado.', 'i');
+    if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
   function ativar(id) {
     Storage.Alunos.atualizar(id, { ativo: true, statusAcesso: 'ativo' });
     _toast('Aluno ativado.', 's');
+    if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
   function resetarSenha(id) {
@@ -65,6 +67,7 @@ var AlunosActions = (() => {
     if (!confirm('Excluir aluno permanentemente?')) return;
     Storage.Alunos.excluir(id);
     _toast('Aluno excluído.', 'i');
+    if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
   // ── Vincular turma ────────────────────────────────────────────
@@ -91,6 +94,7 @@ var AlunosActions = (() => {
     document.getElementById('modal-vincular-turma')?.classList.remove('open');
     AlunosState.vincularAlunoId = null;
     _toast(`Aluno vinculado a "${nome}"!`, 's');
+    if (typeof AlunosMod !== 'undefined') AlunosMod.refresh();
   }
 
   return {
