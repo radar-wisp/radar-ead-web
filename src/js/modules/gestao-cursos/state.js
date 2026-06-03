@@ -38,8 +38,8 @@ var CursosState = (() => {
 
   return {
     clearCache, getCache, setCache, select, deselect, clearSel, hasSel, selSize, selList, syncLoteUI,
-    // Paginação (quebra de página)
-    page:          1,     // Página atual
+    // Paginação (quebra de página) — uma página por tabela de status
+    pages:         { publicado: 1, rascunho: 1, arquivado: 1 },
     perPage:       25,    // Itens por página (25 / 50 / 75 / 100)
     lastFilterSig: null,  // Assinatura dos filtros p/ resetar página ao mudar
   };
