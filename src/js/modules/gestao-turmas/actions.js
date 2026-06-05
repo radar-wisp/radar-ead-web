@@ -115,8 +115,10 @@ var TurmasActions = (() => {
       ${podeEncerrar
         ? `<button onclick="Turmas.encerrar('${t.id}');PortalMenu.close()">${SVG.stop} Encerrar turma</button>`
         : ''}
-      <hr class="sep">
-      <button class="danger" onclick="Turmas.excluir('${t.id}');PortalMenu.close()">${SVG.trash} Excluir</button>`;
+      ${t.status !== 'encerrada'
+        ? `<hr class="sep">
+      <button class="danger" onclick="Turmas.excluir('${t.id}');PortalMenu.close()">${SVG.trash} Excluir</button>`
+        : ''}`;
 
     btn.dataset.menuOpen = '1';
     PortalMenu.open(btn, html);
