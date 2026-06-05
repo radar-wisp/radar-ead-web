@@ -141,25 +141,27 @@ var TurmasTable = (() => {
 
   // ── Tabela principal ─────────────────────────────────────────
 
-  function renderTabela() {
-    const busca   = (q('#tm-busca')?.value              || '').toLowerCase().trim();
-    const fStatus = q('#tm-filtro-status')?.value       || q('#tm-filtro-status-sel')?.value || '';
-    const fCurso  = q('#tm-filtro-curso')?.value        || '';
-    const fData   = q('#tm-filtro-data')?.value         || '';
-    const fResp   = (q('#tm-filtro-resp')?.value        || '').toLowerCase().trim();
+  function _aplicarFiltros(lista) {
+    const busca  = (q('#tm-busca')?.value       || '').toLowerCase().trim();
+    const fCurso = q('#tm-filtro-curso')?.value || '';
+    const fData  = q('#tm-filtro-data')?.value  || '';
+    const fResp  = (q('#tm-filtro-resp')?.value || '').toLowerCase().trim();
 
-    let lista = Storage.Turmas.listar();
-
-    if (busca)   lista = lista.filter(t =>
+    if (busca)  lista = lista.filter(t =>
       t.nome?.toLowerCase().includes(busca) ||
       t.responsavel?.toLowerCase().includes(busca)
     );
-    if (fStatus) lista = lista.filter(t => t.status === fStatus);
-    if (fCurso)  lista = lista.filter(t => t.cursoId === fCurso);
-    if (fData)   lista = lista.filter(t => t.dataInicio && t.dataInicio.slice(0, 10) >= fData);
-    if (fResp)   lista = lista.filter(t => t.responsavel?.toLowerCase().includes(fResp));
+    if (fCurso) lista = lista.filter(t => t.cursoId === fCurso);
+    if (fData)  lista = lista.filter(t => t.dataInicio && t.dataInicio.slice(0, 10) >= fData);
+    if (fResp)  lista = lista.filter(t => t.responsavel?.toLowerCase().includes(fResp));
 
-    lista.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
+    return lista.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
+  }
+
+  function renderTabela() {
+    let lista = _aplicarFiltros(
+      Storage.Turmas.listar().filter(t => t.status === 'aberta')
+    );
 
     const tbody = q('#tm-tbody');
     const empty = q('#tm-empty');
@@ -171,13 +173,17 @@ var TurmasTable = (() => {
       if (tbody) tbody.innerHTML = '';
       if (empty) empty.style.display = 'block';
       _renderPager(0, 1, 1);
+      _renderEncerradas();
       return;
     }
     if (empty) empty.style.display = 'none';
 
     // ── Paginação (quebra de página) ──────────────────────────
     // Reseta para a página 1 sempre que os filtros mudam.
-    const sig = JSON.stringify([busca, fStatus, fCurso, fData, fResp]);
+    const sig = JSON.stringify([
+      q('#tm-busca')?.value, q('#tm-filtro-curso')?.value,
+      q('#tm-filtro-data')?.value, q('#tm-filtro-resp')?.value,
+    ]);
     if (TurmasState.lastSig !== sig) {
       TurmasState.page = 1;
       TurmasState.lastSig = sig;
@@ -191,6 +197,27 @@ var TurmasTable = (() => {
 
     tbody.innerHTML = pagina.map(t => _renderLinha(t)).join('');
     _renderPager(lista.length, perPage, TurmasState.page);
+    _renderEncerradas();
+  }
+
+  function _renderEncerradas() {
+    const lista = _aplicarFiltros(
+      Storage.Turmas.listar().filter(t => t.status === 'encerrada')
+    );
+    const tbody = q('#tm-tbody-enc');
+    const empty = q('#tm-empty-enc');
+    const count = q('#tm-count-enc');
+
+    if (count) count.textContent = `${lista.length} ${lista.length === 1 ? 'turma' : 'turmas'}`;
+    if (!tbody) return;
+
+    if (!lista.length) {
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = lista.map(t => _renderLinha(t)).join('');
   }
 
   // ── Paginação ────────────────────────────────────────────────
