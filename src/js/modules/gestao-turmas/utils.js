@@ -66,8 +66,30 @@ var TurmasUtils = (() => {
    * @param {Function} onOk
    */
   function selectPrompt(titulo, opcoes, onOk) {
-    const modal = el('modal-tm-select');
-    const sel   = el('tm-select-opcoes');
+    let modal = el('modal-tm-select');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.className = 'modal-bg';
+      modal.id = 'modal-tm-select';
+      modal.innerHTML =
+        '<div class="modal" style="max-width:380px">' +
+          '<div class="modal-head"><h3 id="tm-select-titulo"></h3>' +
+            '<button class="modal-close" type="button" data-close>' +
+              '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '</button></div>' +
+          '<div class="modal-body"><select id="tm-select-opcoes" style="width:100%"></select></div>' +
+          '<div class="modal-foot">' +
+            '<button class="btn btn-ghost" type="button" data-close>Cancelar</button>' +
+            '<button class="btn btn-primary" id="tm-select-ok" type="button">Confirmar</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (ev) => {
+        if (ev.target === modal || ev.target.closest('[data-close]'))
+          modal.classList.remove('open');
+      });
+    }
+    const sel = el('tm-select-opcoes');
     if (!modal || !sel) return;
 
     setTxt('tm-select-titulo', titulo);
