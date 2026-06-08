@@ -44,26 +44,46 @@ var TurmasModals = (() => {
 
   // ── Lista de alunos ──────────────────────────────────────────
 
-  function renderListaAlunos(filtro) {
-    const busca = (filtro || el('mt-aluno-busca')?.value || '').toLowerCase().trim();
-    let alunos  = Storage.Alunos.listar().filter(a => a.ativo);
+  const ALUNOS_PP = 25;
+
+  function _alunosFiltrados() {
+    const busca  = (el('mt-aluno-busca')?.value || '').toLowerCase().trim();
+    const filtro = el('mt-aluno-filtro')?.value || 'todos';
+    const sel    = TurmasState.alunosSel;
+    let alunos   = Storage.Alunos.listar().filter(a => a.ativo);
 
     if (busca) alunos = alunos.filter(a =>
       a.nome?.toLowerCase().includes(busca) ||
       a.email?.toLowerCase().includes(busca)
     );
+    if (filtro === 'sel')  alunos = alunos.filter(a => sel.has(a.id));
+    if (filtro === 'nsel') alunos = alunos.filter(a => !sel.has(a.id));
+    return alunos;
+  }
 
+  function filtrarAlunos() { TurmasState.alunoPage = 1; renderListaAlunos(); }
+  function _goAlunoPage(n) { TurmasState.alunoPage = n; renderListaAlunos(); }
+
+  function renderListaAlunos() {
     const wrap = el('mt-alunos-lista');
     if (!wrap) return;
 
+    const alunos  = _alunosFiltrados();
+    const totalPag = Math.max(1, Math.ceil(alunos.length / ALUNOS_PP));
+    let page = TurmasState.alunoPage;
+    if (page > totalPag) { page = totalPag; TurmasState.alunoPage = page; }
+    const ini    = (page - 1) * ALUNOS_PP;
+    const pagina = alunos.slice(ini, ini + ALUNOS_PP);
+
     if (!alunos.length) {
       wrap.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text4);font-size:13px">Nenhum aluno encontrado</div>';
+      _renderPaginacao(0, page, totalPag);
       _atualizarCount();
       return;
     }
 
     const sel = TurmasState.alunosSel;
-    wrap.innerHTML = alunos.map(al => {
+    wrap.innerHTML = pagina.map(al => {
       const selecionado = sel.has(al.id);
       const setor  = al.setorId  ? Storage.Setores.obter(al.setorId)?.nome  || '' : '';
       const equipe = al.equipeId ? Storage.Equipes.obter(al.equipeId)?.nome || '' : '';
@@ -84,7 +104,18 @@ var TurmasModals = (() => {
         </label>`;
     }).join('');
 
+    _renderPaginacao(alunos.length, page, totalPag);
     _atualizarCount();
+  }
+
+  function _renderPaginacao(total, page, totalPag) {
+    const e = el('mt-alunos-pag');
+    if (!e) return;
+    if (total <= ALUNOS_PP) { e.innerHTML = ''; return; }
+    e.innerHTML =
+      `<button class="btn btn-ghost btn-sm" ${page <= 1 ? 'disabled' : ''} onclick="Turmas._goAlunoPage(${page - 1})">‹</button>` +
+      `<span style="font-size:12px;color:var(--text3)">Página ${page} de ${totalPag}</span>` +
+      `<button class="btn btn-ghost btn-sm" ${page >= totalPag ? 'disabled' : ''} onclick="Turmas._goAlunoPage(${page + 1})">›</button>`;
   }
 
   function _atualizarCount() {
@@ -114,9 +145,7 @@ var TurmasModals = (() => {
     if (!setores.length) { toast('Nenhum setor cadastrado.', 'i'); return; }
     selectPrompt('Selecionar por setor', setores, (setor) => {
       TurmasState.setorSel = setor.id;
-      Storage.Alunos.porSetor(setor.id).forEach(a => TurmasState.alunosSel.add(a.id));
-      renderListaAlunos();
-      toast(`Alunos do setor "${setor.nome}" adicionados.`, 's');
+      toast(`Setor "${setor.nome}" selecionado. Agora escolha a equipe.`, 'i');
     });
   }
 
@@ -127,19 +156,19 @@ var TurmasModals = (() => {
     if (!equipes.length) { toast('Nenhuma equipe vinculada ao setor selecionado.', 'i'); return; }
     selectPrompt('Selecionar por equipe', equipes, (equipe) => {
       Storage.Alunos.porEquipe(equipe.id).forEach(a => TurmasState.alunosSel.add(a.id));
-      renderListaAlunos();
+      filtrarAlunos();
       toast(`Alunos da equipe "${equipe.nome}" adicionados.`, 's');
     });
   }
 
   function selecionarTodos() {
     Storage.Alunos.listar().filter(a => a.ativo).forEach(a => TurmasState.alunosSel.add(a.id));
-    renderListaAlunos();
+    filtrarAlunos();
   }
 
   function limparAlunos() {
     TurmasState.alunosSel.clear();
-    renderListaAlunos();
+    filtrarAlunos();
   }
 
   // ── Modal criação / edição ────────────────────────────────────
@@ -261,6 +290,8 @@ var TurmasModals = (() => {
     fecharModal,
     visualizar,
     renderListaAlunos,
+    filtrarAlunos,
+    _goAlunoPage,
     selecionarPorSetor,
     selecionarPorEquipe,
     selecionarTodos,
