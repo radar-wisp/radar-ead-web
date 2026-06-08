@@ -64,6 +64,11 @@ var TurmasModals = (() => {
   function filtrarAlunos() { TurmasState.alunoPage = 1; renderListaAlunos(); }
   function _goAlunoPage(n) { TurmasState.alunoPage = n; renderListaAlunos(); }
 
+  function _resetFiltroSel() {
+    const f = el('mt-aluno-filtro');
+    if (f) f.value = 'todos';
+  }
+
   function renderListaAlunos() {
     const wrap = el('mt-alunos-lista');
     if (!wrap) return;
@@ -156,6 +161,7 @@ var TurmasModals = (() => {
     if (!equipes.length) { toast('Nenhuma equipe vinculada ao setor selecionado.', 'i'); return; }
     selectPrompt('Selecionar por equipe', equipes, (equipe) => {
       Storage.Alunos.porEquipe(equipe.id).forEach(a => TurmasState.alunosSel.add(a.id));
+      _resetFiltroSel();
       filtrarAlunos();
       toast(`Alunos da equipe "${equipe.nome}" adicionados.`, 's');
     });
@@ -163,11 +169,13 @@ var TurmasModals = (() => {
 
   function selecionarTodos() {
     Storage.Alunos.listar().filter(a => a.ativo).forEach(a => TurmasState.alunosSel.add(a.id));
+    _resetFiltroSel();
     filtrarAlunos();
   }
 
   function limparAlunos() {
     TurmasState.alunosSel.clear();
+    _resetFiltroSel();
     filtrarAlunos();
   }
 
@@ -186,6 +194,8 @@ var TurmasModals = (() => {
     setTxt('mt-sub',    '');
     _resetFormulario();
     _popularSelectCursos();
+    setVal('mt-aluno-busca', '');
+    _resetFiltroSel();
     renderListaAlunos();
     tabModal(0, document.querySelector('.mc-tab'));
     _open('modal-turma');
@@ -210,6 +220,8 @@ var TurmasModals = (() => {
     setVal('mt-fim',         t.dataFim    ? t.dataFim.slice(0, 10)    : '');
 
     _popularSelectCursos(t.cursoId);
+    setVal('mt-aluno-busca', '');
+    _resetFiltroSel();
     renderListaAlunos();
     tabModal(0, document.querySelector('.mc-tab'));
     _open('modal-turma');
