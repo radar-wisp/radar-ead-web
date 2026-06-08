@@ -98,42 +98,12 @@ var Admin = (() => {
     const allCursos = Storage.Cursos.listar();
     const allAlunos = Storage.Alunos.listar();
     const allProg   = Storage.Progresso.listar();
-    const agora     = new Date();
     const publicados = allCursos.filter(c => (c.status||'rascunho') === 'publicado').length;
 
     q('#ds-cursos').textContent     = allCursos.length;
     q('#ds-publicados').textContent = publicados;
     q('#ds-colab').textContent      = allAlunos.length;
     q('#ds-concl').textContent      = allProg.length;
-
-    /* pendências */
-    const expirados   = allCursos.filter(c => c.validadeAte && new Date(c.validadeAte) < agora && (c.status||'rascunho') === 'publicado');
-    const semConteudo = allCursos.filter(c => (c.status||'rascunho') === 'publicado' && Storage.Aulas.totalPorCurso(c.id) === 0);
-    const revisao     = allCursos.filter(c => (c.status||'rascunho') === 'revisao');
-    const pends = [
-      ...expirados.map(c  => ({ tipo:'expired', label:'Validade expirada',      curso:c, acao:'Arquivar', fn:`Admin.arquivar('${c.id}')` })),
-      ...semConteudo.map(c => ({ tipo:'empty',   label:'Publicado sem conteúdo', curso:c, acao:'Editar',   fn:`Admin.goEdit('${c.id}')` })),
-      ...revisao.map(c     => ({ tipo:'review',  label:'Aguardando revisão',     curso:c, acao:'Publicar', fn:`Admin.publicar('${c.id}')` })),
-    ];
-    q('#ds-pendencias').innerHTML = pends.length
-      ? pends.map(p => `<div class="pend-item pend-${p.tipo}"><div class="pend-left"><span class="pend-dot"></span><div><div class="pend-titulo">${x(p.curso.titulo)}</div><div class="pend-label">${p.label}</div></div></div><button class="btn btn-sm btn-ghost" onclick="${p.fn}">${p.acao}</button></div>`).join('')
-      : `<div class="pend-ok"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg></span> Tudo em ordem! Nenhuma pendência.</div>`;
-
-
-    /* atividades */
-    const wrap   = q('#ds-atividades');
-    const progs  = Storage.Progresso.listar().slice(-6).reverse();
-    const alunos = Storage.Alunos.listar();
-    const aulas  = Storage.Aulas.listar();
-    const cursos = Storage.Cursos.listar();
-    if (!progs.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:.82rem;padding:8px 0">Nenhuma atividade ainda.</div>'; }
-    else wrap.innerHTML = progs.map(p => {
-      const al  = alunos.find(a => a.id === p.alunoId);
-      const au  = aulas.find(a  => a.id === p.aulaId);
-      const mod = au ? Storage.Modulos.listar().find(m => m.id === au.moduloId) : null;
-      const cur = mod ? cursos.find(c => c.id === mod.cursoId) : null;
-      return `<div class="ativ-item"><div class="ativ-avatar">${(al?.nome||'?').charAt(0).toUpperCase()}</div><div class="ativ-info"><div class="ativ-titulo"><strong>${x(al?.nome||'Colaborador')}</strong> concluiu uma aula</div><div class="ativ-sub">${x(au?.titulo||'—')}${cur?' · '+x(cur.titulo):''}</div></div><div class="ativ-time">${fmtDateShort(p.concluidaEm)}</div></div>`;
-    }).join('');
   }
 
   function _toggleMenu(btn) {
