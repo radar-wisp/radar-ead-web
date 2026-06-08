@@ -22,22 +22,24 @@ var TurmasActions = (() => {
     if (!nome)    { toast('Informe o nome da turma.', 'e'); return; }
     if (!cursoId) { toast('Selecione um curso.', 'e'); return; }
 
+    const limiteRaw = el('mt-limite')?.value.trim();
     const inicio = el('mt-inicio')?.value;
     const fim    = el('mt-fim')?.value;
+
+    if (!limiteRaw || parseInt(limiteRaw) < 1) { toast('Informe o limite de participantes.', 'e'); return; }
+    if (!inicio) { toast('Informe a data de início.', 'e'); return; }
+    if (!fim)    { toast('Informe a data de encerramento.', 'e'); return; }
 
     const dados = {
       nome,
       cursoId,
       descricao:    el('mt-desc')?.value.trim()        || '',
       responsavel:  el('mt-responsavel')?.value.trim() || '',
-      limiteAlunos: parseInt(el('mt-limite')?.value)   || 0,
+      limiteAlunos: parseInt(limiteRaw),
       status:       el('mt-status')?.value             || 'aberta',
-      dataInicio:   inicio ? new Date(inicio).toISOString() : '',
-      dataFim:      fim    ? new Date(fim).toISOString()    : '',
+      dataInicio:   new Date(inicio).toISOString(),
+      dataFim:      new Date(fim).toISOString(),
       alunos:       [...TurmasState.alunosSel],
-      config: {
-        prazoConclucaoDias: parseInt(el('mt-cfg-prazo')?.value) || 0,
-      },
     };
 
     if (TurmasState.editId) {
