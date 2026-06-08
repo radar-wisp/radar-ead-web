@@ -60,7 +60,7 @@ var Turmas = (() => {
     renderTabela:  TurmasTable.renderTabela,
     setStatus:     TurmasTable.setStatus,
     resetFiltros:  TurmasTable.resetFiltros,
-    filtrarAlunos: TurmasModals.renderListaAlunos,
+    filtrarAlunos: TurmasModals.filtrarAlunos,
 
     // Paginação (quebra de página)
     _goPage:       TurmasTable.goPage,
@@ -79,6 +79,7 @@ var Turmas = (() => {
     selecionarPorEquipe:TurmasModals.selecionarPorEquipe,
     selecionarTodos:    TurmasModals.selecionarTodos,
     limparAlunos:       TurmasModals.limparAlunos,
+    _goAlunoPage:       TurmasModals._goAlunoPage,
 
     // Ações
     salvar:  TurmasActions.salvar,
