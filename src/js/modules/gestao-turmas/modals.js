@@ -96,9 +96,8 @@ var TurmasModals = (() => {
       return `
         <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:background .1s;${selecionado ? 'background:var(--blue-light)' : ''}"
           onmouseover="this.style.background='var(--blue-light)'"
-          onmouseout="this.style.background='${selecionado ? 'var(--blue-light)' : ''}'"
-          onclick="Turmas._toggleAluno('${al.id}',this)">
-          <input type="checkbox" ${selecionado ? 'checked' : ''} style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer" onclick="event.stopPropagation()">
+          onmouseout="this.style.background=this.querySelector('input').checked ? 'var(--blue-light)' : ''">
+          <input type="checkbox" ${selecionado ? 'checked' : ''} style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer" onchange="Turmas._toggleAluno('${al.id}',this)">
           <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">
             ${(al.nome?.[0] || '?').toUpperCase()}
           </div>
@@ -128,18 +127,11 @@ var TurmasModals = (() => {
     if (e) e.textContent = TurmasState.alunosSel.size;
   }
 
-  function _toggleAluno(id, label) {
+  function _toggleAluno(id, chk) {
     const sel = TurmasState.alunosSel;
-    const chk = label.querySelector('input[type=checkbox]');
-    if (sel.has(id)) {
-      sel.delete(id);
-      label.style.background = '';
-      if (chk) chk.checked = false;
-    } else {
-      sel.add(id);
-      label.style.background = 'var(--blue-light)';
-      if (chk) chk.checked = true;
-    }
+    if (chk.checked) sel.add(id); else sel.delete(id);
+    const label = chk.closest('label');
+    if (label) label.style.background = chk.checked ? 'var(--blue-light)' : '';
     _atualizarCount();
   }
 
