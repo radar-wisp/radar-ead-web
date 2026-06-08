@@ -113,6 +113,7 @@ var TurmasModals = (() => {
     const setores = Storage.Setores.listar();
     if (!setores.length) { toast('Nenhum setor cadastrado.', 'i'); return; }
     selectPrompt('Selecionar por setor', setores, (setor) => {
+      TurmasState.setorSel = setor.id;
       Storage.Alunos.porSetor(setor.id).forEach(a => TurmasState.alunosSel.add(a.id));
       renderListaAlunos();
       toast(`Alunos do setor "${setor.nome}" adicionados.`, 's');
@@ -120,8 +121,10 @@ var TurmasModals = (() => {
   }
 
   function selecionarPorEquipe() {
-    const equipes = Storage.Equipes.listar();
-    if (!equipes.length) { toast('Nenhuma equipe cadastrada.', 'i'); return; }
+    const setorId = TurmasState.setorSel;
+    if (!setorId) { toast('Selecione um setor primeiro em "Por setor".', 'i'); return; }
+    const equipes = Storage.Equipes.listarPorSetor(setorId);
+    if (!equipes.length) { toast('Nenhuma equipe vinculada ao setor selecionado.', 'i'); return; }
     selectPrompt('Selecionar por equipe', equipes, (equipe) => {
       Storage.Alunos.porEquipe(equipe.id).forEach(a => TurmasState.alunosSel.add(a.id));
       renderListaAlunos();
@@ -143,9 +146,8 @@ var TurmasModals = (() => {
 
   function _resetFormulario() {
     ['mt-nome', 'mt-desc', 'mt-responsavel', 'mt-inicio', 'mt-fim'].forEach(id => setVal(id, ''));
-    setVal('mt-limite',   '0');
+    setVal('mt-limite',   '');
     setVal('mt-status',   'aberta');
-    setVal('mt-cfg-prazo','0');
   }
 
   function abrirModal() {
@@ -177,7 +179,6 @@ var TurmasModals = (() => {
     setVal('mt-status',      t.status      || 'aberta');
     setVal('mt-inicio',      t.dataInicio ? t.dataInicio.slice(0, 10) : '');
     setVal('mt-fim',         t.dataFim    ? t.dataFim.slice(0, 10)    : '');
-    setVal('mt-cfg-prazo',   t.config?.prazoConclucaoDias || 0);
 
     _popularSelectCursos(t.cursoId);
     renderListaAlunos();
