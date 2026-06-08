@@ -2804,15 +2804,15 @@ tbody tr.selected td { background:#f0f4ff }
           <input type="text" id="mt-responsavel" placeholder="Nome do responsável">
         </div>
         <div class="fg">
-          <label>Limite de participantes (0 = ilimitado)</label>
-          <input type="number" id="mt-limite" min="0" value="0">
+          <label>Limite de participantes *</label>
+          <input type="number" id="mt-limite" min="1" placeholder="Ex: 30">
         </div>
         <div class="fg">
-          <label>Data de início</label>
+          <label>Data de início *</label>
           <input type="date" id="mt-inicio">
         </div>
         <div class="fg">
-          <label>Data de encerramento</label>
+          <label>Data de encerramento *</label>
           <input type="date" id="mt-fim">
         </div>
         <div class="fg" style="grid-column:1/-1">
@@ -2896,12 +2896,6 @@ tbody tr.selected td { background:#f0f4ff }
           <div id="mt-cfg-entrada" class="toggle on" onclick="this.classList.toggle('on')" style="position:relative;width:40px;height:22px;background:var(--blue);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0">
             <span style="position:absolute;top:3px;left:21px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
           </div>
-        </div>
-        <div style="padding:11px 0">
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prazo de conclusão (dias)</div>
-          <div style="font-size:11px;color:var(--text4);margin-bottom:8px">0 = sem prazo definido</div>
-          <input type="number" id="mt-cfg-prazo" min="0" value="0"
-            style="width:120px;padding:7px 11px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:var(--font)">
         </div>
       </div>
     </div>
