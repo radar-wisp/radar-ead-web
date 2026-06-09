@@ -147,7 +147,7 @@ var MatModals = (() => {
     if (tituloEl) tituloEl.textContent = 'Novo Material';
     if (subEl)    subEl.textContent    = '';
 
-    ['mm-nome', 'mm-responsavel', 'mm-url', 'mm-url-texto'].forEach(id => {
+    ['mm-nome', 'mm-url', 'mm-url-texto'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -190,7 +190,6 @@ var MatModals = (() => {
     if (subEl)    subEl.textContent    = `Criado em ${_fmtDate(m.criadoEm)}`;
 
     _setVal('mm-nome',        m.nome);
-    _setVal('mm-responsavel', m.responsavel);
     _setVal('mm-tipo',        m.tipo);
     _setVal('mm-categoria',   m.categoria);
     _setVal('mm-status',      m.status || 'ativo');
@@ -456,6 +455,16 @@ var MatModals = (() => {
     if (!nome) { alert('Informe o nome do material.'); return; }
     if (!tipo) { alert('Selecione o tipo do material.'); return; }
 
+    const _cursoId  = document.getElementById('mm-curso')?.value  || '';
+    const _moduloId = document.getElementById('mm-modulo')?.value || '';
+    const _aulaId   = document.getElementById('mm-aula')?.value   || '';
+    const _status   = document.getElementById('mm-status')?.value || '';
+
+    if (!_cursoId)  { alert('Selecione o curso vinculado.'); return; }
+    if (!_moduloId) { alert('Selecione o módulo.');          return; }
+    if (!_aulaId)   { alert('Selecione a aula.');            return; }
+    if (!_status)   { alert('Selecione o status.');          return; }
+
     const getTogOn = id => document.getElementById(id)?.classList.contains('on') ?? false;
 
     // Material original (apenas em edição) — usado para preservar arquivo já enviado.
@@ -483,11 +492,10 @@ var MatModals = (() => {
       tipo,
       categoria:   document.getElementById('mm-categoria')?.value           || '',
       tags:        '',
-      cursoId:     document.getElementById('mm-curso')?.value               || '',
-      moduloId:    document.getElementById('mm-modulo')?.value              || '',
-      aulaId:      document.getElementById('mm-aula')?.value                || '',
-      responsavel: document.getElementById('mm-responsavel')?.value.trim()  || '',
-      status:      document.getElementById('mm-status')?.value              || 'ativo',
+      cursoId:     _cursoId,
+      moduloId:    _moduloId,
+      aulaId:      _aulaId,
+      status:      _status,
       url:         _url,
       tamanho:     _tamanho,
       config: {
