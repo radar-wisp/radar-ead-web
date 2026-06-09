@@ -22,20 +22,15 @@ var TurmasActions = (() => {
     if (!nome)    { toast('Informe o nome da turma.', 'e'); return; }
     if (!cursoId) { toast('Selecione um curso.', 'e'); return; }
 
-    const limiteRaw = el('mt-limite')?.value.trim();
     const inicio = el('mt-inicio')?.value;
     const fim    = el('mt-fim')?.value;
 
-    if (!limiteRaw || parseInt(limiteRaw) < 1) { toast('Informe o limite de participantes.', 'e'); return; }
     if (!inicio) { toast('Informe a data de início.', 'e'); return; }
     if (!fim)    { toast('Informe a data de encerramento.', 'e'); return; }
 
     const dados = {
       nome,
       cursoId,
-      descricao:    el('mt-desc')?.value.trim()        || '',
-      responsavel:  el('mt-responsavel')?.value.trim() || '',
-      limiteAlunos: parseInt(limiteRaw),
       status:       el('mt-status')?.value             || 'aberta',
       dataInicio:   new Date(inicio).toISOString(),
       dataFim:      new Date(fim).toISOString(),
