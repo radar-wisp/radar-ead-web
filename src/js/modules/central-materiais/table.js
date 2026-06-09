@@ -82,29 +82,7 @@ var MatTable = (() => {
    */
   function renderStats() {
     const wrap = document.getElementById('mat-stats');
-    if (!wrap) return;
-
-    const st = Storage.Materiais.stats();
-    const icoFolder = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
-
-    const card = (label, val, sub, cls = '') => `
-      <div class="stat">
-        <div class="stat-top">
-          <div>
-            <div class="stat-lbl">${label}</div>
-            <div class="stat-val ${cls}">${val}</div>
-          </div>
-          <div class="stat-ico">${icoFolder}</div>
-        </div>
-        <div class="stat-sub">${sub}</div>
-      </div>`;
-
-    wrap.innerHTML =
-      card('Total',      st.total,      'na biblioteca') +
-      card('PDFs',       st.pdf,        'documentos') +
-      card('Vídeos',     st.video,      'gravações') +
-      card('Ativos',     st.ativos,     'disponíveis', 'blue') +
-      card('Arquivados', st.arquivados, 'desativados');
+    if (wrap) wrap.innerHTML = '';
   }
 
   // ── Filtro de cursos ──────────────────────────────────────────
