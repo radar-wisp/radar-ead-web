@@ -118,6 +118,9 @@ var AvalTable = (() => {
   // TABELA PRINCIPAL
   // ══════════════════════════════════════════════════════════════
 
+  // Tabelas-accordion por status (rótulo exibido no contador)
+  const SECOES = ['rascunho', 'publicada', 'encerrada', 'arquivada'];
+
   function renderTabela() {
     const busca   = (_q('#av-busca')?.value          || '').toLowerCase().trim();
     const fStatus = _q('#av-filtro-status')?.value   || '';
@@ -133,36 +136,25 @@ var AvalTable = (() => {
     if (fData)   lista = lista.filter(a => a.criadoEm && a.criadoEm.slice(0, 10) >= fData);
     lista.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
 
-    const tbody = _q('#av-tbody');
-    const empty = _q('#av-empty');
-    const count = _q('#av-count');
+    SECOES.forEach(st => {
+      const itens = lista.filter(a => a.status === st);
+      const tbody = _q('#av-tbody-' + st);
+      const empty = _q('#av-empty-' + st);
+      const count = _q('#av-count-' + st);
+      if (count) count.textContent = `${itens.length} avaliação(ões)`;
+      if (tbody) tbody.innerHTML = itens.map(av => _renderLinha(av)).join('');
+      if (empty) empty.style.display = itens.length ? 'none' : 'block';
+    });
+  }
 
-    if (count) count.textContent = `${lista.length} avaliação(ões)`;
-
-    if (!lista.length) {
-      if (tbody) tbody.innerHTML = '';
-      if (empty) empty.style.display = 'block';
-      _renderPager(0, 1, 1);
-      return;
-    }
-    if (empty) empty.style.display = 'none';
-
-    // ── Paginação (quebra de página) ──────────────────────────
-    // Reseta para a página 1 sempre que os filtros mudam.
-    const sig = JSON.stringify([busca, fStatus, fCurso, fTurma, fData]);
-    if (AvalState.lastFilterSig !== sig) {
-      AvalState.page = 1;
-      AvalState.lastFilterSig = sig;
-    }
-    const perPage    = AvalState.perPage || 25;
-    const totalPages = Math.max(1, Math.ceil(lista.length / perPage));
-    if (AvalState.page > totalPages) AvalState.page = totalPages;
-    if (AvalState.page < 1)          AvalState.page = 1;
-    const ini    = (AvalState.page - 1) * perPage;
-    const pagina = lista.slice(ini, ini + perPage);
-
-    if (tbody) tbody.innerHTML = pagina.map(av => _renderLinha(av)).join('');
-    _renderPager(lista.length, perPage, AvalState.page);
+  /** Expande/recolhe um accordion (somente no clique manual no cabeçalho). */
+  function toggleAcc(head) {
+    const body = head.nextElementSibling;
+    if (!body) return;
+    const aberto = body.style.display !== 'none';
+    body.style.display = aberto ? 'none' : 'block';
+    const chev = head.querySelector('.av-chev');
+    if (chev) chev.style.transform = aberto ? '' : 'rotate(90deg)';
   }
 
   // ── Paginação ─────────────────────────────────────────────────
@@ -322,7 +314,7 @@ var AvalTable = (() => {
   }
 
   return {
-    renderStats, renderTabela, _popularFiltros,
+    renderStats, renderTabela, _popularFiltros, toggleAcc,
     setStatus, resetFiltros, _menu, _cm,
     goPage, setPerPage,
   };
