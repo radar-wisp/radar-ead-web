@@ -174,8 +174,7 @@ var TurmasModals = (() => {
   // ── Modal criação / edição ────────────────────────────────────
 
   function _resetFormulario() {
-    ['mt-nome', 'mt-desc', 'mt-responsavel', 'mt-inicio', 'mt-fim'].forEach(id => setVal(id, ''));
-    setVal('mt-limite',   '');
+    ['mt-nome', 'mt-inicio', 'mt-fim'].forEach(id => setVal(id, ''));
     setVal('mt-status',   'aberta');
   }
 
@@ -204,9 +203,6 @@ var TurmasModals = (() => {
     setTxt('mt-sub',    `Criada em ${fmtDate(t.criadoEm)}`);
 
     setVal('mt-nome',        t.nome        || '');
-    setVal('mt-desc',        t.descricao   || '');
-    setVal('mt-responsavel', t.responsavel || '');
-    setVal('mt-limite',      t.limiteAlunos || 0);
     setVal('mt-status',      t.status      || 'aberta');
     setVal('mt-inicio',      t.dataInicio ? t.dataInicio.slice(0, 10) : '');
     setVal('mt-fim',         t.dataFim    ? t.dataFim.slice(0, 10)    : '');
