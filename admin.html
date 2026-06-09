@@ -475,6 +475,23 @@ tbody tr:hover td { background:#fafbff }
 .ds-grid { display:grid; grid-template-columns:1fr 280px; gap:14px; align-items:start }
 @media(max-width:960px) { .ds-grid { grid-template-columns:1fr } }
 
+/* ════════════════ DASHBOARD CHARTS ════════════════ */
+.ds-charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px }
+.ds-chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow) }
+.ds-chart-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--text); margin-bottom:14px }
+.ds-chart-title svg { color:var(--text3) }
+.ds-bar-row { margin-bottom:12px }
+.ds-bar-row:last-child { margin-bottom:0 }
+.ds-bar-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:5px }
+.ds-bar-name { font-size:12px; color:var(--text2); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.ds-bar-val { font-size:12px; color:var(--text3); font-weight:600; flex-shrink:0 }
+.ds-bar-track { height:8px; background:var(--bg); border-radius:99px; overflow:hidden }
+.ds-bar-fill { height:100%; border-radius:99px; transition:width .5s ease }
+.ds-bar-fill.blue { background:var(--blue) }
+.ds-bar-fill.green { background:var(--green) }
+.ds-bar-fill.purple { background:var(--purple) }
+.ds-chart-empty { font-size:12px; color:var(--text4); text-align:center; padding:18px 0 }
+
 /* ════════════════ PENDÊNCIAS ════════════════ */
 .pend-ok { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); padding:2px 0 }
 .pend-item { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); gap:10px }
@@ -1305,7 +1322,7 @@ tbody tr.selected td { background:#f0f4ff }
           <div><h2>Dashboard</h2><p>Visão geral da plataforma de treinamentos</p></div>
         </div>
 
-        <!-- Stats — padrão do sistema de referência -->
+        <!-- Stats -->
         <div class="stats">
           <div class="stat">
             <div class="stat-top">
@@ -1316,29 +1333,52 @@ tbody tr.selected td { background:#f0f4ff }
           </div>
           <div class="stat">
             <div class="stat-top">
-              <div><div class="stat-lbl">Publicados</div><div class="stat-val blue" id="ds-publicados">0</div></div>
-              <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
-            </div>
-            <div class="stat-sub up">disponíveis para alunos</div>
-          </div>
-          <div class="stat">
-            <div class="stat-top">
-              <div><div class="stat-lbl">Colaboradores</div><div class="stat-val" id="ds-colab">0</div></div>
+              <div><div class="stat-lbl">Colaboradores cadastrados</div><div class="stat-val" id="ds-colab-total">0</div></div>
               <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
             </div>
-            <div class="stat-sub">cadastrados e ativos</div>
+            <div class="stat-sub">total na plataforma</div>
           </div>
           <div class="stat">
             <div class="stat-top">
-              <div><div class="stat-lbl">Conclusões</div><div class="stat-val green" id="ds-concl">0</div></div>
-              <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div><div class="stat-lbl">Colaboradores ativos</div><div class="stat-val green" id="ds-colab-ativos">0</div></div>
+              <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg></div>
             </div>
-            <div class="stat-sub up">aulas concluídas</div>
+            <div class="stat-sub up" id="ds-colab-ativos-sub">com acesso liberado</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div><div class="stat-lbl">Certificados emitidos</div><div class="stat-val blue" id="ds-cert-emit">0</div></div>
+              <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+            </div>
+            <div class="stat-sub">válidos e ativos</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div><div class="stat-lbl">Certificados vencidos</div><div class="stat-val red" id="ds-cert-venc">0</div></div>
+              <div class="stat-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            </div>
+            <div class="stat-sub err">fora da validade</div>
+          </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="ds-charts">
+          <div class="ds-chart-card">
+            <div class="ds-chart-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Conclusão dos cursos</div>
+            <div id="ds-chart-conclusao"></div>
+          </div>
+          <div class="ds-chart-card">
+            <div class="ds-chart-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Certificados por setores</div>
+            <div id="ds-chart-setores"></div>
+          </div>
+          <div class="ds-chart-card">
+            <div class="ds-chart-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Certificados por equipes</div>
+            <div id="ds-chart-equipes"></div>
           </div>
         </div>
       </div>
 
-<!-- ═══ GESTÃO DE CURSOS ══════════════════ -->
+      <!-- ═══ GESTÃO DE CURSOS ══════════════════ -->
 <!-- ═══ GESTÃO DE CURSOS ══════════════════════════════════════ -->
       <div class="pg" id="pg-cursos">
 
