@@ -3321,7 +3321,7 @@ tbody tr.selected td { background:#f0f4ff }
           <textarea id="mav-desc" rows="2" placeholder="Instruções ou objetivo da avaliação..."></textarea>
         </div>
         <div class="fg">
-          <label>Curso vinculado</label>
+          <label>Curso vinculado *</label>
           <select id="mav-curso" onchange="Aval._loadModulos()"></select>
         </div>
         <div class="fg">
@@ -3333,7 +3333,7 @@ tbody tr.selected td { background:#f0f4ff }
           <select id="mav-turma"><option value="">Todas as turmas</option></select>
         </div>
         <div class="fg">
-          <label>Status</label>
+          <label>Status *</label>
           <select id="mav-status">
             <option value="rascunho">Rascunho</option>
             <option value="publicada">Publicada</option>
@@ -3348,15 +3348,15 @@ tbody tr.selected td { background:#f0f4ff }
     <div class="mc-pane" id="mav-pane-1">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
         <div class="fg">
-          <label>Nota mínima para aprovação (%)</label>
+          <label>Nota mínima para aprovação (%) *</label>
           <input type="number" id="mav-nota-min" min="0" max="100" value="70">
         </div>
         <div class="fg">
-          <label>Tempo limite (minutos — 0 = sem limite)</label>
+          <label>Tempo limite (minutos — 0 = sem limite) *</label>
           <input type="number" id="mav-tempo" min="0" value="0">
         </div>
         <div class="fg">
-          <label>Tentativas permitidas (0 = ilimitado)</label>
+          <label>Tentativas permitidas (0 = ilimitado) *</label>
           <input type="number" id="mav-tentativas" min="0" value="1">
         </div>
       </div>
@@ -3453,9 +3453,6 @@ tbody tr.selected td { background:#f0f4ff }
           Nenhuma resposta registrada ainda.
         </div>
       </div>
-    </div>
-    <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-av-resultados').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
