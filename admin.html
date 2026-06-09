@@ -1781,17 +1781,6 @@ tbody tr.selected td { background:#f0f4ff }
             </select>
           </div>
 
-          <!-- Status -->
-          <div class="ift-field">
-            <label class="ift-label">Status</label>
-            <select class="ift-select" id="mat-filtro-status" onchange="MatMod.renderTabela()">
-              <option value="">Todos</option>
-              <option value="ativo">Ativo</option>
-              <option value="oculto">Oculto</option>
-              <option value="arquivado">Arquivado</option>
-            </select>
-          </div>
-
           <!-- Data -->
           <div class="ift-field fixed">
             <label class="ift-label">Adicionado a partir de</label>
@@ -1856,7 +1845,7 @@ tbody tr.selected td { background:#f0f4ff }
         <div class="card" style="margin-bottom:14px">
           <div class="card-head" style="padding:10px 16px">
             <div class="card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Biblioteca de materiais
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Ativos
             </div>
             <span id="mat-count" style="font-size:12px;color:var(--text4)"></span>
           </div>
@@ -1889,6 +1878,58 @@ tbody tr.selected td { background:#f0f4ff }
           <div id="mat-pager" class="al-pager"></div>
 
         </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px">
+            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Arquivados</div>
+            <span id="mat-count-arq" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:36px;padding:8px 10px"></th>
+                  <th>Material</th>
+                  <th>Tipo</th>
+                  <th>Curso vinculado</th>
+                  <th>Categoria</th>
+                  <th>Tamanho</th>
+                  <th>Status</th>
+                  <th>Adicionado</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="mat-tbody-arq"></tbody>
+            </table>
+          </div>
+          <div id="mat-empty-arq" style="display:none;text-align:center;padding:32px 20px;color:var(--text4);font-size:13px">Nenhum material encontrado</div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px">
+            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Ocultos</div>
+            <span id="mat-count-oc" style="font-size:12px;color:var(--text4)"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:36px;padding:8px 10px"></th>
+                  <th>Material</th>
+                  <th>Tipo</th>
+                  <th>Curso vinculado</th>
+                  <th>Categoria</th>
+                  <th>Tamanho</th>
+                  <th>Status</th>
+                  <th>Adicionado</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="mat-tbody-oc"></tbody>
+            </table>
+          </div>
+          <div id="mat-empty-oc" style="display:none;text-align:center;padding:32px 20px;color:var(--text4);font-size:13px">Nenhum material encontrado</div>
+        </div>
+
 
       </div>
       <!-- ═══ FIM MATERIAIS ════════════════════════════════════════ -->
@@ -3015,23 +3056,27 @@ tbody tr.selected td { background:#f0f4ff }
           </select>
         </div>
         <div class="fg">
-          <label>Curso vinculado *</label>
-          <select id="mm-curso" required></select>
+          <label>Curso vinculado</label>
+          <select id="mm-curso"></select>
         </div>
         <div class="fg">
-          <label>Módulo *</label>
-          <select id="mm-modulo" required>
+          <label>Módulo (opcional)</label>
+          <select id="mm-modulo">
             <option value="">Selecione um módulo...</option>
           </select>
         </div>
         <div class="fg">
-          <label>Aula *</label>
-          <select id="mm-aula" required disabled>
+          <label>Aula</label>
+          <select id="mm-aula" disabled>
             <option value="">Selecione um módulo primeiro</option>
           </select>
         </div>
         <div class="fg">
-          <label>Status *</label>
+          <label>Responsável</label>
+          <input type="text" id="mm-responsavel" placeholder="Nome do responsável">
+        </div>
+        <div class="fg">
+          <label>Status</label>
           <select id="mm-status">
             <option value="ativo">Ativo</option>
             <option value="oculto">Oculto</option>
