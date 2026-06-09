@@ -127,37 +127,57 @@ var MatTable = (() => {
     const busca   = (_q('#mat-busca')?.value         || '').toLowerCase().trim();
     const fTipo   = _q('#mat-filtro-tipo')?.value    || '';
     const fCurso  = _q('#mat-filtro-curso')?.value   || '';
-    const fStatus = _q('#mat-filtro-status')?.value  || '';
     const fData   = _q('#mat-filtro-data')?.value    || '';
     const ordem   = _q('#mat-order')?.value          || 'recente';
 
-    let lista = Storage.Materiais.listar();
+    let base = Storage.Materiais.listar();
 
-    if (busca) lista = lista.filter(m =>
+    if (busca) base = base.filter(m =>
       m.nome?.toLowerCase().includes(busca) ||
       m.tags?.toLowerCase().includes(busca) ||
       m.responsavel?.toLowerCase().includes(busca) ||
       m.categoria?.toLowerCase().includes(busca)
     );
-    if (fTipo)   lista = lista.filter(m => m.tipo === fTipo);
-    if (fCurso)  lista = lista.filter(m => m.cursoId === fCurso || (m.cursosVinc || []).includes(fCurso));
-    if (fStatus) lista = lista.filter(m => (m.status || 'ativo') === fStatus);
-    if (fData)   lista = lista.filter(m => m.criadoEm && m.criadoEm.slice(0, 10) >= fData);
+    if (fTipo)  base = base.filter(m => m.tipo === fTipo);
+    if (fCurso) base = base.filter(m => m.cursoId === fCurso || (m.cursosVinc || []).includes(fCurso));
+    if (fData)  base = base.filter(m => m.criadoEm && m.criadoEm.slice(0, 10) >= fData);
 
-    lista.sort((a, b) => {
+    base.sort((a, b) => {
       if (ordem === 'az')     return (a.nome || '').localeCompare(b.nome || '');
       if (ordem === 'za')     return (b.nome || '').localeCompare(a.nome || '');
       if (ordem === 'antigo') return new Date(a.criadoEm) - new Date(b.criadoEm);
       return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
     });
 
+    const st = m => m.status || 'ativo';
+
+    // "Ativos" — paginada (estado de página em MatState).
+    _renderAtivos(base.filter(m => st(m) === 'ativo'), [busca, fTipo, fCurso, fData, ordem]);
+    // "Arquivados" e "Ocultos" — listagem completa.
+    _renderSecao(base.filter(m => st(m) === 'arquivado'), '#mat-tbody-arq', '#mat-empty-arq', '#mat-count-arq');
+    _renderSecao(base.filter(m => st(m) === 'oculto'),    '#mat-tbody-oc',  '#mat-empty-oc',  '#mat-count-oc');
+  }
+
+  /** Renderiza uma seção simples (sem paginação). */
+  function _renderSecao(lista, tbodySel, emptySel, countSel) {
+    const tbody = _q(tbodySel), empty = _q(emptySel), count = _q(countSel);
+    if (count) count.textContent = `${lista.length} ${lista.length === 1 ? 'material' : 'materiais'}`;
+    if (!lista.length) {
+      if (tbody) tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    if (tbody) tbody.innerHTML = lista.map(m => _renderLinha(m)).join('');
+  }
+
+  /** Renderiza a tabela "Ativos" com paginação. */
+  function _renderAtivos(lista, sigParts) {
     const tbody = _q('#mat-tbody');
     const empty = _q('#mat-empty');
     const count = _q('#mat-count');
 
-    if (count) {
-      count.textContent = `${lista.length} ${lista.length === 1 ? 'material' : 'materiais'}`;
-    }
+    if (count) count.textContent = `${lista.length} ${lista.length === 1 ? 'material' : 'materiais'}`;
 
     if (!lista.length) {
       if (tbody) tbody.innerHTML = '';
@@ -167,9 +187,8 @@ var MatTable = (() => {
     }
     if (empty) empty.style.display = 'none';
 
-    // ── Paginação (quebra de página) ──────────────────────────
     // Reseta para a página 1 sempre que os filtros mudam.
-    const sig = JSON.stringify([busca, fTipo, fCurso, fStatus, fData, ordem]);
+    const sig = JSON.stringify(sigParts);
     if (MatState.getFilterSig() !== sig) {
       MatState.setPage(1);
       MatState.setFilterSig(sig);
