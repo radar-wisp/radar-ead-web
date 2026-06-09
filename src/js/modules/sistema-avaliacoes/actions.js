@@ -29,6 +29,12 @@ var AvalActions = (() => {
     Aval.refresh();
   }
 
+  function arquivar(id) {
+    Storage.Avaliacoes.arquivar(id);
+    _toast('Avaliação arquivada.', 'i');
+    Aval.refresh();
+  }
+
   function excluir(id) {
     if (!confirm('Excluir avaliação e todos os resultados?')) return;
     Storage.Avaliacoes.excluir(id);
@@ -48,18 +54,32 @@ var AvalActions = (() => {
     const nome = document.getElementById('mav-nome')?.value.trim();
     if (!nome) { alert('Informe o nome da avaliação.'); return; }
 
+    // Campos obrigatórios — Dados gerais
+    const cursoId = document.getElementById('mav-curso')?.value || '';
+    const status  = document.getElementById('mav-status')?.value || '';
+    if (!cursoId) { alert('Selecione o curso vinculado.'); return; }
+    if (!status)  { alert('Selecione o status.'); return; }
+
+    // Campos obrigatórios — Configurações (0 é valor válido; vazio não)
+    const vNota  = document.getElementById('mav-nota-min')?.value ?? '';
+    const vTempo = document.getElementById('mav-tempo')?.value ?? '';
+    const vTent  = document.getElementById('mav-tentativas')?.value ?? '';
+    if (vNota === '')  { alert('Informe a nota mínima para aprovação.'); return; }
+    if (vTempo === '') { alert('Informe o tempo limite.'); return; }
+    if (vTent === '')  { alert('Informe as tentativas permitidas.'); return; }
+
     const getTog = id => document.getElementById(id)?.classList.contains('on') ?? false;
 
     const dados = {
       nome,
       descricao:          document.getElementById('mav-desc')?.value.trim()          || '',
-      cursoId:            document.getElementById('mav-curso')?.value                 || '',
+      cursoId,
       moduloId:           document.getElementById('mav-modulo')?.value                || '',
       turmaId:            document.getElementById('mav-turma')?.value                 || '',
-      status:             document.getElementById('mav-status')?.value                || 'rascunho',
-      notaMinima:         parseInt(document.getElementById('mav-nota-min')?.value)    || 70,
-      tempoLimite:        parseInt(document.getElementById('mav-tempo')?.value)       || 0,
-      tentativas:         parseInt(document.getElementById('mav-tentativas')?.value)  || 1,
+      status,
+      notaMinima:         parseInt(vNota)  || 0,
+      tempoLimite:        parseInt(vTempo) || 0,
+      tentativas:         parseInt(vTent)  || 0,
       resultadoImediato:  getTog('mavcfg-imediato'),
       ordemAleatoria:     getTog('mavcfg-aleatoria'),
       correcaoAutomatica: getTog('mavcfg-correcao'),
@@ -160,5 +180,5 @@ var AvalActions = (() => {
     document.getElementById('modal-av-resultados')?.classList.add('open');
   }
 
-  return { publicar, encerrar, excluir, duplicar, salvar, verResultados };
+  return { publicar, encerrar, arquivar, excluir, duplicar, salvar, verResultados };
 })();
