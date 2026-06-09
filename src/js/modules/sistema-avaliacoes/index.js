@@ -73,6 +73,7 @@ var Aval = (() => {
     salvar:       AvalActions.salvar,
     publicar:     AvalActions.publicar,
     encerrar:     AvalActions.encerrar,
+    arquivar:     AvalActions.arquivar,
     excluir:      AvalActions.excluir,
     duplicar:     AvalActions.duplicar,
     verResultados:AvalActions.verResultados,
