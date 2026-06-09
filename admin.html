@@ -1842,13 +1842,15 @@ tbody tr.selected td { background:#f0f4ff }
         </div>
 
         <!-- Tabela -->
-        <div class="card" style="margin-bottom:14px">
-          <div class="card-head" style="padding:10px 16px">
+        <div class="card" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer;user-select:none" onclick="var card=this.parentElement,b=card.querySelector('.tm-acc-body'),c=this.querySelector('.gc-chevron'),col=card.dataset.collapsed!=='1';card.dataset.collapsed=col?'1':'0';b.style.display=col?'none':'';c.style.transform=col?'rotate(-90deg)':'rotate(0deg)'">
             <div class="card-title">
+              <svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg>
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Ativos
             </div>
             <span id="mat-count" style="font-size:12px;color:var(--text4)"></span>
           </div>
+          <div class="tm-acc-body" style="display:none">
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1876,13 +1878,14 @@ tbody tr.selected td { background:#f0f4ff }
             <div style="font-size:12px">Clique em "+ Novo Material" para começar</div>
           </div>
           <div id="mat-pager" class="al-pager"></div>
-
+          </div>
         </div>
-        <div class="card" style="margin-bottom:14px">
-          <div class="card-head" style="padding:10px 16px">
-            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Arquivados</div>
+        <div class="card" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer;user-select:none" onclick="var card=this.parentElement,b=card.querySelector('.tm-acc-body'),c=this.querySelector('.gc-chevron'),col=card.dataset.collapsed!=='1';card.dataset.collapsed=col?'1':'0';b.style.display=col?'none':'';c.style.transform=col?'rotate(-90deg)':'rotate(0deg)'">
+            <div class="card-title"><svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg> <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Arquivados</div>
             <span id="mat-count-arq" style="font-size:12px;color:var(--text4)"></span>
           </div>
+          <div class="tm-acc-body" style="display:none">
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1902,13 +1905,15 @@ tbody tr.selected td { background:#f0f4ff }
             </table>
           </div>
           <div id="mat-empty-arq" style="display:none;text-align:center;padding:32px 20px;color:var(--text4);font-size:13px">Nenhum material encontrado</div>
+          </div>
         </div>
 
-        <div class="card" style="margin-bottom:14px">
-          <div class="card-head" style="padding:10px 16px">
-            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Ocultos</div>
+        <div class="card" data-collapsed="1" style="margin-bottom:14px">
+          <div class="card-head" style="padding:10px 16px;cursor:pointer;user-select:none" onclick="var card=this.parentElement,b=card.querySelector('.tm-acc-body'),c=this.querySelector('.gc-chevron'),col=card.dataset.collapsed!=='1';card.dataset.collapsed=col?'1':'0';b.style.display=col?'none':'';c.style.transform=col?'rotate(-90deg)':'rotate(0deg)'">
+            <div class="card-title"><svg class="gc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(-90deg);transition:transform .18s"><polyline points="6 9 12 15 18 9"/></svg> <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Ocultos</div>
             <span id="mat-count-oc" style="font-size:12px;color:var(--text4)"></span>
           </div>
+          <div class="tm-acc-body" style="display:none">
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1928,6 +1933,7 @@ tbody tr.selected td { background:#f0f4ff }
             </table>
           </div>
           <div id="mat-empty-oc" style="display:none;text-align:center;padding:32px 20px;color:var(--text4);font-size:13px">Nenhum material encontrado</div>
+          </div>
         </div>
 
 
