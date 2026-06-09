@@ -276,6 +276,12 @@ var AvalTable = (() => {
             </button>
             <hr class="sep">
             ${acaoStatus}
+            ${av.status !== 'arquivada'
+              ? `<button onclick="Aval.arquivar('${av.id}');Aval._cm()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  Arquivar
+                 </button>`
+              : ''}
             <hr class="sep">
             <button class="danger" onclick="Aval.excluir('${av.id}');Aval._cm()">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
