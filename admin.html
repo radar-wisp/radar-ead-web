@@ -3015,27 +3015,23 @@ tbody tr.selected td { background:#f0f4ff }
           </select>
         </div>
         <div class="fg">
-          <label>Curso vinculado</label>
-          <select id="mm-curso"></select>
+          <label>Curso vinculado *</label>
+          <select id="mm-curso" required></select>
         </div>
         <div class="fg">
-          <label>Módulo (opcional)</label>
-          <select id="mm-modulo">
+          <label>Módulo *</label>
+          <select id="mm-modulo" required>
             <option value="">Selecione um módulo...</option>
           </select>
         </div>
         <div class="fg">
-          <label>Aula</label>
-          <select id="mm-aula" disabled>
+          <label>Aula *</label>
+          <select id="mm-aula" required disabled>
             <option value="">Selecione um módulo primeiro</option>
           </select>
         </div>
         <div class="fg">
-          <label>Responsável</label>
-          <input type="text" id="mm-responsavel" placeholder="Nome do responsável">
-        </div>
-        <div class="fg">
-          <label>Status</label>
+          <label>Status *</label>
           <select id="mm-status">
             <option value="ativo">Ativo</option>
             <option value="oculto">Oculto</option>
