@@ -44,6 +44,7 @@ var Aval = (() => {
     renderTabela: AvalTable.renderTabela,
     setStatus:    AvalTable.setStatus,
     resetFiltros: AvalTable.resetFiltros,
+    toggleAcc:    AvalTable.toggleAcc,
     _menu:        AvalTable._menu,
     _cm:          AvalTable._cm,
 
