@@ -97,13 +97,78 @@ var Admin = (() => {
   function dashboard() {
     const allCursos = Storage.Cursos.listar();
     const allAlunos = Storage.Alunos.listar();
-    const allProg   = Storage.Progresso.listar();
-    const publicados = allCursos.filter(c => (c.status||'rascunho') === 'publicado').length;
+    const certStats = Storage.Certificados.stats();
+    const certs     = Storage.Certificados.listar();
+    const ativos    = allAlunos.filter(a => a.statusAcesso === 'ativo' || (a.ativo && !a.statusAcesso)).length;
 
-    q('#ds-cursos').textContent     = allCursos.length;
-    q('#ds-publicados').textContent = publicados;
-    q('#ds-colab').textContent      = allAlunos.length;
-    q('#ds-concl').textContent      = allProg.length;
+    // ── Cards ──
+    q('#ds-cursos').textContent       = allCursos.length;
+    q('#ds-colab-total').textContent  = allAlunos.length;
+    q('#ds-colab-ativos').textContent = ativos;
+    q('#ds-cert-emit').textContent    = certStats.emitidos;
+    q('#ds-cert-venc').textContent    = certStats.expirados;
+    const subAtivos = q('#ds-colab-ativos-sub');
+    if (subAtivos) {
+      const pct = allAlunos.length ? Math.round(ativos / allAlunos.length * 100) : 0;
+      subAtivos.textContent = pct + '% do total';
+    }
+
+    // ── Gráfico: Conclusão dos cursos (taxa média por curso) ──
+    const validos = certs.filter(c => c.status !== 'cancelado');
+    const conclusao = allCursos
+      .filter(c => (c.status || 'rascunho') === 'publicado')
+      .map(c => {
+        const pcts = allAlunos.filter(a => a.ativo).map(a => Storage.Progresso.pctCurso(a.id, c.id));
+        const media = pcts.length ? Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length) : 0;
+        return { nome: c.titulo, valor: media };
+      })
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+    _renderBarChart('ds-chart-conclusao', conclusao, 'blue', v => v + '%', 100);
+
+    // ── Gráfico: Certificados por setores ──
+    const porSetor = {};
+    validos.forEach(c => {
+      const al = allAlunos.find(a => a.id === c.alunoId);
+      const id = al && al.setorId ? al.setorId : '__';
+      porSetor[id] = (porSetor[id] || 0) + 1;
+    });
+    const setores = Object.keys(porSetor).map(id => ({
+      nome: id === '__' ? 'Sem setor' : (Storage.Setores.obter(id)?.nome || 'Setor'),
+      valor: porSetor[id],
+    })).sort((a, b) => b.valor - a.valor).slice(0, 6);
+    _renderBarChart('ds-chart-setores', setores, 'green');
+
+    // ── Gráfico: Certificados por equipes ──
+    const porEquipe = {};
+    validos.forEach(c => {
+      const al = allAlunos.find(a => a.id === c.alunoId);
+      const id = al && al.equipeId ? al.equipeId : '__';
+      porEquipe[id] = (porEquipe[id] || 0) + 1;
+    });
+    const equipes = Object.keys(porEquipe).map(id => ({
+      nome: id === '__' ? 'Sem equipe' : (Storage.Equipes.obter(id)?.nome || 'Equipe'),
+      valor: porEquipe[id],
+    })).sort((a, b) => b.valor - a.valor).slice(0, 6);
+    _renderBarChart('ds-chart-equipes', equipes, 'purple');
+  }
+
+  /* Renderiza um gráfico de barras horizontais simples (sem libs). */
+  function _renderBarChart(elId, dados, cor, fmt, escala) {
+    const el = q('#' + elId); if (!el) return;
+    const fmtVal = fmt || (v => v);
+    if (!dados.length || dados.every(d => !d.valor)) {
+      el.innerHTML = '<div class="ds-chart-empty">Sem dados ainda</div>';
+      return;
+    }
+    const max = escala || Math.max(...dados.map(d => d.valor), 1);
+    el.innerHTML = dados.map(d => {
+      const w = Math.round((d.valor / max) * 100);
+      return `<div class="ds-bar-row">
+        <div class="ds-bar-head"><span class="ds-bar-name">${x(d.nome)}</span><span class="ds-bar-val">${fmtVal(d.valor)}</span></div>
+        <div class="ds-bar-track"><div class="ds-bar-fill ${cor}" style="width:${w}%"></div></div>
+      </div>`;
+    }).join('');
   }
 
   function _toggleMenu(btn) {
