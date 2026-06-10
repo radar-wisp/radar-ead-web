@@ -49,10 +49,6 @@ var SetoresEquipesMod = (() => {
 
     const setores = Storage.Setores.listar();
 
-    // Stats
-    const statsEl = document.getElementById('se-stats');
-    if (statsEl) statsEl.innerHTML = SetoresCards.renderStats();
-
     // Grid de cards — primeiro setor inicia expandido
     if (!setores.length) {
       grid.innerHTML = SetoresCards.renderVazio();
