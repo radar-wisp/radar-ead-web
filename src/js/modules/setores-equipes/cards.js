@@ -186,25 +186,5 @@ var SetoresCards = (() => {
       </div>`;
   }
 
-  /**
-   * Stats resumo no topo da página.
-   * @returns {string} HTML
-   */
-  function renderStats() {
-    const setores = Storage.Setores.listar();
-    const equipes = Storage.Equipes.listar();
-    const alunos  = Storage.Alunos.listar().filter(a => a.setorId);
-
-    const stat = (val, lbl, cls = '') => `
-      <div class="stat">
-        <div class="stat-val ${cls}">${val}</div>
-        <div class="stat-lbl">${lbl}</div>
-      </div>`;
-
-    return stat(setores.length, 'Setores') +
-           stat(equipes.length, 'Equipes', 'blue') +
-           stat(alunos.length,  'Colaboradores alocados');
-  }
-
-  return { renderSetor, renderVazio, renderStats, toggleSetor };
+  return { renderSetor, renderVazio, toggleSetor };
 })();
