@@ -66,29 +66,7 @@ var AvalTable = (() => {
 
   function renderStats() {
     const wrap = document.getElementById('av-stats');
-    if (!wrap) return;
-
-    const st = Storage.Avaliacoes.stats();
-    const icoQuiz = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-
-    const card = (lbl, val, sub, cls = '') => `
-      <div class="stat">
-        <div class="stat-top">
-          <div>
-            <div class="stat-lbl">${lbl}</div>
-            <div class="stat-val ${cls}">${val}</div>
-          </div>
-          <div class="stat-ico">${icoQuiz}</div>
-        </div>
-        <div class="stat-sub">${sub}</div>
-      </div>`;
-
-    wrap.innerHTML =
-      card('Total',       st.total,       'cadastradas') +
-      card('Publicadas',  st.publicadas,  'ativas',        'blue') +
-      card('Rascunhos',   st.rascunhos,   'em edição') +
-      card('Média geral', st.media + '%', 'nota média',    st.media >= 70 ? 'green' : 'red') +
-      card('Aprovação',   st.taxa + '%',  `${st.aprovados} aprovados`, st.taxa >= 70 ? 'green' : '');
+    if (wrap) wrap.innerHTML = '';
   }
 
   // ══════════════════════════════════════════════════════════════
