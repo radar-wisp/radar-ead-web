@@ -1,7 +1,6 @@
 /**
  * admin.js — Painel Admin Corporativo EAD
- * Refatorado: Dashboard profissional · Badges corretos · Pendências
- * Busca global · Menu de ações por curso · Últimas atividades
+ * Roteador principal. Dashboard delegado a DashboardMod.
  */
 
 var Admin = (() => {
@@ -57,19 +56,20 @@ var Admin = (() => {
   }
 
   const renders = {
-    dashboard, cursos, materiais, acessos, colaboradores,
+    dashboard:    () => { if (typeof DashboardMod !== 'undefined') DashboardMod.init(); },
+    cursos:       () => { if (typeof Cursos !== 'undefined') Cursos.init(); },
+    materiais:    () => { if (typeof MatMod !== 'undefined') MatMod.init(); },
+    acessos:      () => { if (typeof AcessosMod !== 'undefined') AcessosMod.init(); },
+    colaboradores:() => { if (typeof AlunosMod !== 'undefined') AlunosMod.init(); else { renderColabList(); renderSetoresEquipes(); q('#btn-novo-colab').onclick=()=>openModal('modal-colab'); } },
     'setores-equipes': () => { if (typeof SetoresEquipesMod !== 'undefined') SetoresEquipesMod.init(); },
-    // Módulos futuros — stub que mostra "em breve"
-    turmas:         () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
-    avaliacoes:     () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
-    relatorios:     () => emBreve('Relatórios'),
-    certificados:   () => { if (typeof CertMod !== 'undefined') CertMod.init(); else emBreve('Certificados'); },
-    configuracoes:  () => emBreve('Configurações'),
+    turmas:       () => { if (typeof Turmas !== 'undefined') Turmas.init(); else emBreve('Turmas'); },
+    avaliacoes:   () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
+    relatorios:   () => emBreve('Relatórios'),
+    certificados: () => { if (typeof CertMod !== 'undefined') CertMod.init(); else emBreve('Certificados'); },
+    configuracoes:() => emBreve('Configurações'),
   };
 
   function emBreve(nome) {
-    const pg = document.getElementById('pg-dashboard');
-    // Reutiliza a área de conteúdo genérica
     document.querySelectorAll('.pg').forEach(el => el.classList.remove('active'));
     let holder = document.getElementById('pg-em-breve');
     if (!holder) {
@@ -92,101 +92,7 @@ var Admin = (() => {
       </div>`;
   }
 
-
-  /* ── Dashboard ── */
-  function dashboard() {
-    const allCursos = Storage.Cursos.listar();
-    const allAlunos = Storage.Alunos.listar();
-    const certStats = Storage.Certificados.stats();
-    const certs     = Storage.Certificados.listar();
-    const ativos    = allAlunos.filter(a => a.statusAcesso === 'ativo' || (a.ativo && !a.statusAcesso)).length;
-
-    // ── Cards ──
-    q('#ds-cursos').textContent       = allCursos.length;
-    q('#ds-colab-total').textContent  = allAlunos.length;
-    q('#ds-colab-ativos').textContent = ativos;
-    q('#ds-cert-emit').textContent    = certStats.emitidos;
-    q('#ds-cert-venc').textContent    = certStats.expirados;
-    const subAtivos = q('#ds-colab-ativos-sub');
-    if (subAtivos) {
-      const pct = allAlunos.length ? Math.round(ativos / allAlunos.length * 100) : 0;
-      subAtivos.textContent = pct + '% do total';
-    }
-
-    // ── Gráfico: Conclusão dos cursos (taxa média por curso) ──
-    const validos = certs.filter(c => c.status !== 'cancelado');
-    const conclusao = allCursos
-      .filter(c => (c.status || 'rascunho') === 'publicado')
-      .map(c => {
-        const pcts = allAlunos.filter(a => a.ativo).map(a => Storage.Progresso.pctCurso(a.id, c.id));
-        const media = pcts.length ? Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length) : 0;
-        return { nome: c.titulo, valor: media };
-      })
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 6);
-    _renderBarChart('ds-chart-conclusao', conclusao, 'blue', v => v + '%', 100);
-
-    // ── Gráfico: Certificados por setores ──
-    const porSetor = {};
-    validos.forEach(c => {
-      const al = allAlunos.find(a => a.id === c.alunoId);
-      const id = al && al.setorId ? al.setorId : '__';
-      porSetor[id] = (porSetor[id] || 0) + 1;
-    });
-    const setores = Object.keys(porSetor).map(id => ({
-      nome: id === '__' ? 'Sem setor' : (Storage.Setores.obter(id)?.nome || 'Setor'),
-      valor: porSetor[id],
-    })).sort((a, b) => b.valor - a.valor).slice(0, 6);
-    _renderBarChart('ds-chart-setores', setores, 'green');
-
-    // ── Gráfico: Certificados por equipes ──
-    const porEquipe = {};
-    validos.forEach(c => {
-      const al = allAlunos.find(a => a.id === c.alunoId);
-      const id = al && al.equipeId ? al.equipeId : '__';
-      porEquipe[id] = (porEquipe[id] || 0) + 1;
-    });
-    const equipes = Object.keys(porEquipe).map(id => ({
-      nome: id === '__' ? 'Sem equipe' : (Storage.Equipes.obter(id)?.nome || 'Equipe'),
-      valor: porEquipe[id],
-    })).sort((a, b) => b.valor - a.valor).slice(0, 6);
-    _renderBarChart('ds-chart-equipes', equipes, 'purple');
-  }
-
-  /* Renderiza um gráfico de barras horizontais simples (sem libs). */
-  function _renderBarChart(elId, dados, cor, fmt, escala) {
-    const el = q('#' + elId); if (!el) return;
-    const fmtVal = fmt || (v => v);
-    if (!dados.length || dados.every(d => !d.valor)) {
-      el.innerHTML = '<div class="ds-chart-empty">Sem dados ainda</div>';
-      return;
-    }
-    const max = escala || Math.max(...dados.map(d => d.valor), 1);
-    el.innerHTML = dados.map(d => {
-      const w = Math.round((d.valor / max) * 100);
-      return `<div class="ds-bar-row">
-        <div class="ds-bar-head"><span class="ds-bar-name">${x(d.nome)}</span><span class="ds-bar-val">${fmtVal(d.valor)}</span></div>
-        <div class="ds-bar-track"><div class="ds-bar-fill ${cor}" style="width:${w}%"></div></div>
-      </div>`;
-    }).join('');
-  }
-
-  function _toggleMenu(btn) {
-    const menu = btn.nextElementSibling, isOpen = menu.classList.contains('open');
-    _closeMenus();
-    if (!isOpen) { menu.classList.add('open'); setTimeout(() => document.addEventListener('click', _closeMenus, { once:true }), 10); }
-  }
-  function _closeMenus() { document.querySelectorAll('.action-menu.open').forEach(m => m.classList.remove('open')); }
-  function goAcessos(cursoId) { go('acessos'); setTimeout(() => { const sel=q('#ac-curso-sel'); if(sel){sel.value=cursoId;sel.dispatchEvent(new Event('change'));} }, 100); }
-  function goEdit(cursoId)    { go('cursos'); setTimeout(() => openModalCurso(cursoId), 100); }
-
   /* ── Gestão de Cursos ── */
-  function cursos() {
-    // Delegado ao módulo Cursos
-    if (typeof Cursos !== 'undefined') Cursos.init();
-  }
-
-
   function openModalCurso(id) {
     const c = id ? Storage.Cursos.obter(id) : null;
     modal.ctx = { cursoId: id };
@@ -221,34 +127,16 @@ var Admin = (() => {
   function duplicarCurso(id) { if(typeof Cursos!=='undefined'){Cursos.duplicarCurso(id);} else {const n=Storage.Cursos.duplicar(id);if(n){toast('Curso duplicado!','s');renders[pg]?.();}} }
   function excluirCurso(id) { if(typeof Cursos!=='undefined'){Cursos.excluirCurso(id);} else {if(!confirm('Excluir permanentemente?'))return;Storage.Cursos.excluir(id);toast('Excluído.','i');renders[pg]?.();} }
 
-  /* ── Materiais ── */
-  function materiais() {
-    if (typeof MatMod !== 'undefined') MatMod.init();
-  }
-
-
   /* ── Acessos ── */
-  function acessos() {
-    if (typeof AcessosMod !== 'undefined') AcessosMod.init();
-  }
-
   function addRestricao(cId){ if(typeof AcessosMod!=='undefined') AcessosMod.addRestricao(cId); }
   function remRestricao(cId,tipo,refId){ if(typeof AcessosMod!=='undefined') AcessosMod.remRestricao(cId,tipo,refId); }
 
   /* ── Colaboradores ── */
-  function colaboradores() {
-    if (typeof AlunosMod !== 'undefined') AlunosMod.init(); else { renderColabList(); renderSetoresEquipes(); q('#btn-novo-colab').onclick=()=>openModal('modal-colab'); }
-  }
   function renderColabList() { if (typeof AlunosMod !== 'undefined') AlunosMod.renderColabList(); }
   function renderSetoresEquipes() { if (typeof AlunosMod !== 'undefined') AlunosMod.renderSetoresEquipes(); }
   function toggleColab(id,ativo){ if (typeof AlunosMod !== 'undefined') AlunosMod.toggleColab(id,ativo); else { Storage.Alunos.atualizar(id,{ativo}); toast(ativo?'Ativado.':'Desativado.','i'); } }
   function delSetor(id){ if(!confirm('Excluir setor?'))return; Storage.Setores.excluir(id); renderSetoresEquipes(); }
   function delEquipe(id){ if(!confirm('Excluir equipe?'))return; Storage.Equipes.excluir(id); renderSetoresEquipes(); }
-
-  /* ── Ações de estado de curso (usadas no dashboard) ── */
-  function publicar(id){ Storage.Cursos.publicar(id); toast('Publicado!','s'); renders[pg]?.(); }
-  function arquivar(id){ Storage.Cursos.arquivar(id); toast('Arquivado.','i'); renders[pg]?.(); }
-  function openValidade(cId){ const c=Storage.Cursos.obter(cId),v=prompt('Data:',c?.validadeAte?c.validadeAte.split('T')[0]:'');if(v===null)return;Storage.Cursos.atualizar(cId,{validadeAte:v?new Date(v).toISOString():null});toast('Validade atualizada!','s');renders[pg]?.(); }
 
   /* ── Modais ── */
   function bindModals() {
@@ -263,22 +151,24 @@ var Admin = (() => {
   /* ── Helpers ── */
   function q(sel){ return document.querySelector(sel); }
   function x(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function fmtDate(iso){ if(!iso)return'—'; return new Date(iso).toLocaleDateString('pt-BR'); }
-  function fmtDateShort(iso){ if(!iso)return'—'; const d=new Date(iso),diff=Math.floor((Date.now()-d)/60000); if(diff<1)return'Agora'; if(diff<60)return diff+'min'; if(diff<1440)return Math.floor(diff/60)+'h'; return d.toLocaleDateString('pt-BR',{day:'numeric',month:'short'}); }
-  function badge(txt,cls){ return`<span class="badge ${cls}">${txt}</span>`; }
   function tipoBadge(tipo){ return{video:'badge-amber',texto:'badge-blue',pdf:'badge-red',link:'badge-green'}[tipo]||'badge-gray'; }
   function toast(msg,tipo='i'){ const s=document.getElementById('toasts'),el=document.createElement('div');el.className=`toast ${tipo}`;el.innerHTML=`<span>${{s:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>',e:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',i:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}[tipo]||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}</span><span>${msg}</span>`;s.appendChild(el);setTimeout(()=>el.remove(),3000); }
 
   function delMaterial(id) {
-    if (typeof MatMod !== 'undefined') {
-      MatMod.excluir(id);
-    } else {
-      Storage.Materiais.excluir(id);
-      toast('Material removido.', 'i');
-    }
+    if (typeof MatMod !== 'undefined') { MatMod.excluir(id); }
+    else { Storage.Materiais.excluir(id); toast('Material removido.', 'i'); }
   }
 
-    return { boot, go, goEdit, goAcessos, _toggleMenu, _closeMenus, openModalCurso, addModulo, addAula, delModulo, delAula, duplicarCurso, excluirCurso, delMaterial, addRestricao, remRestricao, toggleColab, delSetor, delEquipe, publicar, arquivar, openValidade };
+  /* ── Dashboard — delegados a DashboardMod para compatibilidade ── */
+  function _toggleMenu(btn) { if (typeof DashboardMod !== 'undefined') DashboardMod.toggleMenu(btn); }
+  function _closeMenus()    { if (typeof DashboardMod !== 'undefined') DashboardMod.closeMenus(); }
+  function goAcessos(id)    { if (typeof DashboardMod !== 'undefined') DashboardMod.goAcessos(id); }
+  function goEdit(id)       { if (typeof DashboardMod !== 'undefined') DashboardMod.goEdit(id); }
+  function publicar(id)     { if (typeof DashboardMod !== 'undefined') DashboardMod.publicar(id); }
+  function arquivar(id)     { if (typeof DashboardMod !== 'undefined') DashboardMod.arquivar(id); }
+  function openValidade(id) { if (typeof DashboardMod !== 'undefined') DashboardMod.openValidade(id); }
+
+  return { boot, go, goEdit, goAcessos, _toggleMenu, _closeMenus, openModalCurso, addModulo, addAula, delModulo, delAula, duplicarCurso, excluirCurso, delMaterial, addRestricao, remRestricao, toggleColab, delSetor, delEquipe, publicar, arquivar, openValidade };
 })();
 
 document.addEventListener('DOMContentLoaded', () => { Storage.seed(); Admin.boot(); });
