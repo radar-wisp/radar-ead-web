@@ -8,7 +8,7 @@
 var CfgRender = (() => {
   'use strict';
 
-  const { TABS, FORMAT_ICONS } = CfgConstants;
+  const { TABS, FORMAT_ICONS, KEYS } = CfgConstants;
 
   const x = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
   const getIcon = v => FORMAT_ICONS.find(i => i.value === v) || FORMAT_ICONS[0];
@@ -61,9 +61,10 @@ var CfgRender = (() => {
 
   /* ── Pane ──────────────────────────────────────────────────────── */
   function pane(tab, idx) {
-    const isCidade = tab.key === CfgConstants.KEYS.CIDADE;
-    const isFmt    = !!tab.hasIcon;
-    const col2     = isCidade ? 'Estado' : 'Descrição';
+    const isUnidade = tab.key === KEYS.UNIDADE;
+    const isFmt     = !!tab.hasIcon;
+    const col2      = isUnidade ? 'Estado/UF' : 'Descrição';
+    const col2ph    = isUnidade ? 'Ex: SP' : 'Descrição opcional';
     return `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
@@ -93,7 +94,7 @@ var CfgRender = (() => {
           </div>
           <div class="fg">
             <label>${x(col2)}</label>
-            <input type="text" id="cfg-desc-${idx}" placeholder="${isCidade?'Ex: SP':'Descrição opcional'}">
+            <input type="text" id="cfg-desc-${idx}" placeholder="${col2ph}">
           </div>
           ${isFmt ? iconPicker(idx, 'video') : ''}
         </div>
@@ -138,9 +139,9 @@ var CfgRender = (() => {
 
   /* ── List rows ─────────────────────────────────────────────────── */
   function list(idx, items) {
-    const tab      = TABS[idx];
-    const isCidade = tab.key === CfgConstants.KEYS.CIDADE;
-    const isFmt    = !!tab.hasIcon;
+    const tab       = TABS[idx];
+    const isUnidade = tab.key === KEYS.UNIDADE;
+    const isFmt     = !!tab.hasIcon;
 
     const tbody = document.getElementById(`cfg-tbody-${idx}`);
     const empty = document.getElementById(`cfg-empty-${idx}`);
@@ -157,7 +158,7 @@ var CfgRender = (() => {
     if (empty) empty.style.display = 'none';
 
     tbody.innerHTML = items.map(it => {
-      const col2 = isCidade
+      const col2 = isUnidade
         ? `<span class="badge badge-blue" style="font-size:10px">${x(it.estado||'—')}</span>`
         : `<span style="font-size:12px;color:var(--text3)">${x(it.descricao||'—')}</span>`;
       const dt = it.criadoEm
