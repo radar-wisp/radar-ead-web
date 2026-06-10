@@ -979,20 +979,6 @@ tbody tr.selected td { background:#f0f4ff }
 .se-breadcrumb a:hover { color:var(--blue); }
 .se-breadcrumb-sep { color:var(--border2); }
 
-#se-stats {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:12px; margin-bottom:20px;
-}
-#se-stats .stat {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius); padding:14px 18px;
-}
-#se-stats .stat-val {
-  font-size:22px; font-weight:700; color:var(--text); line-height:1;
-}
-#se-stats .stat-val.blue { color:var(--blue); }
-#se-stats .stat-lbl { font-size:12px; color:var(--text4); margin-top:4px; }
-
 #se-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
@@ -2545,7 +2531,6 @@ tbody tr.selected td { background:#f0f4ff }
           </div>
         </div>
 
-        <div id="se-stats"></div>
         <div id="se-grid"></div>
 
       </div>
