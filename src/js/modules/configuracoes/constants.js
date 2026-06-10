@@ -8,12 +8,14 @@ var CfgConstants = (() => {
   'use strict';
 
   const KEYS = {
-    CAT_AULA: 'ead_cfg_cat_aula',
-    FMT_AULA: 'ead_cfg_fmt_aula',
-    TIPO_MAT: 'ead_cfg_tipo_mat',
-    DEPTO:    'ead_cfg_departamentos',
-    CARGO:    'ead_cfg_cargos',
-    CIDADE:   'ead_cfg_cidades',
+    CAT_CURSO: 'ead_cfg_cat_curso',
+    FMT_CURSO: 'ead_cfg_fmt_aula',
+    TIPO_AULA: 'ead_cfg_tipo_aula',
+    TIPO_MAT:  'ead_cfg_tipo_mat',
+    CAT_MAT:   'ead_cfg_cat_mat',
+    DEPTO:     'ead_cfg_departamentos',
+    CARGO:     'ead_cfg_cargos',
+    UNIDADE:   'ead_cfg_unidades',
   };
 
   const FORMAT_ICONS = [
@@ -32,22 +34,24 @@ var CfgConstants = (() => {
   ];
 
   const TABS = [
-    { id:'cat-aula', label:'Categoria de Curso', key:KEYS.CAT_AULA, singular:'categoria',    fields:['nome','descricao'] },
-    { id:'fmt-aula', label:'Formatos de Aula',    key:KEYS.FMT_AULA, singular:'formato',      fields:['nome','descricao','icone'], hasIcon:true },
-    { id:'tipo-mat', label:'Tipos de Material',   key:KEYS.TIPO_MAT, singular:'tipo',         fields:['nome','descricao'] },
-    { id:'depto',    label:'Departamentos',        key:KEYS.DEPTO,    singular:'departamento', fields:['nome','descricao'] },
-    { id:'cargo',    label:'Cargos',               key:KEYS.CARGO,    singular:'cargo',        fields:['nome','descricao'] },
-    { id:'cidade',   label:'Cidades',              key:KEYS.CIDADE,   singular:'cidade',       fields:['nome','estado'] },
+    { id:'cat-curso',  label:'Categoria de curso',    key:KEYS.CAT_CURSO, singular:'categoria',         fields:['nome','descricao'] },
+    { id:'fmt-curso',  label:'Formato de curso',      key:KEYS.FMT_CURSO, singular:'formato',           fields:['nome','descricao','icone'], hasIcon:true },
+    { id:'tipo-aula',  label:'Tipo de aula',          key:KEYS.TIPO_AULA, singular:'tipo de aula',      fields:['nome','descricao'] },
+    { id:'tipo-mat',   label:'Tipo de material',      key:KEYS.TIPO_MAT,  singular:'tipo de material',  fields:['nome','descricao'] },
+    { id:'cat-mat',    label:'Categoria de material', key:KEYS.CAT_MAT,   singular:'categoria',         fields:['nome','descricao'] },
+    { id:'depto',      label:'Departamento',          key:KEYS.DEPTO,     singular:'departamento',      fields:['nome','descricao'] },
+    { id:'cargo',      label:'Cargo',                 key:KEYS.CARGO,     singular:'cargo',             fields:['nome','descricao'] },
+    { id:'unidade',    label:'Unidade/Filial',        key:KEYS.UNIDADE,   singular:'unidade',           fields:['nome','estado'] },
   ];
 
   const SEED = {
-    [KEYS.CAT_AULA]: [
-      { nome:'Teórica',      descricao:'Aula com foco em conceitos e teoria' },
-      { nome:'Prática',      descricao:'Aula com atividades práticas e laboratoriais' },
-      { nome:'Avaliativa',   descricao:'Aula destinada a avaliações e testes' },
-      { nome:'Complementar', descricao:'Conteúdo de apoio e aprofundamento' },
+    [KEYS.CAT_CURSO]: [
+      { nome:'Técnica',        descricao:'Cursos com foco em habilidades técnicas e operacionais' },
+      { nome:'Comportamental', descricao:'Cursos de desenvolvimento humano e soft skills' },
+      { nome:'Regulatória',    descricao:'Cursos obrigatórios por normas e compliance' },
+      { nome:'Liderança',      descricao:'Cursos voltados para gestão e liderança de equipes' },
     ],
-    [KEYS.FMT_AULA]: [
+    [KEYS.FMT_CURSO]: [
       { nome:'Vídeo',           descricao:'Arquivo de vídeo MP4, YouTube, Vimeo etc.',  icone:'video' },
       { nome:'PDF',             descricao:'Documento em formato PDF',                    icone:'pdf' },
       { nome:'Word',            descricao:'Documento Microsoft Word (.docx)',            icone:'word' },
@@ -61,12 +65,24 @@ var CfgConstants = (() => {
       { nome:'Texto / Artigo',  descricao:'Conteúdo textual inline ou artigo',          icone:'text' },
       { nome:'Arquivo ZIP',     descricao:'Pacote compactado de materiais',              icone:'zip' },
     ],
+    [KEYS.TIPO_AULA]: [
+      { nome:'Teórica',      descricao:'Aula com foco em conceitos e teoria' },
+      { nome:'Prática',      descricao:'Aula com atividades práticas e laboratoriais' },
+      { nome:'Avaliativa',   descricao:'Aula destinada a avaliações e testes' },
+      { nome:'Complementar', descricao:'Conteúdo de apoio e aprofundamento' },
+    ],
     [KEYS.TIPO_MAT]: [
       { nome:'PDF',          descricao:'Documento em formato PDF' },
       { nome:'Vídeo',        descricao:'Arquivo ou link de vídeo' },
       { nome:'Planilha',     descricao:'Arquivo Excel / Google Sheets' },
       { nome:'Apresentação', descricao:'Slides PowerPoint ou similares' },
       { nome:'Link Externo', descricao:'URL para recurso externo' },
+    ],
+    [KEYS.CAT_MAT]: [
+      { nome:'Apostila',      descricao:'Material de estudo em formato de apostila' },
+      { nome:'Exercício',     descricao:'Atividade prática para fixação de conteúdo' },
+      { nome:'Referência',    descricao:'Material de consulta e referência técnica' },
+      { nome:'Complementar',  descricao:'Material de apoio e aprofundamento' },
     ],
     [KEYS.DEPTO]: [
       { nome:'Tecnologia',     descricao:'Equipes de TI, desenvolvimento e infraestrutura' },
@@ -82,12 +98,12 @@ var CfgConstants = (() => {
       { nome:'Gerente de TI',           descricao:'Liderança da equipe de tecnologia' },
       { nome:'Auxiliar Administrativo', descricao:'Apoio administrativo e burocrático' },
     ],
-    [KEYS.CIDADE]: [
-      { nome:'Anápolis',      estado:'GO' },
-      { nome:'Goiânia',       estado:'GO' },
-      { nome:'Brasília',      estado:'DF' },
-      { nome:'São Paulo',     estado:'SP' },
-      { nome:'Rio de Janeiro',estado:'RJ' },
+    [KEYS.UNIDADE]: [
+      { nome:'Sede Anápolis',      estado:'GO' },
+      { nome:'Filial Goiânia',     estado:'GO' },
+      { nome:'Filial Brasília',    estado:'DF' },
+      { nome:'Filial São Paulo',   estado:'SP' },
+      { nome:'Filial Rio de Janeiro', estado:'RJ' },
     ],
   };
 
