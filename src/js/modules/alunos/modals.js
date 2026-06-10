@@ -38,6 +38,24 @@ var AlunosModals = (() => {
     return `MAT${ano}${seq}`;
   }
 
+  // ── Selects de cargo e cidade ─────────────────────────────────
+
+  function popularCargos(selected) {
+    const sel = document.getElementById('mal-cargo');
+    if (!sel) return;
+    const items = (() => { try { return JSON.parse(localStorage.getItem('ead_cfg_cargos')) || []; } catch { return []; } })();
+    sel.innerHTML = '<option value="">— Selecione —</option>' +
+      items.map(c => `<option value="${_x(c.nome)}" ${c.nome === selected ? 'selected' : ''}>${_x(c.nome)}</option>`).join('');
+  }
+
+  function popularCidades(selected) {
+    const sel = document.getElementById('mal-unidade');
+    if (!sel) return;
+    const items = (() => { try { return JSON.parse(localStorage.getItem('ead_cfg_cidades')) || []; } catch { return []; } })();
+    sel.innerHTML = '<option value="">— Selecione —</option>' +
+      items.map(c => `<option value="${_x(c.nome)}" ${c.nome === selected ? 'selected' : ''}>${_x(c.nome)} ${c.estado ? '(' + _x(c.estado) + ')' : ''}</option>`).join('');
+  }
+
   // ── Selects de setor/equipe ───────────────────────────────────
 
   function popularSetores(setorId, equipeId) {
@@ -106,11 +124,13 @@ var AlunosModals = (() => {
     AlunosState.editId = null;
     document.getElementById('mal-titulo').textContent = 'Novo Aluno';
     document.getElementById('mal-sub').textContent    = '';
-    ['mal-nome', 'mal-email', 'mal-cargo', 'mal-unidade', 'mal-senha']
+    ['mal-nome', 'mal-email', 'mal-senha']
       .forEach(id => _set(id, ''));
     _set('mal-matricula', _gerarMatricula());
     _set('mal-status', 'ativo');
     _setToggle('mal-primeiro', true);
+    popularCargos();
+    popularCidades();
     popularSetores();
     AlunosValidators.clearErrors();
     goStep(0);
@@ -128,11 +148,11 @@ var AlunosModals = (() => {
     _set('mal-nome',       al.nome);
     _set('mal-email',      al.email);
     _set('mal-matricula',  al.matricula);
-    _set('mal-cargo',      al.cargo);
-    _set('mal-unidade',    al.unidade);
     _set('mal-senha',      al.senha);
     _set('mal-status',     al.statusAcesso || (al.ativo ? 'ativo' : 'bloqueado'));
     _setToggle('mal-primeiro', !!al.primeiroAcesso);
+    popularCargos(al.cargo);
+    popularCidades(al.unidade);
     popularSetores(al.setorId, al.equipeId);
     AlunosValidators.clearErrors();
     goStep(0);
