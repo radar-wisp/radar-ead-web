@@ -53,12 +53,12 @@ var CfgActions = (() => {
   function renderList(idx) {
     const tab    = TABS[idx];
     const busca  = (document.getElementById(`cfg-busca-${idx}`)?.value || '').toLowerCase().trim();
-    const isCidade = tab.key === KEYS.CIDADE;
+    const isUnidade = tab.key === KEYS.UNIDADE;
     let items = get(tab.key);
     if (busca) {
       items = items.filter(it =>
         it.nome?.toLowerCase().includes(busca) ||
-        (isCidade ? it.estado?.toLowerCase().includes(busca) : it.descricao?.toLowerCase().includes(busca))
+        (isUnidade ? it.estado?.toLowerCase().includes(busca) : it.descricao?.toLowerCase().includes(busca))
       );
     }
     CfgRender.list(idx, items);
@@ -98,7 +98,7 @@ var CfgActions = (() => {
 
     if (!nome) { _toast('O campo "Nome" é obrigatório.', 'e'); return; }
 
-    const isCidade = tab.key === KEYS.CIDADE;
+    const isUnidade = tab.key === KEYS.UNIDADE;
     const isFmt    = !!tab.hasIcon;
     const items    = get(tab.key);
 
@@ -107,7 +107,7 @@ var CfgActions = (() => {
       if (i > -1) {
         items[i] = {
           ...items[i], nome,
-          ...(isCidade ? { estado:desc } : { descricao:desc }),
+          ...(isUnidade ? { estado:desc } : { descricao:desc }),
           ...(isFmt ? { icone } : {}),
           atualizadoEm: now(),
         };
@@ -116,7 +116,7 @@ var CfgActions = (() => {
     } else {
       items.push({
         id: uid(), nome,
-        ...(isCidade ? { estado:desc } : { descricao:desc }),
+        ...(isUnidade ? { estado:desc } : { descricao:desc }),
         ...(isFmt ? { icone } : {}),
         criadoEm: now(),
       });
@@ -134,7 +134,7 @@ var CfgActions = (() => {
     const item = get(tab.key).find(it => it.id === id);
     if (!item) return;
 
-    const isCidade = tab.key === KEYS.CIDADE;
+    const isUnidade = tab.key === KEYS.UNIDADE;
     const form  = document.getElementById(`cfg-form-${idx}`);
     const title = document.getElementById(`cfg-form-title-${idx}`);
     if (!form) return;
@@ -145,7 +145,7 @@ var CfgActions = (() => {
     const nome = document.getElementById(`cfg-nome-${idx}`);
     const desc = document.getElementById(`cfg-desc-${idx}`);
     if (nome) nome.value = item.nome || '';
-    if (desc) desc.value = isCidade ? (item.estado || '') : (item.descricao || '');
+    if (desc) desc.value = isUnidade ? (item.estado || '') : (item.descricao || '');
     if (tab.hasIcon) selectIcon(idx, item.icone || 'video');
 
     form.style.display = 'block';
