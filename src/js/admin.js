@@ -66,7 +66,7 @@ var Admin = (() => {
     avaliacoes:   () => { if (typeof Aval !== 'undefined') Aval.init(); else emBreve('Avaliações'); },
     relatorios:   () => emBreve('Relatórios'),
     certificados: () => { if (typeof CertMod !== 'undefined') CertMod.init(); else emBreve('Certificados'); },
-    configuracoes:() => emBreve('Configurações'),
+    configuracoes:() => { if (typeof ConfigMod !== 'undefined') ConfigMod.init(); else emBreve('Configurações'); },
   };
 
   function emBreve(nome) {
