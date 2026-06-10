@@ -51,7 +51,7 @@ var AlunosModals = (() => {
   function popularCidades(selected) {
     const sel = document.getElementById('mal-unidade');
     if (!sel) return;
-    const items = (() => { try { return JSON.parse(localStorage.getItem('ead_cfg_cidades')) || []; } catch { return []; } })();
+    const items = (() => { try { return JSON.parse(localStorage.getItem('ead_cfg_unidades')) || []; } catch { return []; } })();
     sel.innerHTML = '<option value="">— Selecione —</option>' +
       items.map(c => `<option value="${_x(c.nome)}" ${c.nome === selected ? 'selected' : ''}>${_x(c.nome)} ${c.estado ? '(' + _x(c.estado) + ')' : ''}</option>`).join('');
   }
