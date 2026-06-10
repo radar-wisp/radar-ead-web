@@ -152,8 +152,8 @@ var MatModals = (() => {
       if (el) el.value = '';
     });
 
-    _setVal('mm-tipo',      '');
-    _setVal('mm-categoria', '');
+    _popularSelectTipo();
+    _popularSelectCategoria();
     _setVal('mm-status',    'ativo');
 
     const dzText = document.getElementById('mm-dropzone-text');
@@ -190,8 +190,8 @@ var MatModals = (() => {
     if (subEl)    subEl.textContent    = `Criado em ${_fmtDate(m.criadoEm)}`;
 
     _setVal('mm-nome',        m.nome);
-    _setVal('mm-tipo',        m.tipo);
-    _setVal('mm-categoria',   m.categoria);
+    _popularSelectTipo(m.tipo);
+    _popularSelectCategoria(m.categoria);
     _setVal('mm-status',      m.status || 'ativo');
     _setVal('mm-url',         m.url !== '#simulado' ? m.url : '');
 
@@ -220,6 +220,42 @@ var MatModals = (() => {
   function _setVal(id, val) {
     const el = document.getElementById(id);
     if (el) el.value = val || '';
+  }
+
+  /**
+   * Popula o <select> de tipo a partir de Configurações > Tipos de Material.
+   * @param {string} [selectedVal]
+   */
+  function _popularSelectTipo(selectedVal) {
+    const sel = document.getElementById('mm-tipo');
+    if (!sel) return;
+    const items = (typeof ConfigMod !== 'undefined')
+      ? ConfigMod.getItems(ConfigMod.KEYS.TIPO_MAT)
+      : [];
+    sel.innerHTML =
+      '<option value="">Selecione...</option>' +
+      items.map(it => {
+        const val = it.nome || '';
+        return `<option value="${_x(val)}" ${val === selectedVal ? 'selected' : ''}>${_x(val)}</option>`;
+      }).join('');
+  }
+
+  /**
+   * Popula o <select> de categoria a partir de Configurações > Categorias de Aula.
+   * @param {string} [selectedVal]
+   */
+  function _popularSelectCategoria(selectedVal) {
+    const sel = document.getElementById('mm-categoria');
+    if (!sel) return;
+    const items = (typeof ConfigMod !== 'undefined')
+      ? ConfigMod.getItems(ConfigMod.KEYS.CAT_AULA)
+      : [];
+    sel.innerHTML =
+      '<option value="">Selecione...</option>' +
+      items.map(it => {
+        const val = it.nome || '';
+        return `<option value="${_x(val)}" ${val === selectedVal ? 'selected' : ''}>${_x(val)}</option>`;
+      }).join('');
   }
 
   /**
