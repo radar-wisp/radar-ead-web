@@ -2116,26 +2116,36 @@ var Wizard = (() => {
     const _svg = (p) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
     const _DEFAULT_ICO = _svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>');
 
-    // Carrega tipos de aula das Configurações > Tipo de material (ead_cfg_tipo_aula)
+    // Carrega tipos de material de Configurações > Tipo de material (ead_cfg_tipo_mat)
+    const _ICO_SVG = {
+      pdf:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+      video: '<polygon points="5 3 19 12 5 21 5 3"/>',
+      excel: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>',
+      ppt:   '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+      link:  '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+      quiz:  '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+      word:  '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 13 10 18 12 14 14 18 15 13"/>',
+      audio: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',
+      image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+      zip:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="11.5"/><line x1="12" y1="14" x2="12" y2="14.5"/>',
+    };
     function _loadTiposAula() {
       try {
-        const raw = localStorage.getItem('ead_cfg_tipo_aula');
+        const raw = localStorage.getItem('ead_cfg_tipo_mat');
         if (raw) {
           const lista = JSON.parse(raw);
           if (Array.isArray(lista) && lista.length) return lista;
         }
       } catch(e) {}
-      // Seed padrão (mesmo do CfgConstants.SEED)
       return [
-        { nome:'Teórica',      descricao:'Aula com foco em conceitos e teoria' },
-        { nome:'Prática',      descricao:'Aula com atividades práticas e laboratoriais' },
-        { nome:'Avaliativa',   descricao:'Aula destinada a avaliações e testes' },
-        { nome:'Complementar', descricao:'Conteúdo de apoio e aprofundamento' },
+        { nome:'PDF',          icone:'pdf'   },
+        { nome:'Vídeo',        icone:'video' },
+        { nome:'Planilha',     icone:'excel' },
+        { nome:'Apresentação', icone:'ppt'   },
+        { nome:'Link Externo', icone:'link'  },
       ];
     }
 
-    // TIPO_LABEL e TIPO_ICO são derivados dinamicamente dos tipos cadastrados
-    // O valor de aula.tipo é o slug (nome em lowercase sem espaços)
     function _slugTipo(nome) { return nome.toLowerCase().replace(/[^a-z0-9]/g,'_'); }
 
     let _tiposAula = _loadTiposAula();
@@ -2148,7 +2158,7 @@ var Wizard = (() => {
       _tiposAula.forEach(t => {
         const k = _slugTipo(t.nome);
         TIPO_LABEL[k] = t.nome;
-        TIPO_ICO[k]   = _DEFAULT_ICO;
+        TIPO_ICO[k]   = _svg(_ICO_SVG[t.icone] || _ICO_SVG.pdf || '');
       });
     }
     _rebuildTipos();
