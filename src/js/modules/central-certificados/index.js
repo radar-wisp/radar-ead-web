@@ -249,9 +249,10 @@ var CertMod = (() => {
     _renderModelosTab: _renderModelosInline,
 
     // Modelos
-    abrirModelos: CertModals.abrirModelos,
-    novoModelo:   CertModals.novoModelo,
-    salvarModelo: CertModals.salvarModelo,
+    abrirModelos:     CertModals.abrirModelos,
+    novoModelo:       CertModals.novoModelo,
+    salvarNovoModelo: CertModals.salvarNovoModelo,
+    salvarModelo:     CertModals.salvarModelo,
 
     // Menu
     _menu: CertTable._menu,
