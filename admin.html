@@ -4085,7 +4085,7 @@ tbody tr.selected td { background:#f0f4ff }
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
       </button>
     </div>
-    <!-- Editor de modelo ativo -->
+    <!-- Editor de modelo (edição) -->
     <div id="modelo-editor" style="display:none;border-top:1px solid var(--border);padding-top:14px">
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Editar modelo</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -4101,25 +4101,25 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Subtítulo</label>
           <input type="text" id="mod-sub" placeholder="Plataforma EAD">
         </div>
-        <div class="fg">
-          <label>Cor principal</label>
-          <input type="color" id="mod-cor" value="#0002da" style="height:36px;width:100%;padding:3px;cursor:pointer;border:1.5px solid var(--border2);border-radius:var(--radius-sm)">
+        <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+          <div>
+            <label>Assinatura 1 (nome)</label>
+            <input type="text" id="mod-as1" placeholder="Diretor(a) de Operações">
+          </div>
+          <div>
+            <label>Cargo 1</label>
+            <input type="text" id="mod-c1" placeholder="Cargo">
+          </div>
         </div>
-        <div class="fg">
-          <label>Assinatura 1 (nome)</label>
-          <input type="text" id="mod-as1" placeholder="Diretor(a) de Operações">
-        </div>
-        <div class="fg">
-          <label>Cargo 1</label>
-          <input type="text" id="mod-c1" placeholder="Cargo">
-        </div>
-        <div class="fg">
-          <label>Assinatura 2 (nome)</label>
-          <input type="text" id="mod-as2" placeholder="Coordenador(a) de T&D">
-        </div>
-        <div class="fg">
-          <label>Cargo 2</label>
-          <input type="text" id="mod-c2" placeholder="Cargo">
+        <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+          <div>
+            <label>Assinatura 2 (nome)</label>
+            <input type="text" id="mod-as2" placeholder="Coordenador(a) de T&D">
+          </div>
+          <div>
+            <label>Cargo 2</label>
+            <input type="text" id="mod-c2" placeholder="Cargo">
+          </div>
         </div>
         <div class="fg" style="grid-column:1/-1">
           <label>Texto do rodapé</label>
@@ -4133,6 +4133,58 @@ tbody tr.selected td { background:#f0f4ff }
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-cert-modelos').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal exclusivo: Novo Modelo de Certificado -->
+<div class="modal-bg" id="modal-cert-novo-modelo">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-head">
+      <h3>Novo Modelo de Certificado</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-cert-novo-modelo').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0 8px">
+      <div class="fg" style="grid-column:1/-1">
+        <label>Nome do modelo</label>
+        <input type="text" id="novo-mod-nome" placeholder="Ex: Modelo Padrão 2025">
+      </div>
+      <div class="fg">
+        <label>Nome da organização</label>
+        <input type="text" id="novo-mod-logo" placeholder="Radar Internet">
+      </div>
+      <div class="fg">
+        <label>Subtítulo</label>
+        <input type="text" id="novo-mod-sub" placeholder="Plataforma EAD">
+      </div>
+      <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+        <div>
+          <label>Assinatura 1 (nome)</label>
+          <input type="text" id="novo-mod-as1" placeholder="Diretor(a) de Operações">
+        </div>
+        <div>
+          <label>Cargo 1</label>
+          <input type="text" id="novo-mod-c1" placeholder="Cargo">
+        </div>
+      </div>
+      <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+        <div>
+          <label>Assinatura 2 (nome)</label>
+          <input type="text" id="novo-mod-as2" placeholder="Coordenador(a) de T&D">
+        </div>
+        <div>
+          <label>Cargo 2</label>
+          <input type="text" id="novo-mod-c2" placeholder="Cargo">
+        </div>
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>Texto do rodapé</label>
+        <textarea id="novo-mod-rodape" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-cert-novo-modelo').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="CertMod.salvarNovoModelo()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar modelo</button>
     </div>
   </div>
 </div>
@@ -4829,12 +4881,30 @@ var CertMod = (() => {
   }
 
   function novoModelo() {
-    modeloEditId = null;
-    ['mod-nome','mod-logo','mod-sub','mod-as1','mod-c1','mod-as2','mod-c2','mod-rodape'].forEach(id => {
+    ['novo-mod-nome','novo-mod-logo','novo-mod-sub','novo-mod-as1','novo-mod-c1','novo-mod-as2','novo-mod-c2','novo-mod-rodape'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value = '';
     });
-    document.getElementById('mod-cor').value = '#0002da';
-    document.getElementById('modelo-editor').style.display = 'block';
+    document.getElementById('modal-cert-novo-modelo').classList.add('open');
+  }
+
+  function salvarNovoModelo() {
+    const nome = document.getElementById('novo-mod-nome')?.value.trim();
+    if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const dados = {
+      nome,
+      corPrimaria:  '#0002da',
+      logoTexto:    document.getElementById('novo-mod-logo')?.value.trim()   || 'Radar Internet',
+      subtitulo:    document.getElementById('novo-mod-sub')?.value.trim()    || 'Plataforma EAD',
+      assinatura1:  document.getElementById('novo-mod-as1')?.value.trim()    || '',
+      cargo1:       document.getElementById('novo-mod-c1')?.value.trim()     || '',
+      assinatura2:  document.getElementById('novo-mod-as2')?.value.trim()    || '',
+      cargo2:       document.getElementById('novo-mod-c2')?.value.trim()     || '',
+      textoRodape:  document.getElementById('novo-mod-rodape')?.value.trim() || '',
+    };
+    Storage.Certificados.criarModelo(dados);
+    document.getElementById('modal-cert-novo-modelo').classList.remove('open');
+    _renderModelos(); _toast('Modelo criado!','s');
+    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
   }
 
   function _editarModelo(id) {
@@ -4845,15 +4915,15 @@ var CertMod = (() => {
     sv('mod-as1', m.assinatura1); sv('mod-c1', m.cargo1);
     sv('mod-as2', m.assinatura2); sv('mod-c2', m.cargo2);
     sv('mod-rodape', m.textoRodape);
-    document.getElementById('mod-cor').value = m.corPrimaria || '#0002da';
     document.getElementById('modelo-editor').style.display = 'block';
   }
 
   function salvarModelo() {
     const nome = document.getElementById('mod-nome')?.value.trim();
     if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const existing = modeloEditId ? Storage.Certificados.listarModelos().find(x => x.id === modeloEditId) : null;
     const dados = {
-      nome, corPrimaria: document.getElementById('mod-cor')?.value || '#0002da',
+      nome, corPrimaria: existing?.corPrimaria || '#0002da',
       logoTexto:    document.getElementById('mod-logo')?.value.trim()   || 'Radar Internet',
       subtitulo:    document.getElementById('mod-sub')?.value.trim()    || 'Plataforma EAD',
       assinatura1:  document.getElementById('mod-as1')?.value.trim()    || '',
@@ -4897,7 +4967,7 @@ var CertMod = (() => {
     abrirEmissaoManual, salvarEmissao,
     abrirEmissaoLote, previewLote, executarLote,
     abrirValidar, executarValidacao,
-    abrirModelos, novoModelo, salvarModelo,
+    abrirModelos, novoModelo, salvarModelo, salvarNovoModelo,
     _menu, _cm, _emitirRapido, _editarModelo, _excluirModelo,
   };
 })();
