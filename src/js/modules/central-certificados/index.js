@@ -179,6 +179,12 @@ var CertMod = (() => {
 
   const _x = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  // ── Accordion do relatório ────────────────────────────────────
+  function _accToggle(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+  }
+
   // ── Ciclo de vida ──────────────────────────────────────────────
   function init() {
     Storage.Certificados.sincronizar();
@@ -262,5 +268,6 @@ var CertMod = (() => {
     _emitirRapido:  CertActions._emitirRapido,
     _editarModelo:  CertModals._editarModelo,
     _excluirModelo: CertModals._excluirModelo,
+    _accToggle,
   };
 })();
