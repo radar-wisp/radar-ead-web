@@ -4397,6 +4397,8 @@ var CertMod = (() => {
     renderPendentes();
     renderVencimentos();
     _popularFiltroCurso();
+    _renderModelosTab();
+    document.getElementById('cert-ph-actions').style.display = '';
   }
 
   /* ── Stats ──────────────────────────────────────────────────── */
@@ -4856,7 +4858,44 @@ var CertMod = (() => {
       </div>`;
   }
 
-  /* ── Modelos de certificado ─────────────────────────────────── */
+  /* ── Tabs ───────────────────────────────────────────────────── */
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.cert-tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.cert-tab').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('cert-panel-' + tab);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+    const actions = document.getElementById('cert-ph-actions');
+    if (actions) actions.style.display = tab === 'modelos' ? '' : 'none';
+    if (tab === 'modelos') _renderModelosTab();
+  }
+
+  function _renderModelosTab() {
+    const wrap = document.getElementById('cert-modelos-lista'); if (!wrap) return;
+    const lista = Storage.Certificados.listarModelos();
+    if (!lista.length) {
+      wrap.innerHTML = '<div style="color:var(--text4);font-size:13px;padding:8px 0">Nenhum modelo cadastrado.</div>';
+      return;
+    }
+    wrap.innerHTML = lista.map(m => `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+        <div style="width:20px;height:20px;border-radius:4px;background:${m.corPrimaria||'#0002da'};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;color:var(--text)">${x(m.nome)}</div>
+          <div style="font-size:11px;color:var(--text4)">${x(m.logoTexto||'')}</div>
+        </div>
+        ${m.ativo ? '<span class="badge badge-green" style="font-size:9px">Ativo</span>' : ''}
+        <button onclick="CertMod._editarModelo('${m.id}')" class="btn btn-ghost btn-sm">Editar</button>
+        <button onclick="CertMod._excluirModelo('${m.id}')" class="btn btn-danger btn-sm">×</button>
+      </div>`).join('');
+  }
+
+  function _tabNovoModelo() {
+    ['novo-mod-nome','novo-mod-logo','novo-mod-sub','novo-mod-as1','novo-mod-c1','novo-mod-as2','novo-mod-c2','novo-mod-rodape'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('modal-cert-novo-modelo').classList.add('open');
+  }
   function abrirModelos() {
     _renderModelos();
     document.getElementById('modal-cert-modelos').classList.add('open');
@@ -4903,10 +4942,8 @@ var CertMod = (() => {
     };
     Storage.Certificados.criarModelo(dados);
     document.getElementById('modal-cert-novo-modelo').classList.remove('open');
-    _renderModelos();
-    document.getElementById('modal-cert-modelos').classList.add('open');
+    _renderModelosTab();
     _toast('Modelo criado!','s');
-    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
   }
 
   function _editarModelo(id) {
@@ -4937,14 +4974,12 @@ var CertMod = (() => {
     if (modeloEditId) { Storage.Certificados.atualizarModelo(modeloEditId, dados); }
     else { Storage.Certificados.criarModelo(dados); }
     document.getElementById('modelo-editor').style.display = 'none';
-    _renderModelos(); _toast('Modelo salvo!','s'); modeloEditId = null;
-    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
+    _renderModelos(); _renderModelosTab(); _toast('Modelo salvo!','s'); modeloEditId = null;
   }
 
   function _excluirModelo(id) {
     if (!confirm('Excluir este modelo?')) return;
-    Storage.Certificados.excluirModelo(id); _renderModelos();
-    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
+    Storage.Certificados.excluirModelo(id); _renderModelos(); _renderModelosTab();
   }
 
   /* ── Refresh e Toast ─────────────────────────────────────────── */
@@ -4970,6 +5005,7 @@ var CertMod = (() => {
     abrirEmissaoLote, previewLote, executarLote,
     abrirValidar, executarValidacao,
     abrirModelos, novoModelo, salvarModelo, salvarNovoModelo,
+    switchTab, _renderModelosTab, _tabNovoModelo,
     _menu, _cm, _emitirRapido, _editarModelo, _excluirModelo,
   };
 })();
