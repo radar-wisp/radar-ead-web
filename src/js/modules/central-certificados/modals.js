@@ -252,8 +252,9 @@ var CertModals = (() => {
     _setVal('mod-c2',     m.cargo2);
     _setVal('mod-rodape', m.textoRodape);
 
-    _renderModelos();
     document.getElementById('modal-cert-modelos')?.classList.add('open');
+    const lista = document.getElementById('modelos-lista');
+    if (lista) lista.style.display = 'none';
     const editor = document.getElementById('modelo-editor');
     if (editor) editor.style.display = 'block';
   }
@@ -284,6 +285,8 @@ var CertModals = (() => {
 
     const editor = document.getElementById('modelo-editor');
     if (editor) editor.style.display = 'none';
+    const lista = document.getElementById('modelos-lista');
+    if (lista) lista.style.display = '';
 
     _renderModelos();
     if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
