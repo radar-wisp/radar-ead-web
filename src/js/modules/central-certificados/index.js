@@ -151,6 +151,9 @@ var CertMod = (() => {
     const isOpen = menu.classList.contains('open');
     _tabCloseAcoes();
     if (!isOpen) {
+      const r = btn.getBoundingClientRect();
+      menu.style.top  = (r.bottom + 4) + 'px';
+      menu.style.left = (r.right - 140) + 'px';
       menu.classList.add('open');
       setTimeout(() => document.addEventListener('click', _tabCloseAcoes, { once: true }), 0);
     }
