@@ -1116,6 +1116,14 @@ tbody tr.selected td { background:#f0f4ff }
 .cert-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
 .cert-tab-panel{display:none}
 .cert-tab-panel.active{display:block}
+/* ── Dropdown Ações ── */
+.cert-acoes-wrap{position:relative;display:inline-block}
+.cert-acoes-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--card,#fff);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,2,218,.1);min-width:130px;z-index:200;overflow:hidden}
+.cert-acoes-menu.open{display:block}
+.cert-acoes-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;font-size:13px;font-weight:500;color:var(--text);background:none;border:none;cursor:pointer;text-align:left}
+.cert-acoes-menu button:hover{background:var(--blue-light);color:var(--blue)}
+.cert-acoes-menu button.danger{color:var(--red)}
+.cert-acoes-menu button.danger:hover{background:#fff0f0}
 </style>
 </head>
 <body>
@@ -2571,12 +2579,58 @@ tbody tr.selected td { background:#f0f4ff }
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Modelos de certificados
               </div>
-              <button class="btn btn-primary btn-sm" onclick="CertMod.novoModelo()">
+              <button class="btn btn-primary btn-sm" onclick="CertMod._tabNovoModelo()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
               </button>
             </div>
-            <div class="card-body" id="cert-modelos-lista" style="min-height:120px">
-              <div style="font-size:13px;color:var(--t3)">Carregando modelos...</div>
+            <div class="card-body" id="cert-modelos-lista" style="min-height:80px"></div>
+            <!-- Editor inline de modelo -->
+            <div id="cert-modelo-editor" style="display:none;border-top:1px solid var(--border);padding:16px 18px">
+              <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px" id="cert-modelo-editor-title">Novo modelo</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="fg" style="grid-column:1/-1">
+                  <label>Nome do modelo</label>
+                  <input type="text" id="tab-mod-nome" class="fg-input" placeholder="Ex: Modelo Padrão 2025">
+                </div>
+                <div class="fg">
+                  <label>Nome da organização</label>
+                  <input type="text" id="tab-mod-logo" class="fg-input" placeholder="Radar Internet">
+                </div>
+                <div class="fg">
+                  <label>Subtítulo</label>
+                  <input type="text" id="tab-mod-sub" class="fg-input" placeholder="Plataforma EAD">
+                </div>
+                <div class="fg">
+                  <label>Cor principal</label>
+                  <input type="color" id="tab-mod-cor" value="#0002da" style="height:36px;width:100%;padding:3px;cursor:pointer;border:1.5px solid var(--border2);border-radius:var(--radius-sm)">
+                </div>
+                <div class="fg">
+                  <label>Assinatura 1</label>
+                  <input type="text" id="tab-mod-as1" class="fg-input" placeholder="Nome">
+                </div>
+                <div class="fg">
+                  <label>Cargo 1</label>
+                  <input type="text" id="tab-mod-c1" class="fg-input" placeholder="Cargo">
+                </div>
+                <div class="fg">
+                  <label>Assinatura 2</label>
+                  <input type="text" id="tab-mod-as2" class="fg-input" placeholder="Nome">
+                </div>
+                <div class="fg">
+                  <label>Cargo 2</label>
+                  <input type="text" id="tab-mod-c2" class="fg-input" placeholder="Cargo">
+                </div>
+                <div class="fg" style="grid-column:1/-1">
+                  <label>Texto do rodapé</label>
+                  <textarea id="tab-mod-rodape" class="fg-input" rows="2" style="resize:vertical"></textarea>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+                <button class="btn btn-ghost btn-sm" onclick="CertMod._tabFecharEditor()">Cancelar</button>
+                <button class="btn btn-primary btn-sm" onclick="CertMod._tabSalvarModelo()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar modelo
+                </button>
+              </div>
             </div>
           </div>
         </div>
