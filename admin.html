@@ -1108,6 +1108,14 @@ tbody tr.selected td { background:#f0f4ff }
   color:var(--red);
   margin-top:4px;
 }
+
+/* ── Tabs: Certificados ── */
+.cert-tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:20px}
+.cert-tab{padding:9px 18px;font-size:.83rem;font-weight:600;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .15s ease,border-color .15s ease,background .15s ease;border-radius:7px 7px 0 0;white-space:nowrap;line-height:1.4}
+.cert-tab:hover{color:var(--text);background:var(--blue-light)}
+.cert-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
+.cert-tab-panel{display:none}
+.cert-tab-panel.active{display:block}
 </style>
 </head>
 <body>
