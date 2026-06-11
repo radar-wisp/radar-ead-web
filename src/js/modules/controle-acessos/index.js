@@ -38,7 +38,6 @@ var AcessosMod = (() => {
 
   function refresh() {
     Storage.Restricoes.sincronizarStatus();
-    AcTable.renderStats();
     AcTable.renderTabela();
     AcTable.renderVencimentos();
     AcTable.renderHistorico();
@@ -46,7 +45,6 @@ var AcessosMod = (() => {
 
   function init() {
     Storage.Restricoes.sincronizarStatus();
-    AcTable.renderStats();
     AcTable.renderTabela();
     AcTable.renderVencimentos();
     AcTable.renderHistorico();
