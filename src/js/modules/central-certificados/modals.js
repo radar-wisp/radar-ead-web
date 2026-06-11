@@ -211,6 +211,7 @@ var CertModals = (() => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    document.getElementById('modal-cert-modelos')?.classList.remove('open');
     document.getElementById('modal-cert-novo-modelo')?.classList.add('open');
   }
 
@@ -232,6 +233,8 @@ var CertModals = (() => {
 
     Storage.Certificados.criarModelo(dados);
     document.getElementById('modal-cert-novo-modelo')?.classList.remove('open');
+    _renderModelos();
+    document.getElementById('modal-cert-modelos')?.classList.add('open');
     if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
     _toast('Modelo criado!', 's');
   }
