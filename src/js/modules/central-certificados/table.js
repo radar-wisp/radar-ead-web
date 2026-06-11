@@ -62,34 +62,7 @@ var CertTable = (() => {
   }
 
   // ── STATS ─────────────────────────────────────────────────────
-  function renderStats() {
-    const wrap = document.getElementById('cert-stats');
-    if (!wrap) return;
-
-    const st   = Storage.Certificados.stats();
-    const pend = Storage.Certificados.pendentesElegivel();
-
-    const icoCert = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`;
-
-    const card = (lbl, val, sub, cls = '') => `
-      <div class="stat">
-        <div class="stat-top">
-          <div>
-            <div class="stat-lbl">${lbl}</div>
-            <div class="stat-val ${cls}">${val}</div>
-          </div>
-          <div class="stat-ico">${icoCert}</div>
-        </div>
-        <div class="stat-sub">${sub}</div>
-      </div>`;
-
-    wrap.innerHTML =
-      card('Certificados', st.emitidos,  'emitidos',             'blue') +
-      card('Pendentes',    pend,         'elegíveis sem cert.',  pend > 0 ? 'amber' : '') +
-      card('Expirados',    st.expirados, 'vencidos',             st.expirados > 0 ? 'red' : '') +
-      card('Vencendo',     st.vencendo,  'nos próximos 30d',     st.vencendo > 0 ? 'amber' : '') +
-      card('Cancelados',   st.cancelados,'revogados');
-  }
+  function renderStats() {}
 
   // ── FILTRO DE CURSOS ──────────────────────────────────────────
   function _popularFiltroCurso() {
