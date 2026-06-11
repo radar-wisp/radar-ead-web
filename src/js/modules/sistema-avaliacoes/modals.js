@@ -25,7 +25,7 @@ var AvalModals = (() => {
     if (tituloEl) tituloEl.textContent = 'Nova Avaliação';
     if (subEl)    subEl.textContent    = '';
 
-    ['mav-nome', 'mav-desc'].forEach(id => {
+    ['mav-nome'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -59,7 +59,6 @@ var AvalModals = (() => {
     if (subEl)    subEl.textContent    = `Criada em ${_fmtDate(av.criadoEm)}`;
 
     _setVal('mav-nome',       av.nome);
-    _setVal('mav-desc',       av.descricao);
     _setVal('mav-nota-min',   av.notaMinima  || 70);
     _setVal('mav-tempo',      av.tempoLimite || 0);
     _setVal('mav-tentativas', av.tentativas  || 1);
