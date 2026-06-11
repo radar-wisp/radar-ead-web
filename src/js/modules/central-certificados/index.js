@@ -35,6 +35,8 @@ var CertMod = (() => {
     if (btn) btn.classList.add('active');
     const panel = document.getElementById('cert-panel-' + tab);
     if (panel) panel.classList.add('active');
+    const phActions = document.getElementById('cert-ph-actions');
+    if (phActions) phActions.style.display = tab === 'modelos' ? '' : 'none';
     if (tab === 'emitir')    _initEmitirInline();
     if (tab === 'lote')      _initLoteInline();
     if (tab === 'modelos')   _renderModelosInline();
@@ -224,6 +226,8 @@ var CertMod = (() => {
     CertTable.renderStats();
     CertTable._popularFiltroCurso();
     _renderModelosInline();
+    const phActions = document.getElementById('cert-ph-actions');
+    if (phActions) phActions.style.display = '';
   }
 
   function refresh() {
