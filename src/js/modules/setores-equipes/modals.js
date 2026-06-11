@@ -27,8 +27,7 @@ var SetoresModals = (() => {
     _editSetorId = null;
     document.getElementById('mse-titulo').textContent = 'Novo Setor';
     _set('mse-nome', '');
-    _set('mse-cor', '#0002da');
-    _syncCorLabel();
+    _popularDeptosSelect('mse-depto', null);
     _open('modal-se-setor');
     setTimeout(() => document.getElementById('mse-nome')?.focus(), 50);
   }
@@ -39,22 +38,22 @@ var SetoresModals = (() => {
     _editSetorId = id;
     document.getElementById('mse-titulo').textContent = 'Editar Setor';
     _set('mse-nome', s.nome);
-    _set('mse-cor', s.cor || '#0002da');
-    _syncCorLabel();
+    _popularDeptosSelect('mse-depto', s.departamento || null);
     _open('modal-se-setor');
     setTimeout(() => document.getElementById('mse-nome')?.focus(), 50);
   }
 
   function salvarSetor() {
-    const nome = _val('mse-nome');
-    const cor  = _val('mse-cor') || '#0002da';
-    if (!nome) { alert('Informe o nome do setor.'); return; }
+    const nome        = _val('mse-nome');
+    const departamento = _val('mse-depto');
+    if (!nome)        { alert('Informe o nome do setor.'); return; }
+    if (!departamento){ alert('Selecione um departamento.'); return; }
 
     if (_editSetorId) {
-      Storage.Setores.atualizar(_editSetorId, { nome, cor });
+      Storage.Setores.atualizar(_editSetorId, { nome, departamento });
       _toast('Setor atualizado!', 's');
     } else {
-      Storage.Setores.criar({ nome, cor });
+      Storage.Setores.criar({ nome, departamento });
       _toast('Setor criado!', 's');
     }
 
@@ -63,16 +62,18 @@ var SetoresModals = (() => {
     SetoresEquipesMod.refresh();
   }
 
-  function _syncCorLabel() {
-    selecionarCor(_val('mse-cor') || '#0002da');
-  }
-
-  function selecionarCor(cor) {
-    _set('mse-cor', cor);
-    document.getElementById('mse-cor-lbl').textContent = cor;
-    document.querySelectorAll('.se-cor-btn').forEach(b => {
-      b.classList.toggle('ativa', b.dataset.cor === cor.toLowerCase());
-    });
+  function _popularDeptosSelect(selId, selectedVal) {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const deptos = (() => {
+      try { return JSON.parse(localStorage.getItem('ead_cfg_departamentos')) || []; }
+      catch { return []; }
+    })();
+    sel.innerHTML =
+      '<option value="">— Selecione um departamento —</option>' +
+      deptos.map(d =>
+        `<option value="${_x(d.nome)}"${d.nome === selectedVal ? ' selected' : ''}>${_x(d.nome)}</option>`
+      ).join('');
   }
 
   // ── EQUIPE ────────────────────────────────────────────────────
@@ -126,7 +127,6 @@ var SetoresModals = (() => {
       Storage.Setores.listar().map(s =>
         `<option value="${_x(s.id)}">${_x(s.nome)}</option>`
       ).join('');
-    // Forçar valor após innerHTML para garantir pré-seleção em todos os browsers
     if (selectedId) sel.value = selectedId;
   }
 
@@ -144,6 +144,5 @@ var SetoresModals = (() => {
     abrirEditarEquipe,
     salvarEquipe,
     fecharEquipe,
-    selecionarCor,
   };
 })();
