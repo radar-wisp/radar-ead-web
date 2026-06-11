@@ -26,8 +26,7 @@ var SetoresModals = (() => {
   function abrirNovoSetor() {
     _editSetorId = null;
     document.getElementById('mse-titulo').textContent = 'Novo Setor';
-    _set('mse-nome', '');
-    _popularDeptosSelect('mse-depto', null);
+    _popularDeptosSelect('mse-nome', null);
     _open('modal-se-setor');
     setTimeout(() => document.getElementById('mse-nome')?.focus(), 50);
   }
@@ -37,23 +36,20 @@ var SetoresModals = (() => {
     if (!s) return;
     _editSetorId = id;
     document.getElementById('mse-titulo').textContent = 'Editar Setor';
-    _set('mse-nome', s.nome);
-    _popularDeptosSelect('mse-depto', s.departamento || null);
+    _popularDeptosSelect('mse-nome', s.nome);
     _open('modal-se-setor');
     setTimeout(() => document.getElementById('mse-nome')?.focus(), 50);
   }
 
   function salvarSetor() {
-    const nome        = _val('mse-nome');
-    const departamento = _val('mse-depto');
-    if (!nome)        { alert('Informe o nome do setor.'); return; }
-    if (!departamento){ alert('Selecione um departamento.'); return; }
+    const nome = _val('mse-nome');
+    if (!nome) { alert('Selecione um departamento.'); return; }
 
     if (_editSetorId) {
-      Storage.Setores.atualizar(_editSetorId, { nome, departamento });
+      Storage.Setores.atualizar(_editSetorId, { nome });
       _toast('Setor atualizado!', 's');
     } else {
-      Storage.Setores.criar({ nome, departamento });
+      Storage.Setores.criar({ nome });
       _toast('Setor criado!', 's');
     }
 
