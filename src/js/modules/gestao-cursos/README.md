@@ -1,3 +1,4 @@
+[README.md](https://github.com/user-attachments/files/28840826/README.md)
 [README-gestao-cursos (1).md](https://github.com/user-attachments/files/28476159/README-gestao-cursos.1.md)
 # Módulo: Gestão de Cursos
 
@@ -110,12 +111,12 @@ porque é carregado antes deste módulo e é tratado como sub-módulo independen
 
 | Função | Descrição |
 |---|---|
-| `abrir(id)` | Abre o drawer lateral carregando `novo-curso.html?edit=<id>` no iframe. |
+| `abrir(id)` | Abre o drawer lateral carregando `gestao-cursos/wizard.html?edit=<id>` no iframe. |
 | `fechar()` | Fecha o drawer, limpa o iframe e dispara `renderTabela()`. |
 
 ### Comunicação com o Wizard
 
-O wizard (`novo-curso.html`) comunica conclusão via:
+O wizard (`gestao-cursos/wizard.html`) comunica conclusão via:
 
 ```javascript
 window.parent.postMessage('wizard:concluido', '*');
