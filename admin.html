@@ -1075,13 +1075,6 @@ tbody tr.selected td { background:#f0f4ff }
 .se-empty p  { margin:0 0 16px; font-size:13px; }
 
 .se-btn-danger:hover { color:var(--red) !important; }
-.se-cor-btn {
-  width:28px; height:28px; border-radius:50%; border:2px solid transparent;
-  cursor:pointer; transition:border-color .15s, transform .15s;
-  flex-shrink:0;
-}
-.se-cor-btn:hover { transform:scale(1.12); }
-.se-cor-btn.ativa { border-color:var(--text); transform:scale(1.12); }
 /* ── fim Tela Setores e Equipes ─────────────────────────────── */
 
 
@@ -4815,17 +4808,8 @@ var CertMod = (() => {
           onkeydown="if(event.key==='Enter') SetoresModals.salvarSetor()">
       </div>
       <div>
-        <label class="lbl">Cor identificadora</label>
-        <input type="hidden" id="mse-cor" value="#0002da">
-        <div style="display:flex;gap:10px;align-items:center">
-          <button type="button" class="se-cor-btn" data-cor="#0002da"
-            style="background:#0002da"
-            onclick="SetoresModals.selecionarCor('#0002da')"></button>
-          <button type="button" class="se-cor-btn" data-cor="#08ffff"
-            style="background:#08ffff"
-            onclick="SetoresModals.selecionarCor('#08ffff')"></button>
-          <span id="mse-cor-lbl" style="font-size:12px;color:var(--text3)">#0002da</span>
-        </div>
+        <label class="lbl">Departamento <span style="color:var(--red)">*</span></label>
+        <select class="inp" id="mse-depto"></select>
       </div>
     </div>
     <div class="modal-foot">
