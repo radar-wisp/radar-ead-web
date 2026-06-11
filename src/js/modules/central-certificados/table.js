@@ -83,8 +83,7 @@ var CertTable = (() => {
     const fData   = _q('#cert-filtro-data')?.value    || '';
     const ordem   = _q('#cert-order')?.value          || 'recente';
 
-    let lista = Storage.Certificados.listar();
-    if (fStatus) lista = lista.filter(c => c.status === fStatus);
+    let lista = Storage.Certificados.listar().filter(c => c.status === 'pendente');
     if (fCurso)  lista = lista.filter(c => c.cursoId === fCurso);
     if (fData)   lista = lista.filter(c => c.dataEmissao && c.dataEmissao.slice(0, 10) >= fData);
     if (busca) {
@@ -215,10 +214,12 @@ var CertTable = (() => {
     document.querySelectorAll('.gc-menu.open').forEach(m => m.classList.remove('open'));
   }
 
-  // ── PAINEL: PENDENTES ─────────────────────────────────────────
+  // ── TABELA: PENDENTES ─────────────────────────────────────────
   function renderPendentes() {
-    const wrap = document.getElementById('cert-pendentes');
-    if (!wrap) return;
+    const tbody  = document.getElementById('cert-pend-tbody');
+    const empty  = document.getElementById('cert-pend-empty');
+    const count  = document.getElementById('cert-pend-count');
+    if (!tbody) return;
 
     const cursos   = Storage.Cursos.listar().filter(c => c.status === 'publicado');
     const emitidos = new Set(
@@ -239,32 +240,40 @@ var CertTable = (() => {
       });
     });
 
+    if (count) count.textContent = `${pend.length} pendente(s)`;
     if (!pend.length) {
-      wrap.innerHTML = '<div style="font-size:12px;color:var(--text4)">Nenhuma emissão pendente.</div>';
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
       return;
     }
+    if (empty) empty.style.display = 'none';
 
-    wrap.innerHTML =
-      pend.slice(0, 6).map(({ al, cu }) => `
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_x(al.nome)}</div>
-            <div style="font-size:10px;color:var(--text4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_x(cu.titulo)}</div>
+    tbody.innerHTML = pend.map(({ al, cu }) => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">
+              ${(al.nome?.[0] || '?').toUpperCase()}
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${_x(al.nome)}</div>
           </div>
+        </td>
+        <td style="font-size:13px;color:var(--text)">${_x(cu.titulo)}</td>
+        <td>
           <button onclick="CertMod._emitirRapido('${al.id}','${cu.id}')"
-            style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">
+            style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">
             Emitir
           </button>
-        </div>`).join('') +
-      (pend.length > 6
-        ? `<div style="font-size:11px;color:var(--text4);padding-top:6px">+${pend.length - 6} outros</div>`
-        : '');
+        </td>
+      </tr>`).join('');
   }
 
-  // ── PAINEL: VENCIMENTOS ───────────────────────────────────────
+  // ── TABELA: VENCIMENTOS ───────────────────────────────────────
   function renderVencimentos() {
-    const wrap = document.getElementById('cert-vencimentos');
-    if (!wrap) return;
+    const tbody = document.getElementById('cert-venc-tbody');
+    const empty = document.getElementById('cert-venc-empty');
+    const count = document.getElementById('cert-venc-count');
+    if (!tbody) return;
 
     const agora = new Date();
     const em30  = new Date();
@@ -277,26 +286,35 @@ var CertTable = (() => {
         new Date(c.dataValidade) > agora &&
         new Date(c.dataValidade) <= em30
       )
-      .sort((a, b) => new Date(a.dataValidade) - new Date(b.dataValidade))
-      .slice(0, 5);
+      .sort((a, b) => new Date(a.dataValidade) - new Date(b.dataValidade));
 
+    if (count) count.textContent = `${prox.length} vencimento(s)`;
     if (!prox.length) {
-      wrap.innerHTML = '<div style="font-size:12px;color:var(--text4)">Nenhum vencimento próximo.</div>';
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
       return;
     }
+    if (empty) empty.style.display = 'none';
 
-    wrap.innerHTML = prox.map(c => {
+    tbody.innerHTML = prox.map(c => {
       const al   = Storage.Alunos.obter(c.alunoId);
+      const cur  = Storage.Cursos.obter(c.cursoId);
       const diff = Math.ceil((new Date(c.dataValidade) - agora) / 86400000);
       const cor  = diff <= 7 ? 'var(--red)' : 'var(--amber)';
-      return `
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
-          <div style="width:6px;height:6px;border-radius:50%;background:${cor};margin-top:4px;flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_x(al?.nome || '—')}</div>
-            <div style="font-size:10px;color:var(--text4)">${diff === 1 ? 'amanhã' : diff + ' dias'}</div>
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">
+              ${(al?.nome?.[0] || '?').toUpperCase()}
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${_x(al?.nome || '—')}</div>
           </div>
-        </div>`;
+        </td>
+        <td style="font-size:13px;color:var(--text)">${_x(cur?.titulo || '—')}</td>
+        <td><code style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text3);letter-spacing:.04em">${_x(c.codigo)}</code></td>
+        <td style="font-size:12px;color:var(--text4)">${_fmtDate(c.dataValidade)}</td>
+        <td><span style="font-size:12px;font-weight:600;color:${cor}">${diff === 1 ? 'amanhã' : diff + ' dias'}</span></td>
+      </tr>`;
     }).join('');
   }
 
