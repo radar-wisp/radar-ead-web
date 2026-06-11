@@ -233,9 +233,8 @@ var CertModals = (() => {
 
     Storage.Certificados.criarModelo(dados);
     document.getElementById('modal-cert-novo-modelo')?.classList.remove('open');
-    _renderModelos();
-    document.getElementById('modal-cert-modelos')?.classList.add('open');
     if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
+    if (window.CertMod?.switchTab) CertMod.switchTab('modelos');
     _toast('Modelo criado!', 's');
   }
 
