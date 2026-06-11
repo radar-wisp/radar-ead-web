@@ -620,3 +620,13 @@ tbody tr:hover{background:#FAFBFE}
 .al-pg-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);cursor:default}
 .al-pg-btn:disabled{opacity:.4;cursor:not-allowed}
 .al-pg-dots{padding:0 4px;color:var(--text4);font-size:12px}
+
+/* ══════════════════════════════════════
+   TABS (navegação por abas)
+══════════════════════════════════════ */
+.cert-tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:20px}
+.cert-tab{padding:9px 18px;font-size:.83rem;font-weight:600;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color var(--trans),border-color var(--trans);border-radius:var(--radius) var(--radius) 0 0;white-space:nowrap}
+.cert-tab:hover{color:var(--t1);background:var(--blue-soft)}
+.cert-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-soft)}
+.cert-tab-panel{display:none}
+.cert-tab-panel.active{display:block}
