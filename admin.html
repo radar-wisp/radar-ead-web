@@ -2553,6 +2553,11 @@ tbody tr.selected td { background:#f0f4ff }
             <h2>Certificados</h2>
             <p>Emissão, controle e validação de certificados dos cursos concluídos</p>
           </div>
+          <div id="cert-ph-actions" style="display:none">
+            <button class="btn btn-primary btn-sm" onclick="CertMod._tabNovoModelo()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
+            </button>
+          </div>
         </div>
 
         <!-- Navegação por abas -->
@@ -2579,9 +2584,6 @@ tbody tr.selected td { background:#f0f4ff }
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 Modelos de certificados
               </div>
-              <button class="btn btn-primary btn-sm" onclick="CertMod._tabNovoModelo()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
-              </button>
             </div>
             <div class="card-body" id="cert-modelos-lista" style="min-height:80px"></div>
             <!-- Editor inline de modelo -->
