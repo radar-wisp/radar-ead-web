@@ -2537,132 +2537,231 @@ tbody tr.selected td { background:#f0f4ff }
             <h2>Certificados</h2>
             <p>Emissão, controle e validação de certificados dos cursos concluídos</p>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="CertMod.abrirEmissaoLote()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Emitir em lote
-            </button>
-            <button class="btn btn-ghost" onclick="CertMod.abrirModelos()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Modelos
-            </button>
-            <button class="btn btn-ghost" onclick="CertMod.abrirValidar()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Validar código
-            </button>
-            <button class="btn btn-primary" onclick="CertMod.abrirEmissaoManual()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Emitir certificado
-            </button>
-          </div>
         </div>
 
-        <!-- Stats -->
-
-
-        <!-- IFT -->
-        <div class="ift" id="cert-toolbar" style="margin-bottom:14px">
-          <div class="ift-field" style="flex:2;min-width:200px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-            <input class="ift-input" type="text" id="cert-busca"
-              placeholder="Buscar por aluno, curso ou código..."
-              oninput="CertMod.renderTabela()">
-          </div>
-          <div class="ift-sep"></div>
-
-          <div class="ift-status-chips">
-            <button class="ift-chip" data-cest="" onclick="CertMod.setStatus(this,'')">Todos</button>
-            <button class="ift-chip" data-cest="emitido"  onclick="CertMod.setStatus(this,'emitido')">● Emitido</button>
-            <button class="ift-chip" data-cest="pendente" onclick="CertMod.setStatus(this,'pendente')">◎ Pendente</button>
-            <button class="ift-chip" data-cest="expirado" onclick="CertMod.setStatus(this,'expirado')">✕ Expirado</button>
-            <button class="ift-chip" data-cest="cancelado" onclick="CertMod.setStatus(this,'cancelado')">■ Cancelado</button>
-            <select id="cert-filtro-status" style="display:none"></select>
-          </div>
-          <div class="ift-sep"></div>
-
-          <div class="ift-field fixed" style="min-width:160px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-            <select class="ift-select" id="cert-filtro-curso" onchange="CertMod.renderTabela()">
-              <option value="">Curso</option>
-            </select>
-          </div>
-          <div class="ift-sep"></div>
-
-          <div class="ift-field fixed" style="min-width:140px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-            <input class="ift-date" type="date" id="cert-filtro-data"
-              title="Emitido a partir de" onchange="CertMod.renderTabela()">
-          </div>
-          <div class="ift-sep"></div>
-
-          <div class="ift-field fixed" style="min-width:130px">
-            <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></span>
-            <select class="ift-select" id="cert-order" onchange="CertMod.renderTabela()">
-              <option value="recente">Mais recentes</option>
-              <option value="antigo">Mais antigos</option>
-              <option value="az">A → Z</option>
-            </select>
-          </div>
-          <div class="ift-sep"></div>
-
-          <button class="ift-btn" onclick="CertMod.resetFiltros()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> <span id="cert-badge" class="ift-active-badge"></span>
+        <!-- Navegação por abas -->
+        <nav class="cert-tabs" id="cert-tabs-nav">
+          <button class="cert-tab active" data-tab="modelos" onclick="CertMod.switchTab('modelos',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Modelos de certificados
           </button>
-        </div>
+          <button class="cert-tab" data-tab="emitir" onclick="CertMod.switchTab('emitir',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>Emitir certificado
+          </button>
+          <button class="cert-tab" data-tab="lote" onclick="CertMod.switchTab('lote',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Emitir em lote
+          </button>
+          <button class="cert-tab" data-tab="relatorio" onclick="CertMod.switchTab('relatorio',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Relatório
+          </button>
+        </nav>
 
-        <!-- Layout grid: tabela + painel lateral -->
-        <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start">
-
-          <!-- Tabela -->
+        <!-- ── TAB: Modelos de certificados ──────────────────── -->
+        <div class="cert-tab-panel active" id="cert-panel-modelos">
           <div class="card">
-            <div class="card-head" style="padding:10px 16px">
-              <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Certificados emitidos</div>
-              <span id="cert-count" style="font-size:12px;color:var(--text4)"></span>
+            <div class="card-head">
+              <div class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Modelos de certificados
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="CertMod.novoModelo()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
+              </button>
             </div>
-            <div class="tbl-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Aluno</th>
-                    <th>Curso</th>
-                    <th style="text-align:center">Carga</th>
-                    <th>Código</th>
-                    <th>Emissão</th>
-                    <th>Validade</th>
-                    <th>Status</th>
-                    <th style="width:80px"></th>
-                  </tr>
-                </thead>
-                <tbody id="cert-tbody"></tbody>
-              </table>
-            </div>
-            <div id="cert-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text4)">
-              <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-              <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Nenhum certificado encontrado</div>
-              <div style="font-size:12px">Emita o primeiro certificado para começar</div>
+            <div class="card-body" id="cert-modelos-lista" style="min-height:120px">
+              <div style="font-size:13px;color:var(--t3)">Carregando modelos...</div>
             </div>
           </div>
+        </div>
 
-          <!-- Painel lateral -->
-          <div style="display:flex;flex-direction:column;gap:12px">
-
-            <!-- Pendentes de emissão -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title" style="font-size:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes de emissão</div>
-                <button class="btn btn-ghost btn-sm" onclick="CertMod.renderPendentes()">↺</button>
+        <!-- ── TAB: Emitir certificado ───────────────────────── -->
+        <div class="cert-tab-panel" id="cert-panel-emitir">
+          <div class="card" style="max-width:580px">
+            <div class="card-head">
+              <div class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                Emissão unitária
               </div>
-              <div class="card-body" id="cert-pendentes" style="padding:10px 14px">
-                <div style="font-size:12px;color:var(--text4)">Calculando...</div>
+            </div>
+            <div class="card-body">
+              <div class="fg">
+                <label>Aluno</label>
+                <select id="mce-aluno" class="fg-input"></select>
+              </div>
+              <div class="fg">
+                <label>Curso</label>
+                <select id="mce-curso" class="fg-input"></select>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="fg">
+                  <label>Data de conclusão</label>
+                  <input type="date" id="mce-conclusao" class="fg-input">
+                </div>
+                <div class="fg">
+                  <label>Validade (opcional)</label>
+                  <input type="date" id="mce-validade" class="fg-input">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="fg">
+                  <label>Nota (opcional)</label>
+                  <input type="number" id="mce-nota" class="fg-input" min="0" max="100" placeholder="0–100">
+                </div>
+                <div class="fg">
+                  <label>Responsável</label>
+                  <input type="text" id="mce-resp" class="fg-input" value="Admin">
+                </div>
+              </div>
+              <div class="fg">
+                <label>Observações (opcional)</label>
+                <textarea id="mce-obs" class="fg-input" rows="2" style="resize:vertical"></textarea>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:4px">
+                <button class="btn btn-primary" onclick="CertMod.salvarEmissaoInline()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                  Emitir certificado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Emitir em lote ───────────────────────────── -->
+        <div class="cert-tab-panel" id="cert-panel-lote">
+          <div class="card" style="max-width:580px">
+            <div class="card-head">
+              <div class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Emissão em lote
+              </div>
+            </div>
+            <div class="card-body">
+              <p style="font-size:13px;color:var(--t2);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:1px;flex-shrink:0;color:var(--blue)"><polyline points="20 6 9 17 4 12"/></svg>
+                Emite certificados para todos os alunos que concluíram 100% do curso selecionado.
+              </p>
+              <div class="fg">
+                <label>Curso</label>
+                <select id="mlote-curso" class="fg-input"></select>
+              </div>
+              <div id="mlote-preview" style="margin:12px 0;min-height:20px;font-size:13px;color:var(--t2)"></div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
+                <button class="btn btn-ghost" onclick="CertMod.previewLoteInline()">Pré-visualizar</button>
+                <button class="btn btn-primary" onclick="CertMod.executarLoteInline()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Emitir em lote
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Relatório ────────────────────────────────── -->
+        <div class="cert-tab-panel" id="cert-panel-relatorio">
+
+          <!-- IFT -->
+          <div class="ift" id="cert-toolbar" style="margin-bottom:14px">
+            <div class="ift-field" style="flex:2;min-width:200px">
+              <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input class="ift-input" type="text" id="cert-busca"
+                placeholder="Buscar por aluno, curso ou código..."
+                oninput="CertMod.renderTabela()">
+            </div>
+            <div class="ift-sep"></div>
+            <div class="ift-status-chips">
+              <button class="ift-chip" data-cest="" onclick="CertMod.setStatus(this,'')">Todos</button>
+              <button class="ift-chip" data-cest="emitido"  onclick="CertMod.setStatus(this,'emitido')">● Emitido</button>
+              <button class="ift-chip" data-cest="pendente" onclick="CertMod.setStatus(this,'pendente')">◎ Pendente</button>
+              <button class="ift-chip" data-cest="expirado" onclick="CertMod.setStatus(this,'expirado')">✕ Expirado</button>
+              <button class="ift-chip" data-cest="cancelado" onclick="CertMod.setStatus(this,'cancelado')">■ Cancelado</button>
+              <select id="cert-filtro-status" style="display:none"></select>
+            </div>
+            <div class="ift-sep"></div>
+            <div class="ift-field fixed" style="min-width:160px">
+              <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+              <select class="ift-select" id="cert-filtro-curso" onchange="CertMod.renderTabela()">
+                <option value="">Curso</option>
+              </select>
+            </div>
+            <div class="ift-sep"></div>
+            <div class="ift-field fixed" style="min-width:140px">
+              <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+              <input class="ift-date" type="date" id="cert-filtro-data"
+                title="Emitido a partir de" onchange="CertMod.renderTabela()">
+            </div>
+            <div class="ift-sep"></div>
+            <div class="ift-field fixed" style="min-width:130px">
+              <span class="ift-ico"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></span>
+              <select class="ift-select" id="cert-order" onchange="CertMod.renderTabela()">
+                <option value="recente">Mais recentes</option>
+                <option value="antigo">Mais antigos</option>
+                <option value="az">A → Z</option>
+              </select>
+            </div>
+            <div class="ift-sep"></div>
+            <button class="ift-btn" onclick="CertMod.resetFiltros()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span id="cert-badge" class="ift-active-badge"></span>
+            </button>
+          </div>
+
+          <!-- Layout grid: tabela + painel lateral -->
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start">
+
+            <!-- Tabela -->
+            <div class="card">
+              <div class="card-head" style="padding:10px 16px">
+                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Certificados emitidos</div>
+                <span id="cert-count" style="font-size:12px;color:var(--t3)"></span>
+              </div>
+              <div class="tbl-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Aluno</th>
+                      <th>Curso</th>
+                      <th style="text-align:center">Carga</th>
+                      <th>Código</th>
+                      <th>Emissão</th>
+                      <th>Validade</th>
+                      <th>Status</th>
+                      <th style="width:80px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="cert-tbody"></tbody>
+                </table>
+              </div>
+              <div id="cert-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--t3)">
+                <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+                <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:6px">Nenhum certificado encontrado</div>
+                <div style="font-size:12px">Emita o primeiro certificado para começar</div>
               </div>
             </div>
 
-            <!-- Próximos vencimentos -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title" style="font-size:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Próximos vencimentos</div>
-              </div>
-              <div class="card-body" id="cert-vencimentos" style="padding:10px 14px">
-                <div style="font-size:12px;color:var(--text4)">Nenhum vencimento próximo.</div>
-              </div>
-            </div>
+            <!-- Painel lateral -->
+            <div style="display:flex;flex-direction:column;gap:12px">
 
+              <!-- Pendentes de emissão -->
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title" style="font-size:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes de emissão</div>
+                  <button class="btn btn-ghost btn-sm" onclick="CertMod.renderPendentes()">↺</button>
+                </div>
+                <div class="card-body" id="cert-pendentes" style="padding:10px 14px">
+                  <div style="font-size:12px;color:var(--t3)">Calculando...</div>
+                </div>
+              </div>
+
+              <!-- Próximos vencimentos -->
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title" style="font-size:12px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Próximos vencimentos</div>
+                </div>
+                <div class="card-body" id="cert-vencimentos" style="padding:10px 14px">
+                  <div style="font-size:12px;color:var(--t3)">Nenhum vencimento próximo.</div>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
 
