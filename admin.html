@@ -4851,6 +4851,7 @@ var CertMod = (() => {
 <script src="src/js/modules/gestao-cursos/actions.js"></script>
 <script src="src/js/modules/gestao-cursos/modals.js"></script>
 <script src="src/js/modules/gestao-cursos/index.js"></script>
+<script src="src/js/modules/gestao-cursos/wizard.js"></script>
 <script src="src/js/modules/gestao-turmas/state.js"></script>
 <script src="src/js/modules/gestao-turmas/utils.js"></script>
 <script src="src/js/modules/gestao-turmas/table.js"></script>
@@ -4995,7 +4996,7 @@ var CursoDrawer = (() => {
     if (!drawer || !iframe) return;
     const c = Storage.Cursos.obter(id);
     if (titulo) titulo.textContent = c ? 'Editar: ' + c.titulo : 'Editar Curso';
-    iframe.src = 'novo-curso.html?v=' + Date.now() + '&edit=' + encodeURIComponent(id);
+    iframe.src = 'src/js/modules/gestao-cursos/wizard.html?v=' + Date.now() + '&edit=' + encodeURIComponent(id);
     drawer.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
@@ -5006,7 +5007,7 @@ var CursoDrawer = (() => {
     const titulo = document.getElementById('drawer-titulo');
     if (!drawer || !iframe) return;
     if (titulo) titulo.textContent = 'Novo Curso';
-    iframe.src = 'novo-curso.html?v=' + Date.now();
+    iframe.src = 'src/js/modules/gestao-cursos/wizard.html?v=' + Date.now();
     drawer.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
