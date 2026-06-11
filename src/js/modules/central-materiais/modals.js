@@ -248,7 +248,7 @@ var MatModals = (() => {
     const sel = document.getElementById('mm-categoria');
     if (!sel) return;
     const items = (typeof ConfigMod !== 'undefined')
-      ? ConfigMod.getItems(ConfigMod.KEYS.CAT_AULA)
+      ? ConfigMod.getItems(ConfigMod.KEYS.CAT_MAT)
       : [];
     sel.innerHTML =
       '<option value="">Selecione...</option>' +
