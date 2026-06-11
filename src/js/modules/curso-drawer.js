@@ -6,7 +6,7 @@
  * ║                                                                  ║
  * ║  Responsabilidade única:                                         ║
  * ║  Gerenciar o painel lateral (drawer) que carrega o wizard        ║
- * ║  novo-curso.html via <iframe> para edição de curso existente.    ║
+ * ║  gestao-cursos/wizard.html via <iframe> para edição de curso.    ║
  * ║                                                                  ║
  * ║  Contrato de entrada (dependências externas):                    ║
  * ║  • window.Storage.Cursos.obter(id) — leitura do título           ║
@@ -17,7 +17,7 @@
  * ║  • window.CursoDrawer.abrir(id)                                  ║
  * ║  • window.CursoDrawer.fechar()                                   ║
  * ║                                                                  ║
- * ║  Comunicação com o wizard (novo-curso.html):                     ║
+ * ║  Comunicação com o wizard (gestao-cursos/wizard.html):           ║
  * ║  Recebe window.postMessage('wizard:concluido') para fechar       ║
  * ║  automaticamente após salvar.                                    ║
  * ╚══════════════════════════════════════════════════════════════════╝
@@ -49,7 +49,7 @@ var CursoDrawer = (() => {
     const c = Storage.Cursos.obter(id);
     if (titulo) titulo.textContent = c ? 'Editar: ' + c.titulo : 'Editar Curso';
 
-    iframe.src = 'novo-curso.html?edit=' + encodeURIComponent(id);
+    iframe.src = 'src/js/modules/gestao-cursos/wizard.html?edit=' + encodeURIComponent(id);
     drawer.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
@@ -88,5 +88,23 @@ var CursoDrawer = (() => {
     if (e.data === 'wizard:concluido') fechar();
   });
 
-  return { abrir, fechar };
+  
+  /**
+   * Abre o drawer lateral para criação de novo curso.
+   */
+  function abrirNovo() {
+    const drawer = document.getElementById('curso-editor-drawer');
+    const iframe = document.getElementById('curso-editor-iframe');
+    const titulo = document.getElementById('drawer-titulo');
+    if (!drawer || !iframe) {
+      console.warn('[CursoDrawer] Elementos do drawer não encontrados no DOM.');
+      return;
+    }
+    if (titulo) titulo.textContent = 'Novo Curso';
+    iframe.src = 'src/js/modules/gestao-cursos/wizard.html?v=' + Date.now();
+    drawer.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  return { abrir, abrirNovo, fechar };
 })();
