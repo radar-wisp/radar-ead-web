@@ -161,58 +161,17 @@ var CertMod = (() => {
   }
 
   function _tabNovoModelo() {
-    _tabModeloEditId = null;
-    ['tab-mod-nome','tab-mod-logo','tab-mod-sub','tab-mod-as1','tab-mod-c1','tab-mod-as2','tab-mod-c2','tab-mod-rodape']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    const cor = document.getElementById('tab-mod-cor'); if (cor) cor.value = '#0002da';
-    const title = document.getElementById('cert-modelo-editor-title'); if (title) title.textContent = 'Novo modelo';
-    const ed = document.getElementById('cert-modelo-editor'); if (ed) { ed.style.display = 'block'; ed.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+    CertModals.novoModelo();
   }
 
   function _tabEditarModelo(id) {
-    _tabModeloEditId = id;
-    const m = Storage.Certificados.listarModelos().find(e => e.id === id); if (!m) return;
-    const sv = (elId, v) => { const el = document.getElementById(elId); if (el) el.value = v || ''; };
-    sv('tab-mod-nome', m.nome); sv('tab-mod-logo', m.logoTexto); sv('tab-mod-sub', m.subtitulo);
-    sv('tab-mod-as1', m.assinatura1); sv('tab-mod-c1', m.cargo1);
-    sv('tab-mod-as2', m.assinatura2); sv('tab-mod-c2', m.cargo2);
-    sv('tab-mod-rodape', m.textoRodape);
-    const cor = document.getElementById('tab-mod-cor'); if (cor) cor.value = m.corPrimaria || '#0002da';
-    const title = document.getElementById('cert-modelo-editor-title'); if (title) title.textContent = 'Editar modelo';
-    const ed = document.getElementById('cert-modelo-editor'); if (ed) { ed.style.display = 'block'; ed.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
-  }
-
-  function _tabSalvarModelo() {
-    const nome = document.getElementById('tab-mod-nome')?.value.trim();
-    if (!nome) { alert('Informe o nome do modelo.'); return; }
-    const dados = {
-      nome,
-      corPrimaria:  document.getElementById('tab-mod-cor')?.value    || '#0002da',
-      logoTexto:    document.getElementById('tab-mod-logo')?.value.trim()   || 'Radar Internet',
-      subtitulo:    document.getElementById('tab-mod-sub')?.value.trim()    || 'Plataforma EAD',
-      assinatura1:  document.getElementById('tab-mod-as1')?.value.trim()    || '',
-      cargo1:       document.getElementById('tab-mod-c1')?.value.trim()     || '',
-      assinatura2:  document.getElementById('tab-mod-as2')?.value.trim()    || '',
-      cargo2:       document.getElementById('tab-mod-c2')?.value.trim()     || '',
-      textoRodape:  document.getElementById('tab-mod-rodape')?.value.trim() || '',
-    };
-    if (_tabModeloEditId) { Storage.Certificados.atualizarModelo(_tabModeloEditId, dados); }
-    else { Storage.Certificados.criarModelo(dados); }
-    _tabFecharEditor();
-    _renderModelosInline();
-    CertUtils.toast('Modelo salvo!', 's');
-    _tabModeloEditId = null;
+    CertModals._editarModelo(id);
   }
 
   function _tabExcluirModelo(id) {
     if (!confirm('Excluir este modelo?')) return;
     Storage.Certificados.excluirModelo(id);
     _renderModelosInline();
-  }
-
-  function _tabFecharEditor() {
-    const ed = document.getElementById('cert-modelo-editor'); if (ed) ed.style.display = 'none';
-    _tabModeloEditId = null;
   }
 
   const _x = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -283,7 +242,8 @@ var CertMod = (() => {
 
     // Modelos inline (tab)
     _tabNovoModelo, _tabEditarModelo, _tabExcluirModelo,
-    _tabSalvarModelo, _tabFecharEditor, _tabToggleAcoes, _tabCloseAcoes,
+    _tabToggleAcoes, _tabCloseAcoes,
+    _renderModelosTab: _renderModelosInline,
 
     // Modelos
     abrirModelos: CertModals.abrirModelos,
