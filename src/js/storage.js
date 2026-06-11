@@ -1245,6 +1245,7 @@ var Storage = (() => {
             ? new Date(Date.now() + config.validadeDias * 86400000).toISOString()
             : null,
           responsavel: config?.responsavel || 'Admin',
+          ...(config?.modeloId && { modeloId: config.modeloId }),
         });
         emitidos.push(cert);
       });
