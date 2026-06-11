@@ -1116,6 +1116,13 @@ tbody tr.selected td { background:#f0f4ff }
 .cert-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
 .cert-tab-panel{display:none}
 .cert-tab-panel.active{display:block}
+/* ── Cert accordion ── */
+.cert-acc .card-head{cursor:pointer;user-select:none}
+.cert-acc .card-head:hover{background:var(--bg)}
+.cert-acc-chevron{display:flex;align-items:center;color:var(--text4);transition:transform .2s ease;flex-shrink:0}
+.cert-acc.open .cert-acc-chevron{transform:rotate(180deg)}
+.cert-acc-body{overflow:hidden;max-height:0;transition:max-height .28s ease}
+.cert-acc.open .cert-acc-body{max-height:9999px}
 /* ── Dropdown Ações ── */
 .cert-acoes-wrap{position:relative;display:inline-block}
 .cert-acoes-menu{display:none;position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,2,218,.15);min-width:140px;z-index:600;overflow:hidden}
@@ -2720,84 +2727,99 @@ tbody tr.selected td { background:#f0f4ff }
             </button>
           </div>
 
-          <!-- Layout: 3 tabelas empilhadas -->
+          <!-- Layout: 3 accordions empilhados -->
           <div style="display:flex;flex-direction:column;gap:14px">
 
-            <!-- Tabela: Emitidos -->
-            <div class="card">
-              <div class="card-head" style="padding:10px 16px">
+            <!-- Accordion: Emitidos -->
+            <div class="card cert-acc" id="cert-acc-emitidos">
+              <div class="card-head" style="padding:10px 16px" onclick="CertMod._accToggle('cert-acc-emitidos')">
                 <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Emitidos</div>
-                <span id="cert-count" style="font-size:12px;color:var(--t3)"></span>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span id="cert-count" style="font-size:12px;color:var(--t3)"></span>
+                  <span class="cert-acc-chevron"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                </div>
               </div>
-              <div class="tbl-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Aluno</th>
-                      <th>Curso</th>
-                      <th style="text-align:center">Carga</th>
-                      <th>Código</th>
-                      <th>Emissão</th>
-                      <th>Validade</th>
-                      <th>Status</th>
-                      <th style="width:80px"></th>
-                    </tr>
-                  </thead>
-                  <tbody id="cert-tbody"></tbody>
-                </table>
-              </div>
-              <div id="cert-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--t3)">
-                <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-                <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:6px">Nenhum certificado encontrado</div>
-                <div style="font-size:12px">Emita o primeiro certificado para começar</div>
+              <div class="cert-acc-body">
+                <div class="tbl-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Aluno</th>
+                        <th>Curso</th>
+                        <th style="text-align:center">Carga</th>
+                        <th>Código</th>
+                        <th>Emissão</th>
+                        <th>Validade</th>
+                        <th>Status</th>
+                        <th style="width:80px"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="cert-tbody"></tbody>
+                  </table>
+                </div>
+                <div id="cert-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--t3)">
+                  <div style="opacity:.35;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+                  <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:6px">Nenhum certificado encontrado</div>
+                  <div style="font-size:12px">Emita o primeiro certificado para começar</div>
+                </div>
               </div>
             </div>
 
-            <!-- Tabela: Pendentes -->
-            <div class="card">
-              <div class="card-head" style="padding:10px 16px">
+            <!-- Accordion: Pendentes -->
+            <div class="card cert-acc" id="cert-acc-pendentes">
+              <div class="card-head" style="padding:10px 16px" onclick="CertMod._accToggle('cert-acc-pendentes')">
                 <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes</div>
-                <span id="cert-pend-count" style="font-size:12px;color:var(--t3)"></span>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span id="cert-pend-count" style="font-size:12px;color:var(--t3)"></span>
+                  <span class="cert-acc-chevron"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                </div>
               </div>
-              <div class="tbl-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Aluno</th>
-                      <th>Curso</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="cert-pend-tbody"></tbody>
-                </table>
-              </div>
-              <div id="cert-pend-empty" style="display:none;text-align:center;padding:32px 20px;color:var(--t3)">
-                <div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px">Nenhuma emissão pendente</div>
+              <div class="cert-acc-body">
+                <div class="tbl-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Aluno</th>
+                        <th>Curso</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="cert-pend-tbody"></tbody>
+                  </table>
+                </div>
+                <div id="cert-pend-empty" style="display:none;text-align:center;padding:32px 20px;color:var(--t3)">
+                  <div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px">Nenhuma emissão pendente</div>
+                </div>
               </div>
             </div>
 
-            <!-- Tabela: Próximos vencimentos -->
-            <div class="card">
-              <div class="card-head" style="padding:10px 16px">
+            <!-- Accordion: Próximos vencimentos -->
+            <div class="card cert-acc" id="cert-acc-vencimentos">
+              <div class="card-head" style="padding:10px 16px" onclick="CertMod._accToggle('cert-acc-vencimentos')">
                 <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Próximos vencimentos</div>
-                <span id="cert-venc-count" style="font-size:12px;color:var(--t3)"></span>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span id="cert-venc-count" style="font-size:12px;color:var(--t3)"></span>
+                  <span class="cert-acc-chevron"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                </div>
               </div>
-              <div class="tbl-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Aluno</th>
-                      <th>Curso</th>
-                      <th>Código</th>
-                      <th>Validade</th>
-                      <th>Dias restantes</th>
-                    </tr>
-                  </thead>
-                  <tbody id="cert-venc-tbody"></tbody>
-                </table>
-              </div>
-              <div id="cert-venc-empty" style="display:none;text-align:center;padding:32px 20px;color:var(--t3)">
-                <div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px">Nenhum vencimento próximo</div>
+              <div class="cert-acc-body">
+                <div class="tbl-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Aluno</th>
+                        <th>Curso</th>
+                        <th>Código</th>
+                        <th>Validade</th>
+                        <th>Dias restantes</th>
+                      </tr>
+                    </thead>
+                    <tbody id="cert-venc-tbody"></tbody>
+                  </table>
+                </div>
+                <div id="cert-venc-empty" style="display:none;text-align:center;padding:32px 20px;color:var(--t3)">
+                  <div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px">Nenhum vencimento próximo</div>
+                </div>
               </div>
             </div>
 
