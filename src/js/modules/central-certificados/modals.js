@@ -283,13 +283,9 @@ var CertModals = (() => {
       Storage.Certificados.criarModelo(dados);
     }
 
-    const editor = document.getElementById('modelo-editor');
-    if (editor) editor.style.display = 'none';
-    const lista = document.getElementById('modelos-lista');
-    if (lista) lista.style.display = '';
-
-    _renderModelos();
+    document.getElementById('modal-cert-modelos')?.classList.remove('open');
     if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
+    if (window.CertMod?.switchTab) CertMod.switchTab('modelos');
     _toast('Modelo salvo!', 's');
     CertState.editId = null;
   }
