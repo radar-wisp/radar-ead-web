@@ -4080,11 +4080,6 @@ tbody tr.selected td { background:#f0f4ff }
       <button class="modal-close" onclick="document.getElementById('modal-cert-modelos').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div id="modelos-lista" style="margin-bottom:14px"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      <button class="btn btn-outline btn-sm" onclick="CertMod.novoModelo()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo modelo
-      </button>
-    </div>
     <!-- Editor de modelo (edição) -->
     <div id="modelo-editor" style="display:none;border-top:1px solid var(--border);padding-top:14px">
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Editar modelo</div>
@@ -4130,9 +4125,6 @@ tbody tr.selected td { background:#f0f4ff }
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('modelo-editor').style.display='none'">Cancelar</button>
         <button class="btn btn-primary btn-sm" onclick="CertMod.salvarModelo()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar modelo</button>
       </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-cert-modelos').classList.remove('open')">Fechar</button>
     </div>
   </div>
 </div>
