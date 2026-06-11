@@ -212,6 +212,8 @@ var CertModals = (() => {
       if (el) el.value = '';
     });
     _setVal('mod-cor', '#0002da');
+    _renderModelos();
+    document.getElementById('modal-cert-modelos')?.classList.add('open');
     const editor = document.getElementById('modelo-editor');
     if (editor) editor.style.display = 'block';
   }
@@ -231,6 +233,8 @@ var CertModals = (() => {
     _setVal('mod-rodape', m.textoRodape);
     _setVal('mod-cor',    m.corPrimaria || '#0002da');
 
+    _renderModelos();
+    document.getElementById('modal-cert-modelos')?.classList.add('open');
     const editor = document.getElementById('modelo-editor');
     if (editor) editor.style.display = 'block';
   }
@@ -261,6 +265,7 @@ var CertModals = (() => {
     if (editor) editor.style.display = 'none';
 
     _renderModelos();
+    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
     _toast('Modelo salvo!', 's');
     CertState.editId = null;
   }
@@ -269,6 +274,7 @@ var CertModals = (() => {
     if (!confirm('Excluir este modelo?')) return;
     Storage.Certificados.excluirModelo(id);
     _renderModelos();
+    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
   }
 
   return {
