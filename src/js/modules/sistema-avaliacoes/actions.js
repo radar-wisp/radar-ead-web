@@ -72,7 +72,6 @@ var AvalActions = (() => {
 
     const dados = {
       nome,
-      descricao:          document.getElementById('mav-desc')?.value.trim()          || '',
       cursoId,
       moduloId:           document.getElementById('mav-modulo')?.value                || '',
       turmaId:            document.getElementById('mav-turma')?.value                 || '',
