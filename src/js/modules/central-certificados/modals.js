@@ -25,6 +25,7 @@ var CertModals = (() => {
 
     const sA = document.getElementById('mce-aluno');
     const sC = document.getElementById('mce-curso');
+    const sM = document.getElementById('mce-modelo');
     if (sA) sA.innerHTML =
       '<option value="">Selecione...</option>' +
       alunos.map(a =>
@@ -35,6 +36,11 @@ var CertModals = (() => {
       cursos.map(c =>
         `<option value="${_x(c.id)}" ${c.id === cursoId ? 'selected' : ''}>${_x(c.titulo)}</option>`
       ).join('');
+    if (sM) {
+      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
+      sM.innerHTML = '<option value="">Padrão</option>' +
+        modelos.map(m => `<option value="${_x(m.id)}">${_x(m.nome)}</option>`).join('');
+    }
 
     _setVal('mce-conclusao', new Date().toISOString().slice(0, 10));
     _setVal('mce-validade', '');
@@ -55,6 +61,7 @@ var CertModals = (() => {
     const nota  = parseInt(document.getElementById('mce-nota')?.value) || 0;
     const cur   = Storage.Cursos.obter(cursoId);
 
+    const modeloId = document.getElementById('mce-modelo')?.value || '';
     Storage.Certificados.emitir({
       alunoId,
       cursoId,
@@ -64,6 +71,7 @@ var CertModals = (() => {
       nota,
       responsavel:   document.getElementById('mce-resp')?.value.trim() || 'Admin',
       obs:           document.getElementById('mce-obs')?.value.trim()  || '',
+      ...(modeloId && { modeloId }),
     });
 
     _toast('Certificado emitido!', 's');
@@ -78,6 +86,13 @@ var CertModals = (() => {
     if (sel) sel.innerHTML =
       '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${_x(c.id)}">${_x(c.titulo)}</option>`).join('');
+
+    const selMod = document.getElementById('mlote-modelo');
+    if (selMod) {
+      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
+      selMod.innerHTML = '<option value="">Padrão</option>' +
+        modelos.map(m => `<option value="${_x(m.id)}">${_x(m.nome)}</option>`).join('');
+    }
 
     const prev = document.getElementById('mlote-preview');
     if (prev) prev.style.display = 'none';
@@ -118,11 +133,13 @@ var CertModals = (() => {
     const nota     = parseInt(document.getElementById('mlote-nota')?.value)     || 0;
     const valDias  = parseInt(document.getElementById('mlote-validade')?.value) || 0;
     const resp     = document.getElementById('mlote-resp')?.value.trim()        || 'Admin';
+    const loteModeloId = document.getElementById('mlote-modelo')?.value        || '';
 
     const emitidos = Storage.Certificados.emitirLote(cursoId, {
       notaMinima:   nota,
       validadeDias: valDias,
       responsavel:  resp,
+      ...(loteModeloId && { modeloId: loteModeloId }),
     });
 
     _toast(`${emitidos.length} certificado(s) emitido(s)!`, emitidos.length > 0 ? 's' : 'i');
