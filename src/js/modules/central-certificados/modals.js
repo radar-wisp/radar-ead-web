@@ -207,15 +207,33 @@ var CertModals = (() => {
 
   function novoModelo() {
     CertState.editId = null;
-    ['mod-nome', 'mod-logo', 'mod-sub', 'mod-as1', 'mod-c1', 'mod-as2', 'mod-c2', 'mod-rodape'].forEach(id => {
+    ['novo-mod-nome', 'novo-mod-logo', 'novo-mod-sub', 'novo-mod-as1', 'novo-mod-c1', 'novo-mod-as2', 'novo-mod-c2', 'novo-mod-rodape'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    _setVal('mod-cor', '#0002da');
-    _renderModelos();
-    document.getElementById('modal-cert-modelos')?.classList.add('open');
-    const editor = document.getElementById('modelo-editor');
-    if (editor) editor.style.display = 'block';
+    document.getElementById('modal-cert-novo-modelo')?.classList.add('open');
+  }
+
+  function salvarNovoModelo() {
+    const nome = document.getElementById('novo-mod-nome')?.value.trim();
+    if (!nome) { alert('Informe o nome do modelo.'); return; }
+
+    const dados = {
+      nome,
+      corPrimaria:  '#0002da',
+      logoTexto:    document.getElementById('novo-mod-logo')?.value.trim()   || 'Radar Internet',
+      subtitulo:    document.getElementById('novo-mod-sub')?.value.trim()    || 'Plataforma EAD',
+      assinatura1:  document.getElementById('novo-mod-as1')?.value.trim()    || '',
+      cargo1:       document.getElementById('novo-mod-c1')?.value.trim()     || '',
+      assinatura2:  document.getElementById('novo-mod-as2')?.value.trim()    || '',
+      cargo2:       document.getElementById('novo-mod-c2')?.value.trim()     || '',
+      textoRodape:  document.getElementById('novo-mod-rodape')?.value.trim() || '',
+    };
+
+    Storage.Certificados.criarModelo(dados);
+    document.getElementById('modal-cert-novo-modelo')?.classList.remove('open');
+    if (window.CertMod?._renderModelosTab) CertMod._renderModelosTab();
+    _toast('Modelo criado!', 's');
   }
 
   function _editarModelo(id) {
@@ -231,7 +249,6 @@ var CertModals = (() => {
     _setVal('mod-as2',    m.assinatura2);
     _setVal('mod-c2',     m.cargo2);
     _setVal('mod-rodape', m.textoRodape);
-    _setVal('mod-cor',    m.corPrimaria || '#0002da');
 
     _renderModelos();
     document.getElementById('modal-cert-modelos')?.classList.add('open');
@@ -245,7 +262,9 @@ var CertModals = (() => {
 
     const dados = {
       nome,
-      corPrimaria:  document.getElementById('mod-cor')?.value                 || '#0002da',
+      corPrimaria:  CertState.editId
+        ? (Storage.Certificados.listarModelos().find(m => m.id === CertState.editId)?.corPrimaria || '#0002da')
+        : '#0002da',
       logoTexto:    document.getElementById('mod-logo')?.value.trim()         || 'Radar Internet',
       subtitulo:    document.getElementById('mod-sub')?.value.trim()          || 'Plataforma EAD',
       assinatura1:  document.getElementById('mod-as1')?.value.trim()          || '',
@@ -281,7 +300,7 @@ var CertModals = (() => {
     abrirEmissaoManual, salvarEmissao,
     abrirEmissaoLote, previewLote, executarLote,
     abrirValidar, executarValidacao,
-    abrirModelos, novoModelo, salvarModelo,
+    abrirModelos, novoModelo, salvarNovoModelo, salvarModelo,
     _editarModelo, _excluirModelo,
   };
 })();
