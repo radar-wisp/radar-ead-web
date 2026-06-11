@@ -1,3 +1,4 @@
+[README.md](https://github.com/user-attachments/files/28840643/README.md)
 [README-modules-index (1).md](https://github.com/user-attachments/files/28476150/README-modules-index.1.md)
 # Módulos — Radar Internet EAD Platform
 
@@ -33,7 +34,7 @@ diretamente — exceto logs auxiliares pontuais.
 | `sistema-avaliacoes/` | `window.Aval` | `avaliacoes` | Avaliações e editor de questões |
 | `alunos/` | `window.AlunosMod` | `colaboradores` | Cadastro, perfil e filtros de alunos/colaboradores |
 | `setores-equipes/` | `window.SetoresEquipesMod` | `setores-equipes` | Gestão de setores e equipes |
-| `curso-drawer.js` | `window.CursoDrawer` | — | Drawer lateral que carrega o wizard `novo-curso.html` |
+| `curso-drawer.js` | `window.CursoDrawer` | — | Drawer lateral que carrega o wizard `gestao-cursos/wizard.html` |
 
 `curso-drawer.js` é o único módulo de arquivo único; é um sub-módulo de
 `gestao-cursos` (abre/fecha o painel de edição) e fica na raiz por ser
