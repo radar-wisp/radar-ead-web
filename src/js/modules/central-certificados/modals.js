@@ -1,3 +1,4 @@
+
 /**
  * modals.js — Modais do módulo Certificados.
  * Responsabilidade: abertura/submit dos modais (emissão manual, emissão
