@@ -2610,9 +2610,15 @@ tbody tr.selected td { background:#f0f4ff }
                 <label>Aluno</label>
                 <select id="mce-aluno" class="fg-input"></select>
               </div>
-              <div class="fg">
-                <label>Curso</label>
-                <select id="mce-curso" class="fg-input"></select>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="fg">
+                  <label>Curso</label>
+                  <select id="mce-curso" class="fg-input"></select>
+                </div>
+                <div class="fg">
+                  <label>Modelo de certificado</label>
+                  <select id="mce-modelo" class="fg-input"></select>
+                </div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div class="fg">
@@ -2665,6 +2671,10 @@ tbody tr.selected td { background:#f0f4ff }
               <div class="fg">
                 <label>Curso</label>
                 <select id="mlote-curso" class="fg-input"></select>
+              </div>
+              <div class="fg">
+                <label>Modelo de certificado</label>
+                <select id="mlote-modelo" class="fg-input"></select>
               </div>
               <div id="mlote-preview" style="margin:12px 0;min-height:20px;font-size:13px;color:var(--t2)"></div>
               <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
@@ -4012,19 +4022,12 @@ tbody tr.selected td { background:#f0f4ff }
           <option value="">Selecione um aluno...</option>
         </select>
       </div>
-      <div class="fg">
+      <div class="fg" style="grid-column:1/-1">
         <label>Curso *</label>
         <select id="mce-curso">
           <option value="">Selecione um curso...</option>
         </select>
       </div>
-      <div class="fg">
-        <label>Modelo de certificado</label>
-        <select id="mce-modelo">
-          <option value="">Padrão</option>
-        </select>
-      </div>
-      <div class="fg" style="grid-column:1/-1;margin-top:-4px"></div>
       <div class="fg">
         <label>Data de conclusão</label>
         <input type="date" id="mce-conclusao">
@@ -4072,12 +4075,6 @@ tbody tr.selected td { background:#f0f4ff }
           <label>Curso *</label>
           <select id="mlote-curso">
             <option value="">Selecione...</option>
-          </select>
-        </div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>Modelo de certificado</label>
-          <select id="mlote-modelo">
-            <option value="">Padrão</option>
           </select>
         </div>
         <div class="fg">
@@ -4791,16 +4788,10 @@ var CertMod = (() => {
     const cursos = Storage.Cursos.listar();
     const sA = document.getElementById('mce-aluno');
     const sC = document.getElementById('mce-curso');
-    const sM = document.getElementById('mce-modelo');
     if (sA) sA.innerHTML = '<option value="">Selecione...</option>' +
       alunos.map(a => `<option value="${x(a.id)}" ${a.id===alunoId?'selected':''}>${x(a.nome)}</option>`).join('');
     if (sC) sC.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${x(c.id)}" ${c.id===cursoId?'selected':''}>${x(c.titulo)}</option>`).join('');
-    if (sM) {
-      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
-      sM.innerHTML = '<option value="">Padrão</option>' +
-        modelos.map(m => `<option value="${x(m.id)}">${x(m.nome)}</option>`).join('');
-    }
     sv('mce-conclusao', new Date().toISOString().slice(0,10));
     sv('mce-validade', ''); sv('mce-nota', ''); sv('mce-obs', ''); sv('mce-resp','Admin');
     document.getElementById('modal-cert-emitir').classList.add('open');
@@ -4814,7 +4805,6 @@ var CertMod = (() => {
     const val    = document.getElementById('mce-validade')?.value;
     const nota   = parseInt(document.getElementById('mce-nota')?.value)||0;
     const cur    = Storage.Cursos.obter(cursoId);
-    const modeloId = document.getElementById('mce-modelo')?.value || '';
     const c = Storage.Certificados.emitir({
       alunoId, cursoId,
       cargaHoraria: cur?.carga || 0,
@@ -4823,7 +4813,6 @@ var CertMod = (() => {
       nota,
       responsavel: document.getElementById('mce-resp')?.value.trim() || 'Admin',
       obs: document.getElementById('mce-obs')?.value.trim() || '',
-      ...(modeloId && { modeloId }),
     });
     _toast('Certificado emitido!','s');
     document.getElementById('modal-cert-emitir').classList.remove('open');
@@ -4836,12 +4825,6 @@ var CertMod = (() => {
     const cursos = Storage.Cursos.listar().filter(c => c.status === 'publicado');
     if (sel) sel.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${x(c.id)}">${x(c.titulo)}</option>`).join('');
-    const selMod = document.getElementById('mlote-modelo');
-    if (selMod) {
-      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
-      selMod.innerHTML = '<option value="">Padrão</option>' +
-        modelos.map(m => `<option value="${x(m.id)}">${x(m.nome)}</option>`).join('');
-    }
     document.getElementById('mlote-preview').style.display = 'none';
     document.getElementById('modal-cert-lote').classList.add('open');
   }
@@ -4874,10 +4857,8 @@ var CertMod = (() => {
     const nota   = parseInt(document.getElementById('mlote-nota')?.value)||0;
     const valDias= parseInt(document.getElementById('mlote-validade')?.value)||0;
     const resp   = document.getElementById('mlote-resp')?.value.trim() || 'Admin';
-    const loteModeloId = document.getElementById('mlote-modelo')?.value || '';
     const emitidos = Storage.Certificados.emitirLote(cursoId, {
       notaMinima: nota, validadeDias: valDias, responsavel: resp,
-      ...(loteModeloId && { modeloId: loteModeloId }),
     });
     _toast(`${emitidos.length} certificado(s) emitido(s)!`, emitidos.length > 0 ? 's' : 'i');
     document.getElementById('modal-cert-lote').classList.remove('open');
