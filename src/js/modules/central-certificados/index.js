@@ -53,6 +53,12 @@ var CertMod = (() => {
       alunos.map(a => `<option value="${_x(a.id)}">${_x(a.nome)}</option>`).join('');
     if (sC) sC.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${_x(c.id)}">${_x(c.titulo)}</option>`).join('');
+    const sM = document.getElementById('mce-modelo');
+    if (sM) {
+      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
+      sM.innerHTML = '<option value="">Padrão</option>' +
+        modelos.map(m => `<option value="${_x(m.id)}">${_x(m.nome)}</option>`).join('');
+    }
     const concl = document.getElementById('mce-conclusao');
     if (concl) concl.value = new Date().toISOString().slice(0, 10);
     ['mce-validade','mce-nota','mce-obs'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
@@ -64,6 +70,7 @@ var CertMod = (() => {
     const cursoId = document.getElementById('mce-curso')?.value;
     if (!alunoId || !cursoId) { alert('Selecione aluno e curso.'); return; }
     const cur = Storage.Cursos.obter(cursoId);
+    const modeloId = document.getElementById('mce-modelo')?.value || '';
     Storage.Certificados.emitir({
       alunoId, cursoId,
       cargaHoraria:  cur?.carga || 0,
@@ -72,6 +79,7 @@ var CertMod = (() => {
       nota:          parseInt(document.getElementById('mce-nota')?.value) || 0,
       responsavel:   document.getElementById('mce-resp')?.value.trim() || 'Admin',
       obs:           document.getElementById('mce-obs')?.value.trim()  || '',
+      ...(modeloId && { modeloId }),
     });
     CertUtils.toast('Certificado emitido!', 's');
     _initEmitirInline();
@@ -84,6 +92,12 @@ var CertMod = (() => {
     const cursos = Storage.Cursos.listar().filter(c => c.status === 'publicado');
     if (sel) sel.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${_x(c.id)}">${_x(c.titulo)}</option>`).join('');
+    const selMod = document.getElementById('mlote-modelo');
+    if (selMod) {
+      const modelos = Storage.Certificados.listarModelos().filter(m => m.ativo !== false);
+      selMod.innerHTML = '<option value="">Padrão</option>' +
+        modelos.map(m => `<option value="${_x(m.id)}">${_x(m.nome)}</option>`).join('');
+    }
     const prev = document.getElementById('mlote-preview'); if(prev) prev.innerHTML='';
   }
 
@@ -106,7 +120,8 @@ var CertMod = (() => {
   function executarLoteInline() {
     const cursoId = document.getElementById('mlote-curso')?.value;
     if (!cursoId) { alert('Selecione um curso.'); return; }
-    CertModals.executarLote(cursoId);
+    const loteModeloId = document.getElementById('mlote-modelo')?.value || '';
+    CertModals.executarLote(cursoId, loteModeloId);
     _initLoteInline();
     refresh();
   }
