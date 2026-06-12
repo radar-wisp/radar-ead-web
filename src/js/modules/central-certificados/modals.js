@@ -46,11 +46,16 @@ var CertModals = (() => {
   }
 
   function salvarEmissao() {
-    const alunoId = document.getElementById('mce-aluno')?.value;
-    const cursoId = document.getElementById('mce-curso')?.value;
-    if (!alunoId || !cursoId) { alert('Selecione aluno e curso.'); return; }
-
-    const concl = document.getElementById('mce-conclusao')?.value;
+    const alunoId  = document.getElementById('mce-aluno')?.value;
+    const cursoId  = document.getElementById('mce-curso')?.value;
+    const modeloId = document.getElementById('mce-modelo')?.value;
+    const concl    = document.getElementById('mce-conclusao')?.value;
+    const resp     = document.getElementById('mce-resp')?.value.trim();
+    if (!alunoId)  { alert('Selecione o aluno.');                   return; }
+    if (!cursoId)  { alert('Selecione o curso.');                   return; }
+    if (!modeloId) { alert('Selecione o modelo de certificado.');   return; }
+    if (!concl)    { alert('Informe a data de conclusão.');         return; }
+    if (!resp)     { alert('Informe o responsável.');               return; }
     const val   = document.getElementById('mce-validade')?.value;
     const nota  = parseInt(document.getElementById('mce-nota')?.value) || 0;
     const cur   = Storage.Cursos.obter(cursoId);
@@ -59,11 +64,12 @@ var CertModals = (() => {
       alunoId,
       cursoId,
       cargaHoraria:  cur?.carga || 0,
-      dataConclucao: concl ? new Date(concl).toISOString() : new Date().toISOString(),
-      dataValidade:  val   ? new Date(val).toISOString()   : null,
+      dataConclucao: new Date(concl).toISOString(),
+      dataValidade:  val ? new Date(val).toISOString() : null,
       nota,
-      responsavel:   document.getElementById('mce-resp')?.value.trim() || 'Admin',
-      obs:           document.getElementById('mce-obs')?.value.trim()  || '',
+      responsavel:   resp,
+      obs:           document.getElementById('mce-obs')?.value.trim() || '',
+      ...(modeloId && { modeloId }),
     });
 
     _toast('Certificado emitido!', 's');
@@ -112,13 +118,14 @@ var CertModals = (() => {
   }
 
   function executarLote(cursoIdArg, modeloIdArg) {
-    const cursoId  = cursoIdArg || document.getElementById('mlote-curso')?.value;
-    if (!cursoId) { alert('Selecione um curso.'); return; }
-
-    const nota     = parseInt(document.getElementById('mlote-nota')?.value)     || 0;
-    const valDias  = parseInt(document.getElementById('mlote-validade')?.value) || 0;
-    const resp     = document.getElementById('mlote-resp')?.value.trim()        || 'Admin';
+    const cursoId  = cursoIdArg  || document.getElementById('mlote-curso')?.value;
     const modeloId = modeloIdArg || document.getElementById('mlote-modelo')?.value || '';
+    if (!cursoId)  { alert('Selecione um curso.');                  return; }
+    if (!modeloId) { alert('Selecione o modelo de certificado.');   return; }
+
+    const nota    = parseInt(document.getElementById('mlote-nota')?.value)     || 0;
+    const valDias = parseInt(document.getElementById('mlote-validade')?.value) || 0;
+    const resp    = document.getElementById('mlote-resp')?.value.trim()        || 'Admin';
 
     const emitidos = Storage.Certificados.emitirLote(cursoId, {
       notaMinima:   nota,
@@ -218,19 +225,31 @@ var CertModals = (() => {
   }
 
   function salvarNovoModelo() {
-    const nome = document.getElementById('novo-mod-nome')?.value.trim();
-    if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const nome      = document.getElementById('novo-mod-nome')?.value.trim();
+    const logo      = document.getElementById('novo-mod-logo')?.value.trim();
+    const as1       = document.getElementById('novo-mod-as1')?.value.trim();
+    const as2       = document.getElementById('novo-mod-as2')?.value.trim();
+    const c1        = document.getElementById('novo-mod-c1')?.value.trim();
+    const c2        = document.getElementById('novo-mod-c2')?.value.trim();
+    const rodape    = document.getElementById('novo-mod-rodape')?.value.trim();
+    if (!nome)   { alert('Informe o nome do modelo.');           return; }
+    if (!logo)   { alert('Informe o nome da organização.');      return; }
+    if (!as1)    { alert('Informe a Assinatura 1.');             return; }
+    if (!as2)    { alert('Informe a Assinatura 2.');             return; }
+    if (!c1)     { alert('Informe o Cargo 1.');                  return; }
+    if (!c2)     { alert('Informe o Cargo 2.');                  return; }
+    if (!rodape) { alert('Informe o texto do rodapé.');          return; }
 
     const dados = {
       nome,
       corPrimaria:  '#0002da',
-      logoTexto:    document.getElementById('novo-mod-logo')?.value.trim()   || 'Radar Internet',
+      logoTexto:    logo,
       subtitulo:    document.getElementById('novo-mod-sub')?.value.trim()    || 'Plataforma EAD',
-      assinatura1:  document.getElementById('novo-mod-as1')?.value.trim()    || '',
-      cargo1:       document.getElementById('novo-mod-c1')?.value.trim()     || '',
-      assinatura2:  document.getElementById('novo-mod-as2')?.value.trim()    || '',
-      cargo2:       document.getElementById('novo-mod-c2')?.value.trim()     || '',
-      textoRodape:  document.getElementById('novo-mod-rodape')?.value.trim() || '',
+      assinatura1:  as1,
+      cargo1:       c1,
+      assinatura2:  as2,
+      cargo2:       c2,
+      textoRodape:  rodape,
     };
 
     Storage.Certificados.criarModelo(dados);
@@ -262,21 +281,33 @@ var CertModals = (() => {
   }
 
   function salvarModelo() {
-    const nome = document.getElementById('mod-nome')?.value.trim();
-    if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const nome      = document.getElementById('mod-nome')?.value.trim();
+    const logo      = document.getElementById('mod-logo')?.value.trim();
+    const as1       = document.getElementById('mod-as1')?.value.trim();
+    const as2       = document.getElementById('mod-as2')?.value.trim();
+    const c1        = document.getElementById('mod-c1')?.value.trim();
+    const c2        = document.getElementById('mod-c2')?.value.trim();
+    const rodape    = document.getElementById('mod-rodape')?.value.trim();
+    if (!nome)   { alert('Informe o nome do modelo.');           return; }
+    if (!logo)   { alert('Informe o nome da organização.');      return; }
+    if (!as1)    { alert('Informe a Assinatura 1.');             return; }
+    if (!as2)    { alert('Informe a Assinatura 2.');             return; }
+    if (!c1)     { alert('Informe o Cargo 1.');                  return; }
+    if (!c2)     { alert('Informe o Cargo 2.');                  return; }
+    if (!rodape) { alert('Informe o texto do rodapé.');          return; }
 
     const dados = {
       nome,
       corPrimaria:  CertState.editId
         ? (Storage.Certificados.listarModelos().find(m => m.id === CertState.editId)?.corPrimaria || '#0002da')
         : '#0002da',
-      logoTexto:    document.getElementById('mod-logo')?.value.trim()         || 'Radar Internet',
+      logoTexto:    logo,
       subtitulo:    document.getElementById('mod-sub')?.value.trim()          || 'Plataforma EAD',
-      assinatura1:  document.getElementById('mod-as1')?.value.trim()          || '',
-      cargo1:       document.getElementById('mod-c1')?.value.trim()           || '',
-      assinatura2:  document.getElementById('mod-as2')?.value.trim()          || '',
-      cargo2:       document.getElementById('mod-c2')?.value.trim()           || '',
-      textoRodape:  document.getElementById('mod-rodape')?.value.trim()       || '',
+      assinatura1:  as1,
+      cargo1:       c1,
+      assinatura2:  as2,
+      cargo2:       c2,
+      textoRodape:  rodape,
     };
 
     if (CertState.editId) {
