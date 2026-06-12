@@ -138,6 +138,8 @@ input[type=text],input[type=email],input[type=password],input[type=number],selec
 input:focus,select:focus,textarea:focus{
   border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,69,255,.1);background:#fff;
 }
+.field-invalid input,.field-invalid select,.field-invalid textarea{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(220,38,38,.1)!important}
+.field-err-msg{font-size:.72rem;color:var(--red);margin-top:2px}
 textarea{resize:vertical;min-height:80px}
 select{
   appearance:none;
