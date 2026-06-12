@@ -4022,18 +4022,24 @@ tbody tr.selected td { background:#f0f4ff }
           <option value="">Selecione um aluno...</option>
         </select>
       </div>
-      <div class="fg" style="grid-column:1/-1">
+      <div class="fg">
         <label>Curso *</label>
         <select id="mce-curso">
           <option value="">Selecione um curso...</option>
         </select>
       </div>
       <div class="fg">
-        <label>Data de conclusão</label>
+        <label>Modelo de certificado *</label>
+        <select id="mce-modelo">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Data de conclusão *</label>
         <input type="date" id="mce-conclusao">
       </div>
       <div class="fg">
-        <label>Validade (deixe vazio = sem validade)</label>
+        <label>Validade (opcional)</label>
         <input type="date" id="mce-validade">
       </div>
       <div class="fg">
@@ -4041,8 +4047,8 @@ tbody tr.selected td { background:#f0f4ff }
         <input type="number" id="mce-nota" min="0" max="100" placeholder="0-100">
       </div>
       <div class="fg">
-        <label>Responsável</label>
-        <input type="text" id="mce-resp" value="Admin">
+        <label>Responsável *</label>
+        <input type="text" id="mce-resp" value="">
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Observações</label>
@@ -4074,6 +4080,12 @@ tbody tr.selected td { background:#f0f4ff }
         <div class="fg" style="grid-column:1/-1">
           <label>Curso *</label>
           <select id="mlote-curso">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Modelo de certificado *</label>
+          <select id="mlote-modelo">
             <option value="">Selecione...</option>
           </select>
         </div>
@@ -4140,11 +4152,11 @@ tbody tr.selected td { background:#f0f4ff }
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Editar modelo</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="fg" style="grid-column:1/-1">
-          <label>Nome do modelo</label>
+          <label>Nome do modelo *</label>
           <input type="text" id="mod-nome" placeholder="Ex: Modelo Padrão 2025">
         </div>
         <div class="fg">
-          <label>Nome da organização</label>
+          <label>Nome da organização *</label>
           <input type="text" id="mod-logo" placeholder="Radar Internet">
         </div>
         <div class="fg">
@@ -4153,26 +4165,26 @@ tbody tr.selected td { background:#f0f4ff }
         </div>
         <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
           <div>
-            <label>Assinatura 1 (nome)</label>
+            <label>Assinatura 1 (nome) *</label>
             <input type="text" id="mod-as1" placeholder="Diretor(a) de Operações">
           </div>
           <div>
-            <label>Cargo 1</label>
+            <label>Cargo 1 *</label>
             <input type="text" id="mod-c1" placeholder="Cargo">
           </div>
         </div>
         <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
           <div>
-            <label>Assinatura 2 (nome)</label>
+            <label>Assinatura 2 (nome) *</label>
             <input type="text" id="mod-as2" placeholder="Coordenador(a) de T&D">
           </div>
           <div>
-            <label>Cargo 2</label>
+            <label>Cargo 2 *</label>
             <input type="text" id="mod-c2" placeholder="Cargo">
           </div>
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label>Texto do rodapé</label>
+          <label>Texto do rodapé *</label>
           <textarea id="mod-rodape" rows="2"></textarea>
         </div>
       </div>
@@ -4193,11 +4205,11 @@ tbody tr.selected td { background:#f0f4ff }
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0 8px">
       <div class="fg" style="grid-column:1/-1">
-        <label>Nome do modelo</label>
+        <label>Nome do modelo *</label>
         <input type="text" id="novo-mod-nome" placeholder="Ex: Modelo Padrão 2025">
       </div>
       <div class="fg">
-        <label>Nome da organização</label>
+        <label>Nome da organização *</label>
         <input type="text" id="novo-mod-logo" placeholder="Radar Internet">
       </div>
       <div class="fg">
@@ -4206,26 +4218,26 @@ tbody tr.selected td { background:#f0f4ff }
       </div>
       <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
         <div>
-          <label>Assinatura 1 (nome)</label>
+          <label>Assinatura 1 (nome) *</label>
           <input type="text" id="novo-mod-as1" placeholder="Diretor(a) de Operações">
         </div>
         <div>
-          <label>Cargo 1</label>
+          <label>Cargo 1 *</label>
           <input type="text" id="novo-mod-c1" placeholder="Cargo">
         </div>
       </div>
       <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
         <div>
-          <label>Assinatura 2 (nome)</label>
+          <label>Assinatura 2 (nome) *</label>
           <input type="text" id="novo-mod-as2" placeholder="Coordenador(a) de T&D">
         </div>
         <div>
-          <label>Cargo 2</label>
+          <label>Cargo 2 *</label>
           <input type="text" id="novo-mod-c2" placeholder="Cargo">
         </div>
       </div>
       <div class="fg" style="grid-column:1/-1">
-        <label>Texto do rodapé</label>
+        <label>Texto do rodapé *</label>
         <textarea id="novo-mod-rodape" rows="2"></textarea>
       </div>
     </div>
@@ -4793,26 +4805,36 @@ var CertMod = (() => {
     if (sC) sC.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${x(c.id)}" ${c.id===cursoId?'selected':''}>${x(c.titulo)}</option>`).join('');
     sv('mce-conclusao', new Date().toISOString().slice(0,10));
-    sv('mce-validade', ''); sv('mce-nota', ''); sv('mce-obs', ''); sv('mce-resp','Admin');
+    sv('mce-validade', ''); sv('mce-nota', ''); sv('mce-obs', ''); sv('mce-resp','');
+    const sM = document.getElementById('mce-modelo');
+    if (sM) sM.innerHTML = '<option value="">Selecione...</option>' +
+      Storage.Certificados.listarModelos().map(m => `<option value="${x(m.id)}">${x(m.nome)}</option>`).join('');
     document.getElementById('modal-cert-emitir').classList.add('open');
   }
 
   function salvarEmissao() {
-    const alunoId = document.getElementById('mce-aluno')?.value;
-    const cursoId = document.getElementById('mce-curso')?.value;
-    if (!alunoId || !cursoId) { alert('Selecione aluno e curso.'); return; }
-    const concl  = document.getElementById('mce-conclusao')?.value;
+    const alunoId  = document.getElementById('mce-aluno')?.value;
+    const cursoId  = document.getElementById('mce-curso')?.value;
+    const modeloId = document.getElementById('mce-modelo')?.value;
+    const concl    = document.getElementById('mce-conclusao')?.value;
+    const resp     = document.getElementById('mce-resp')?.value.trim();
+    if (!alunoId)  { alert('Selecione o aluno.');                 return; }
+    if (!cursoId)  { alert('Selecione o curso.');                 return; }
+    if (!modeloId) { alert('Selecione o modelo de certificado.'); return; }
+    if (!concl)    { alert('Informe a data de conclusão.');       return; }
+    if (!resp)     { alert('Informe o responsável.');             return; }
     const val    = document.getElementById('mce-validade')?.value;
     const nota   = parseInt(document.getElementById('mce-nota')?.value)||0;
     const cur    = Storage.Cursos.obter(cursoId);
     const c = Storage.Certificados.emitir({
       alunoId, cursoId,
       cargaHoraria: cur?.carga || 0,
-      dataConclucao: concl ? new Date(concl).toISOString() : new Date().toISOString(),
-      dataValidade:  val   ? new Date(val).toISOString() : null,
+      dataConclucao: new Date(concl).toISOString(),
+      dataValidade:  val ? new Date(val).toISOString() : null,
       nota,
-      responsavel: document.getElementById('mce-resp')?.value.trim() || 'Admin',
+      responsavel: resp,
       obs: document.getElementById('mce-obs')?.value.trim() || '',
+      ...(modeloId && { modeloId }),
     });
     _toast('Certificado emitido!','s');
     document.getElementById('modal-cert-emitir').classList.remove('open');
@@ -4826,6 +4848,9 @@ var CertMod = (() => {
     if (sel) sel.innerHTML = '<option value="">Selecione...</option>' +
       cursos.map(c => `<option value="${x(c.id)}">${x(c.titulo)}</option>`).join('');
     document.getElementById('mlote-preview').style.display = 'none';
+    const sML = document.getElementById('mlote-modelo');
+    if (sML) sML.innerHTML = '<option value="">Selecione...</option>' +
+      Storage.Certificados.listarModelos().map(m => `<option value="${x(m.id)}">${x(m.nome)}</option>`).join('');
     document.getElementById('modal-cert-lote').classList.add('open');
   }
 
@@ -4852,13 +4877,16 @@ var CertMod = (() => {
   }
 
   function executarLote() {
-    const cursoId = document.getElementById('mlote-curso')?.value;
-    if (!cursoId) { alert('Selecione um curso.'); return; }
+    const cursoId  = document.getElementById('mlote-curso')?.value;
+    const modeloId = document.getElementById('mlote-modelo')?.value || '';
+    if (!cursoId)  { alert('Selecione um curso.');                  return; }
+    if (!modeloId) { alert('Selecione o modelo de certificado.');   return; }
     const nota   = parseInt(document.getElementById('mlote-nota')?.value)||0;
     const valDias= parseInt(document.getElementById('mlote-validade')?.value)||0;
     const resp   = document.getElementById('mlote-resp')?.value.trim() || 'Admin';
     const emitidos = Storage.Certificados.emitirLote(cursoId, {
       notaMinima: nota, validadeDias: valDias, responsavel: resp,
+      ...(modeloId && { modeloId }),
     });
     _toast(`${emitidos.length} certificado(s) emitido(s)!`, emitidos.length > 0 ? 's' : 'i');
     document.getElementById('modal-cert-lote').classList.remove('open');
@@ -4974,18 +5002,27 @@ var CertMod = (() => {
   }
 
   function salvarNovoModelo() {
-    const nome = document.getElementById('novo-mod-nome')?.value.trim();
-    if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const nome   = document.getElementById('novo-mod-nome')?.value.trim();
+    const logo   = document.getElementById('novo-mod-logo')?.value.trim();
+    const as1    = document.getElementById('novo-mod-as1')?.value.trim();
+    const as2    = document.getElementById('novo-mod-as2')?.value.trim();
+    const c1     = document.getElementById('novo-mod-c1')?.value.trim();
+    const c2     = document.getElementById('novo-mod-c2')?.value.trim();
+    const rodape = document.getElementById('novo-mod-rodape')?.value.trim();
+    if (!nome)   { alert('Informe o nome do modelo.');       return; }
+    if (!logo)   { alert('Informe o nome da organização.');  return; }
+    if (!as1)    { alert('Informe a Assinatura 1.');         return; }
+    if (!as2)    { alert('Informe a Assinatura 2.');         return; }
+    if (!c1)     { alert('Informe o Cargo 1.');              return; }
+    if (!c2)     { alert('Informe o Cargo 2.');              return; }
+    if (!rodape) { alert('Informe o texto do rodapé.');      return; }
     const dados = {
-      nome,
-      corPrimaria:  '#0002da',
-      logoTexto:    document.getElementById('novo-mod-logo')?.value.trim()   || 'Radar Internet',
-      subtitulo:    document.getElementById('novo-mod-sub')?.value.trim()    || 'Plataforma EAD',
-      assinatura1:  document.getElementById('novo-mod-as1')?.value.trim()    || '',
-      cargo1:       document.getElementById('novo-mod-c1')?.value.trim()     || '',
-      assinatura2:  document.getElementById('novo-mod-as2')?.value.trim()    || '',
-      cargo2:       document.getElementById('novo-mod-c2')?.value.trim()     || '',
-      textoRodape:  document.getElementById('novo-mod-rodape')?.value.trim() || '',
+      nome, corPrimaria: '#0002da',
+      logoTexto:   logo,
+      subtitulo:   document.getElementById('novo-mod-sub')?.value.trim() || 'Plataforma EAD',
+      assinatura1: as1, cargo1: c1,
+      assinatura2: as2, cargo2: c2,
+      textoRodape: rodape,
     };
     Storage.Certificados.criarModelo(dados);
     document.getElementById('modal-cert-novo-modelo').classList.remove('open');
@@ -5005,18 +5042,28 @@ var CertMod = (() => {
   }
 
   function salvarModelo() {
-    const nome = document.getElementById('mod-nome')?.value.trim();
-    if (!nome) { alert('Informe o nome do modelo.'); return; }
+    const nome   = document.getElementById('mod-nome')?.value.trim();
+    const logo   = document.getElementById('mod-logo')?.value.trim();
+    const as1    = document.getElementById('mod-as1')?.value.trim();
+    const as2    = document.getElementById('mod-as2')?.value.trim();
+    const c1     = document.getElementById('mod-c1')?.value.trim();
+    const c2     = document.getElementById('mod-c2')?.value.trim();
+    const rodape = document.getElementById('mod-rodape')?.value.trim();
+    if (!nome)   { alert('Informe o nome do modelo.');       return; }
+    if (!logo)   { alert('Informe o nome da organização.');  return; }
+    if (!as1)    { alert('Informe a Assinatura 1.');         return; }
+    if (!as2)    { alert('Informe a Assinatura 2.');         return; }
+    if (!c1)     { alert('Informe o Cargo 1.');              return; }
+    if (!c2)     { alert('Informe o Cargo 2.');              return; }
+    if (!rodape) { alert('Informe o texto do rodapé.');      return; }
     const existing = modeloEditId ? Storage.Certificados.listarModelos().find(x => x.id === modeloEditId) : null;
     const dados = {
       nome, corPrimaria: existing?.corPrimaria || '#0002da',
-      logoTexto:    document.getElementById('mod-logo')?.value.trim()   || 'Radar Internet',
-      subtitulo:    document.getElementById('mod-sub')?.value.trim()    || 'Plataforma EAD',
-      assinatura1:  document.getElementById('mod-as1')?.value.trim()    || '',
-      cargo1:       document.getElementById('mod-c1')?.value.trim()     || '',
-      assinatura2:  document.getElementById('mod-as2')?.value.trim()    || '',
-      cargo2:       document.getElementById('mod-c2')?.value.trim()     || '',
-      textoRodape:  document.getElementById('mod-rodape')?.value.trim() || '',
+      logoTexto:   logo,
+      subtitulo:   document.getElementById('mod-sub')?.value.trim() || 'Plataforma EAD',
+      assinatura1: as1, cargo1: c1,
+      assinatura2: as2, cargo2: c2,
+      textoRodape: rodape,
     };
     if (modeloEditId) { Storage.Certificados.atualizarModelo(modeloEditId, dados); }
     else { Storage.Certificados.criarModelo(dados); }
