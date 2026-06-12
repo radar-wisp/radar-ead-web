@@ -16,20 +16,27 @@ var CertModals = (() => {
 
   // ── HELPERS DE VALIDAÇÃO ──────────────────────────────────────
   function _err(id, msg) {
-    const wrap = document.getElementById(id)?.closest('.fg') || document.getElementById(id)?.parentElement;
-    if (!wrap) return;
-    wrap.classList.add('field-invalid');
-    let span = wrap.querySelector('.field-err-msg');
-    if (!span) { span = document.createElement('span'); span.className = 'field-err-msg'; wrap.appendChild(span); }
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.borderColor = 'var(--red)';
+    el.style.boxShadow = '0 0 0 3px rgba(220,38,38,.1)';
+    let span = el.parentElement?.querySelector(`.field-err-msg[data-for="${id}"]`);
+    if (!span) {
+      span = document.createElement('span');
+      span.className = 'field-err-msg';
+      span.dataset.for = id;
+      el.insertAdjacentElement('afterend', span);
+    }
     span.textContent = msg;
   }
 
   function _clearErrs(ids) {
     ids.forEach(id => {
-      const wrap = document.getElementById(id)?.closest('.fg') || document.getElementById(id)?.parentElement;
-      if (!wrap) return;
-      wrap.classList.remove('field-invalid');
-      wrap.querySelector('.field-err-msg')?.remove();
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.borderColor = '';
+      el.style.boxShadow = '';
+      el.parentElement?.querySelector(`.field-err-msg[data-for="${id}"]`)?.remove();
     });
   }
 
