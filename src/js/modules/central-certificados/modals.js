@@ -1,9 +1,5 @@
 /**
  * modals.js — Modais do módulo Certificados.
- * Responsabilidade: abertura/submit dos modais (emissão manual, emissão
- * em lote, validação por código e gestão de modelos). Persiste via
- * window.Storage e dispara CertMod.refresh() após mutações.
- *
  * @module CertModals
  */
 
@@ -17,6 +13,25 @@ var CertModals = (() => {
   const _setVal  = CertUtils.setVal;
   const _toast   = CertUtils.toast;
   const _ST      = CertUtils.ST;
+
+  // ── HELPERS DE VALIDAÇÃO ──────────────────────────────────────
+  function _err(id, msg) {
+    const wrap = document.getElementById(id)?.closest('.fg') || document.getElementById(id)?.parentElement;
+    if (!wrap) return;
+    wrap.classList.add('field-invalid');
+    let span = wrap.querySelector('.field-err-msg');
+    if (!span) { span = document.createElement('span'); span.className = 'field-err-msg'; wrap.appendChild(span); }
+    span.textContent = msg;
+  }
+
+  function _clearErrs(ids) {
+    ids.forEach(id => {
+      const wrap = document.getElementById(id)?.closest('.fg') || document.getElementById(id)?.parentElement;
+      if (!wrap) return;
+      wrap.classList.remove('field-invalid');
+      wrap.querySelector('.field-err-msg')?.remove();
+    });
+  }
 
   // ── EMISSÃO MANUAL ────────────────────────────────────────────
   function abrirEmissaoManual(alunoId, cursoId) {
@@ -46,23 +61,27 @@ var CertModals = (() => {
   }
 
   function salvarEmissao() {
+    const MCE_FIELDS = ['mce-aluno','mce-curso','mce-modelo','mce-conclusao','mce-resp'];
+    _clearErrs(MCE_FIELDS);
     const alunoId  = document.getElementById('mce-aluno')?.value;
     const cursoId  = document.getElementById('mce-curso')?.value;
     const modeloId = document.getElementById('mce-modelo')?.value;
     const concl    = document.getElementById('mce-conclusao')?.value;
     const resp     = document.getElementById('mce-resp')?.value.trim();
-    if (!alunoId)  { alert('Selecione o aluno.');                   return; }
-    if (!cursoId)  { alert('Selecione o curso.');                   return; }
-    if (!modeloId) { alert('Selecione o modelo de certificado.');   return; }
-    if (!concl)    { alert('Informe a data de conclusão.');         return; }
-    if (!resp)     { alert('Informe o responsável.');               return; }
-    const val   = document.getElementById('mce-validade')?.value;
-    const nota  = parseInt(document.getElementById('mce-nota')?.value) || 0;
-    const cur   = Storage.Cursos.obter(cursoId);
+    let ok = true;
+    if (!alunoId)  { _err('mce-aluno',    'Selecione o aluno.');                ok = false; }
+    if (!cursoId)  { _err('mce-curso',    'Selecione o curso.');                ok = false; }
+    if (!modeloId) { _err('mce-modelo',   'Selecione o modelo de certificado.'); ok = false; }
+    if (!concl)    { _err('mce-conclusao','Informe a data de conclusão.');       ok = false; }
+    if (!resp)     { _err('mce-resp',     'Informe o responsável.');             ok = false; }
+    if (!ok) return;
+
+    const val  = document.getElementById('mce-validade')?.value;
+    const nota = parseInt(document.getElementById('mce-nota')?.value) || 0;
+    const cur  = Storage.Cursos.obter(cursoId);
 
     Storage.Certificados.emitir({
-      alunoId,
-      cursoId,
+      alunoId, cursoId,
       cargaHoraria:  cur?.carga || 0,
       dataConclucao: new Date(concl).toISOString(),
       dataValidade:  val ? new Date(val).toISOString() : null,
@@ -92,8 +111,9 @@ var CertModals = (() => {
   }
 
   function previewLote() {
+    _clearErrs(['mlote-curso']);
     const cursoId = document.getElementById('mlote-curso')?.value;
-    if (!cursoId) { alert('Selecione um curso.'); return; }
+    if (!cursoId) { _err('mlote-curso', 'Selecione um curso.'); return; }
 
     const emitidos = new Set(
       Storage.Certificados.listar()
@@ -118,10 +138,14 @@ var CertModals = (() => {
   }
 
   function executarLote(cursoIdArg, modeloIdArg) {
+    const LOTE_FIELDS = ['mlote-curso','mlote-modelo'];
+    _clearErrs(LOTE_FIELDS);
     const cursoId  = cursoIdArg  || document.getElementById('mlote-curso')?.value;
     const modeloId = modeloIdArg || document.getElementById('mlote-modelo')?.value || '';
-    if (!cursoId)  { alert('Selecione um curso.');                  return; }
-    if (!modeloId) { alert('Selecione o modelo de certificado.');   return; }
+    let ok = true;
+    if (!cursoId)  { _err('mlote-curso',  'Selecione um curso.');                  ok = false; }
+    if (!modeloId) { _err('mlote-modelo', 'Selecione o modelo de certificado.');   ok = false; }
+    if (!ok) return;
 
     const nota    = parseInt(document.getElementById('mlote-nota')?.value)     || 0;
     const valDias = parseInt(document.getElementById('mlote-validade')?.value) || 0;
@@ -148,8 +172,9 @@ var CertModals = (() => {
   }
 
   function executarValidacao() {
+    _clearErrs(['validar-codigo']);
     const codigo = document.getElementById('validar-codigo')?.value.trim().toUpperCase();
-    if (!codigo) { alert('Digite o código do certificado.'); return; }
+    if (!codigo) { _err('validar-codigo', 'Digite o código do certificado.'); return; }
 
     const c   = Storage.Certificados.porCodigo(codigo);
     const res = document.getElementById('validar-result');
@@ -216,7 +241,7 @@ var CertModals = (() => {
 
   function novoModelo() {
     CertState.editId = null;
-    ['novo-mod-nome', 'novo-mod-logo', 'novo-mod-sub', 'novo-mod-as1', 'novo-mod-c1', 'novo-mod-as2', 'novo-mod-c2', 'novo-mod-rodape'].forEach(id => {
+    ['novo-mod-nome','novo-mod-logo','novo-mod-sub','novo-mod-as1','novo-mod-c1','novo-mod-as2','novo-mod-c2','novo-mod-rodape'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -224,31 +249,34 @@ var CertModals = (() => {
     document.getElementById('modal-cert-novo-modelo')?.classList.add('open');
   }
 
+  const _NOVO_MOD_FIELDS = ['novo-mod-nome','novo-mod-logo','novo-mod-as1','novo-mod-as2','novo-mod-c1','novo-mod-c2','novo-mod-rodape'];
+
   function salvarNovoModelo() {
-    const nome      = document.getElementById('novo-mod-nome')?.value.trim();
-    const logo      = document.getElementById('novo-mod-logo')?.value.trim();
-    const as1       = document.getElementById('novo-mod-as1')?.value.trim();
-    const as2       = document.getElementById('novo-mod-as2')?.value.trim();
-    const c1        = document.getElementById('novo-mod-c1')?.value.trim();
-    const c2        = document.getElementById('novo-mod-c2')?.value.trim();
-    const rodape    = document.getElementById('novo-mod-rodape')?.value.trim();
-    if (!nome)   { alert('Informe o nome do modelo.');           return; }
-    if (!logo)   { alert('Informe o nome da organização.');      return; }
-    if (!as1)    { alert('Informe a Assinatura 1.');             return; }
-    if (!as2)    { alert('Informe a Assinatura 2.');             return; }
-    if (!c1)     { alert('Informe o Cargo 1.');                  return; }
-    if (!c2)     { alert('Informe o Cargo 2.');                  return; }
-    if (!rodape) { alert('Informe o texto do rodapé.');          return; }
+    _clearErrs(_NOVO_MOD_FIELDS);
+    const nome   = document.getElementById('novo-mod-nome')?.value.trim();
+    const logo   = document.getElementById('novo-mod-logo')?.value.trim();
+    const as1    = document.getElementById('novo-mod-as1')?.value.trim();
+    const as2    = document.getElementById('novo-mod-as2')?.value.trim();
+    const c1     = document.getElementById('novo-mod-c1')?.value.trim();
+    const c2     = document.getElementById('novo-mod-c2')?.value.trim();
+    const rodape = document.getElementById('novo-mod-rodape')?.value.trim();
+    let ok = true;
+    if (!nome)   { _err('novo-mod-nome',   'Informe o nome do modelo.');      ok = false; }
+    if (!logo)   { _err('novo-mod-logo',   'Informe o nome da organização.'); ok = false; }
+    if (!as1)    { _err('novo-mod-as1',    'Informe a Assinatura 1.');        ok = false; }
+    if (!as2)    { _err('novo-mod-as2',    'Informe a Assinatura 2.');        ok = false; }
+    if (!c1)     { _err('novo-mod-c1',     'Informe o Cargo 1.');             ok = false; }
+    if (!c2)     { _err('novo-mod-c2',     'Informe o Cargo 2.');             ok = false; }
+    if (!rodape) { _err('novo-mod-rodape', 'Informe o texto do rodapé.');     ok = false; }
+    if (!ok) return;
 
     const dados = {
       nome,
       corPrimaria:  '#0002da',
       logoTexto:    logo,
-      subtitulo:    document.getElementById('novo-mod-sub')?.value.trim()    || 'Plataforma EAD',
-      assinatura1:  as1,
-      cargo1:       c1,
-      assinatura2:  as2,
-      cargo2:       c2,
+      subtitulo:    document.getElementById('novo-mod-sub')?.value.trim() || 'Plataforma EAD',
+      assinatura1:  as1, cargo1: c1,
+      assinatura2:  as2, cargo2: c2,
       textoRodape:  rodape,
     };
 
@@ -280,34 +308,37 @@ var CertModals = (() => {
     if (editor) editor.style.display = 'block';
   }
 
+  const _MOD_FIELDS = ['mod-nome','mod-logo','mod-as1','mod-as2','mod-c1','mod-c2','mod-rodape'];
+
   function salvarModelo() {
-    const nome      = document.getElementById('mod-nome')?.value.trim();
-    const logo      = document.getElementById('mod-logo')?.value.trim();
-    const as1       = document.getElementById('mod-as1')?.value.trim();
-    const as2       = document.getElementById('mod-as2')?.value.trim();
-    const c1        = document.getElementById('mod-c1')?.value.trim();
-    const c2        = document.getElementById('mod-c2')?.value.trim();
-    const rodape    = document.getElementById('mod-rodape')?.value.trim();
-    if (!nome)   { alert('Informe o nome do modelo.');           return; }
-    if (!logo)   { alert('Informe o nome da organização.');      return; }
-    if (!as1)    { alert('Informe a Assinatura 1.');             return; }
-    if (!as2)    { alert('Informe a Assinatura 2.');             return; }
-    if (!c1)     { alert('Informe o Cargo 1.');                  return; }
-    if (!c2)     { alert('Informe o Cargo 2.');                  return; }
-    if (!rodape) { alert('Informe o texto do rodapé.');          return; }
+    _clearErrs(_MOD_FIELDS);
+    const nome   = document.getElementById('mod-nome')?.value.trim();
+    const logo   = document.getElementById('mod-logo')?.value.trim();
+    const as1    = document.getElementById('mod-as1')?.value.trim();
+    const as2    = document.getElementById('mod-as2')?.value.trim();
+    const c1     = document.getElementById('mod-c1')?.value.trim();
+    const c2     = document.getElementById('mod-c2')?.value.trim();
+    const rodape = document.getElementById('mod-rodape')?.value.trim();
+    let ok = true;
+    if (!nome)   { _err('mod-nome',   'Informe o nome do modelo.');      ok = false; }
+    if (!logo)   { _err('mod-logo',   'Informe o nome da organização.'); ok = false; }
+    if (!as1)    { _err('mod-as1',    'Informe a Assinatura 1.');        ok = false; }
+    if (!as2)    { _err('mod-as2',    'Informe a Assinatura 2.');        ok = false; }
+    if (!c1)     { _err('mod-c1',     'Informe o Cargo 1.');             ok = false; }
+    if (!c2)     { _err('mod-c2',     'Informe o Cargo 2.');             ok = false; }
+    if (!rodape) { _err('mod-rodape', 'Informe o texto do rodapé.');     ok = false; }
+    if (!ok) return;
 
     const dados = {
       nome,
-      corPrimaria:  CertState.editId
+      corPrimaria: CertState.editId
         ? (Storage.Certificados.listarModelos().find(m => m.id === CertState.editId)?.corPrimaria || '#0002da')
         : '#0002da',
-      logoTexto:    logo,
-      subtitulo:    document.getElementById('mod-sub')?.value.trim()          || 'Plataforma EAD',
-      assinatura1:  as1,
-      cargo1:       c1,
-      assinatura2:  as2,
-      cargo2:       c2,
-      textoRodape:  rodape,
+      logoTexto:   logo,
+      subtitulo:   document.getElementById('mod-sub')?.value.trim() || 'Plataforma EAD',
+      assinatura1: as1, cargo1: c1,
+      assinatura2: as2, cargo2: c2,
+      textoRodape: rodape,
     };
 
     if (CertState.editId) {
