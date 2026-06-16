@@ -9,17 +9,7 @@ var Admin = (() => {
   let modal = { id: null, ctx: {} };
 
   function boot() {
-    const s = Storage.Sessao.obter();
-    if (s && s.tipo === 'admin') { showApp(); }
-    else { q('#loginWrap').classList.add('active'); q('#loginForm').onsubmit = doLogin; }
-  }
-
-  function doLogin(e) {
-    e.preventDefault();
-    const em = e.target.email.value.trim(), pw = e.target.senha.value, err = q('#loginErr');
-    if (Storage.Admin.auth(em, pw)) {
-      Storage.Sessao.salvar({ tipo:'admin', email:em }); err.classList.remove('show'); showApp();
-    } else { err.textContent = 'Credenciais inválidas.'; err.classList.add('show'); }
+    showApp();
   }
 
   function showApp() {
