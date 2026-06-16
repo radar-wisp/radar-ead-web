@@ -55,7 +55,13 @@ var Storage = (() => {
   // Inicializa dados de demonstração.
   // MIGRAÇÃO: remover completamente. Substituir por script SQL de seed.
   function seed() {
-    if (localStorage.getItem('ead_seeded_v2')) return;
+    if (localStorage.getItem('ead_seeded_v2')) {
+      ['ead_alunos','ead_cursos','ead_modulos','ead_aulas','ead_progresso',
+       'ead_turmas','ead_equipes','ead_setores','ead_materiais','ead_restricoes',
+       'ead_sessao'].forEach(k => localStorage.removeItem(k));
+      localStorage.removeItem('ead_seeded_v2');
+    }
+    if (localStorage.getItem('ead_seeded_v3')) return;
 
     set(K.ADMIN, { email: 'admin@ead.com', senha: 'admin123' });
 
@@ -136,7 +142,7 @@ var Storage = (() => {
       },
     ]);
 
-        localStorage.setItem('ead_seeded_v2', '1');
+        localStorage.setItem('ead_seeded_v3', '1');
   }
 
   // ════════════════════════════════════════════════════════════════
