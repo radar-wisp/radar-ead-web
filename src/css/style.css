@@ -642,3 +642,19 @@ tbody tr:hover{background:#FAFBFE}
 .badge-check{display:inline-flex;align-items:center;vertical-align:middle}
 .empty-icon svg{opacity:.4}
 .cr-emoji svg{color:var(--blue);opacity:.6}
+
+/* ══════════════════════════════════════
+   PAINEL — Perfil / Certificados / Config
+══════════════════════════════════════ */
+.painel-info{padding:4px 0}
+.pi-row{display:flex;align-items:baseline;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.pi-row:last-child{border-bottom:none}
+.pi-label{font-size:.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;min-width:130px;flex-shrink:0}
+.pi-val{font-size:.88rem;color:var(--t1);font-weight:500}
+
+.cert-row{margin-bottom:10px}
+
+.cfg-foto-wrap{display:flex;align-items:center;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.cfg-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue-soft);color:var(--blue);
+  font-family:var(--font-j);font-weight:800;font-size:1.5rem;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
