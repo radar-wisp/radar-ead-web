@@ -260,9 +260,13 @@ var Wizard = (() => {
   //  • setor  → Setores e Equipes (Storage.Setores)
   //  • equipe → Setores e Equipes (Storage.Equipes) — só do(s) setor(es) selecionado(s)
   //  • colab  → Alunos > Colaboradores cadastrados (Storage.Alunos)
-  function _setores() { try { return Storage.Setores.listar(); } catch(e){ return []; } }
-  function _equipes() { try { return Storage.Equipes.listar(); } catch(e){ return []; } }
-  function _alunos()  { try { return Storage.Alunos.listar();  } catch(e){ return []; } }
+  // ATENÇÃO: window.Storage é a Web Storage API nativa do browser e sempre existe.
+  // Usar Storage (sem window.) resolve o var declarado em storage.js, mas só se
+  // o módulo customizado estiver disponível (.Setores é o discriminador).
+  const _EadStorage = (typeof Storage !== 'undefined' && Storage.Setores) ? Storage : null;
+  function _setores() { try { return _EadStorage ? _EadStorage.Setores.listar() : []; } catch(e){ return []; } }
+  function _equipes() { try { return _EadStorage ? _EadStorage.Equipes.listar() : []; } catch(e){ return []; } }
+  function _alunos()  { try { return _EadStorage ? _EadStorage.Alunos.listar()  : []; } catch(e){ return []; } }
   function _selSetorIds()  { return _setores().filter(s => state.acessos.setor.includes(s.nome)).map(s => s.id); }
   function _selEquipeIds() { return _equipes().filter(e => state.acessos.equipe.includes(e.nome)).map(e => e.id); }
 
