@@ -112,7 +112,18 @@ var Aluno = (() => {
      HOME
   ════════════════════════════════════ */
   function renderHome() {
-    const cursos = Storage.Cursos.listar();
+    const todos  = Storage.Cursos.listar().filter(c => c.status === 'publicado');
+    const restricoes = Storage.Restricoes.listar();
+    const cursos = todos.filter(c => {
+      const restr = restricoes.filter(r => r.cursoId === c.id);
+      if (!restr.length) return true;
+      return restr.some(r => {
+        if (r.tipo === 'colaborador') return r.refId === me.id;
+        if (r.tipo === 'equipe')     return r.refId === me.equipeId;
+        if (r.tipo === 'setor')      return r.refId === me.setorId;
+        return false;
+      });
+    });
     const conc   = Storage.Progresso.concluidas(me.id);
 
     document.getElementById('hNome').textContent = (me?.nome||'').split(' ')[0];
@@ -162,7 +173,18 @@ var Aluno = (() => {
   }
 
   function encontrarProximaAula() {
-    const cursos = Storage.Cursos.listar();
+    const todos  = Storage.Cursos.listar().filter(c => c.status === 'publicado');
+    const restricoes = Storage.Restricoes.listar();
+    const cursos = todos.filter(c => {
+      const restr = restricoes.filter(r => r.cursoId === c.id);
+      if (!restr.length) return true;
+      return restr.some(r => {
+        if (r.tipo === 'colaborador') return r.refId === me.id;
+        if (r.tipo === 'equipe')     return r.refId === me.equipeId;
+        if (r.tipo === 'setor')      return r.refId === me.setorId;
+        return false;
+      });
+    });
     const conc   = Storage.Progresso.concluidas(me.id);
 
     // primeiro curso em andamento (pct > 0 e < 100)
@@ -191,7 +213,18 @@ var Aluno = (() => {
      LISTA DE CURSOS
   ════════════════════════════════════ */
   function renderCursos() {
-    const cursos = Storage.Cursos.listar();
+    const todos   = Storage.Cursos.listar().filter(c => c.status === 'publicado');
+    const restricoes = Storage.Restricoes.listar();
+    const cursos = todos.filter(c => {
+      const restr = restricoes.filter(r => r.cursoId === c.id);
+      if (!restr.length) return true;
+      return restr.some(r => {
+        if (r.tipo === 'colaborador') return r.refId === me.id;
+        if (r.tipo === 'equipe')     return r.refId === me.equipeId;
+        if (r.tipo === 'setor')      return r.refId === me.setorId;
+        return false;
+      });
+    });
     const grid   = document.getElementById('cursos-grid');
     if (!cursos.length) {
       grid.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>
@@ -393,10 +426,19 @@ var Aluno = (() => {
   ════════════════════════════════════ */
   function mostrarCertificado() {
     const curso = Storage.Cursos.obter(cur.cursoId);
+    const cert  = Storage.Certificados.emitir({
+      alunoId: me.id, cursoId: cur.cursoId,
+      cargaHoraria: curso?.carga || 0,
+      dataConclucao: new Date().toISOString(),
+      dataValidade: null,
+      responsavel: 'Sistema',
+    });
     document.getElementById('certNome').textContent   = me?.nome || '—';
     document.getElementById('certCurso').textContent  = curso?.titulo || '—';
     document.getElementById('certData').textContent   =
       new Date().toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' });
+    const codigoEl = document.getElementById('certCodigo');
+    if (codigoEl) codigoEl.textContent = cert?.codigo || '';
     document.getElementById('certBg').classList.add('open');
     document.getElementById('btnFecharCert').onclick   = () => document.getElementById('certBg').classList.remove('open');
     document.getElementById('btnImprimirCert').onclick = () => window.print();
