@@ -60,6 +60,7 @@ var Storage = (() => {
        'ead_turmas','ead_equipes','ead_setores','ead_materiais','ead_restricoes',
        'ead_sessao'].forEach(k => localStorage.removeItem(k));
       localStorage.removeItem('ead_seeded_v2');
+      localStorage.removeItem('ead_seeded_v3');
     }
     if (localStorage.getItem('ead_seeded_v3')) return;
 
