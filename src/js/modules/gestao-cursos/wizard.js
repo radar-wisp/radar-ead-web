@@ -263,13 +263,14 @@ var Wizard = (() => {
   // ATENÇÃO: window.Storage é a Web Storage API nativa do browser e sempre existe.
   // Usar Storage (sem window.) resolve o var declarado em storage.js, mas só se
   // o módulo customizado estiver disponível (.Setores é o discriminador).
-  const _EadStorage = (typeof Storage !== 'undefined' && Storage.Setores) ? Storage : null;
-  function _setores() { try { return _EadStorage ? _EadStorage.Setores.listar() : []; } catch(e){ return []; } }
-  function _equipes() { try { return _EadStorage ? _EadStorage.Equipes.listar() : []; } catch(e){ return []; } }
+  function _EadStorage() { return (typeof Storage !== 'undefined' && Storage.Setores) ? Storage : null; }
+  function _setores() { try { const s = _EadStorage(); return s ? s.Setores.listar() : []; } catch(e){ return []; } }
+  function _equipes() { try { const s = _EadStorage(); return s ? s.Equipes.listar() : []; } catch(e){ return []; } }
   function _alunos()  {
     try {
-      if (!_EadStorage) return [];
-      return _EadStorage.Alunos.listar().filter(a => a.ativo === true || a.statusAcesso === 'ativo');
+      const s = _EadStorage();
+      if (!s) return [];
+      return s.Alunos.listar().filter(a => a.ativo === true || a.statusAcesso === 'ativo');
     } catch(e) { return []; }
   }
   function _selSetorIds()  { return _setores().filter(s => state.acessos.setor.includes(s.nome)).map(s => s.id); }
@@ -957,6 +958,7 @@ var Wizard = (() => {
   }
 
   function init() {
+    try { if (typeof Storage !== 'undefined' && Storage.seed) Storage.seed(); } catch(e) {}
     _loadEditMode();
     _populateSelects();
     updateStepperUI();
