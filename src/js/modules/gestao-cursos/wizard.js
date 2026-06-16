@@ -685,6 +685,55 @@ var Wizard = (() => {
     };
   }
 
+  /**
+   * Explode state.modulos (estrutura aninhada do wizard) para ead_modulos + ead_aulas.
+   * @param {string} cursoId
+   * @param {Array}  modulos  — state.modulos do wizard
+   */
+  function _persistirModulosAulas(cursoId, modulos) {
+    if (!modulos || !modulos.length) return;
+    try {
+      if (typeof Storage !== 'undefined' && Storage.Modulos) {
+        // Remove módulos/aulas anteriores deste curso
+        Storage.Modulos.listarPorCurso(cursoId).forEach(m => Storage.Modulos.excluir(m.id));
+        modulos.forEach((mod, mi) => {
+          const novoMod = Storage.Modulos.criar({
+            cursoId, titulo: mod.titulo || `Módulo ${mi + 1}`,
+            descricao: mod.descricao || '', ordem: mi + 1,
+          });
+          (mod.aulas || []).forEach((aula, ai) => {
+            Storage.Aulas.criar({
+              moduloId: novoMod.id,
+              titulo:   aula.titulo || `Aula ${ai + 1}`,
+              tipo:     aula.tipo   || 'video',
+              conteudo: aula.conteudo || aula.url || '',
+              duracao:  parseInt(aula.durMin) || 0,
+              ordem:    ai + 1,
+            });
+          });
+        });
+      } else {
+        // Fallback direto em localStorage
+        const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        const now   = () => new Date().toISOString();
+        let mods  = JSON.parse(localStorage.getItem('ead_modulos') || '[]').filter(m => m.cursoId !== cursoId);
+        let aulas = JSON.parse(localStorage.getItem('ead_aulas')   || '[]');
+        const modIdsAntigos = JSON.parse(localStorage.getItem('ead_modulos') || '[]')
+          .filter(m => m.cursoId === cursoId).map(m => m.id);
+        aulas = aulas.filter(a => !modIdsAntigos.includes(a.moduloId));
+        modulos.forEach((mod, mi) => {
+          const mid = genId();
+          mods.push({ id: mid, cursoId, titulo: mod.titulo || `Módulo ${mi+1}`, descricao: mod.descricao || '', ordem: mi+1, criadoEm: now() });
+          (mod.aulas || []).forEach((aula, ai) => {
+            aulas.push({ id: genId(), moduloId: mid, titulo: aula.titulo || `Aula ${ai+1}`, tipo: aula.tipo || 'video', conteudo: aula.conteudo || aula.url || '', duracao: parseInt(aula.durMin)||0, ordem: ai+1, criadoEm: now() });
+          });
+        });
+        localStorage.setItem('ead_modulos', JSON.stringify(mods));
+        localStorage.setItem('ead_aulas',   JSON.stringify(aulas));
+      }
+    } catch(e) { console.error('[Wizard] Erro ao persistir módulos/aulas:', e); }
+  }
+
   function _persistirCurso(dadosCurso) {
     // Storage é declarado por storage.js (var Storage = ...) carregado antes deste script.
     // NÃO usar window.Storage — no browser, window.Storage é a Web Storage API nativa,
@@ -692,6 +741,7 @@ var Wizard = (() => {
     try {
       if (typeof Storage !== 'undefined' && Storage.Cursos) {
         const novo = Storage.Cursos.criar(dadosCurso);
+        _persistirModulosAulas(novo.id, dadosCurso.modulos);
         console.log('[Wizard] Curso criado:', novo?.id, novo?.titulo);
       } else {
         console.warn('[Wizard] Storage.Cursos não disponível, escrita direta');
@@ -721,11 +771,13 @@ var Wizard = (() => {
       try {
         if (typeof Storage !== 'undefined' && Storage.Cursos) {
           Storage.Cursos.atualizar(_editId, dados);
+          _persistirModulosAulas(_editId, dados.modulos);
         } else {
           const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
           const idx = lista.findIndex(c => c.id === _editId);
           if (idx >= 0) lista[idx] = { ...lista[idx], ...dados };
           localStorage.setItem('ead_cursos', JSON.stringify(lista));
+          _persistirModulosAulas(_editId, dados.modulos);
         }
       } catch(e) { console.error('[Wizard] Erro ao atualizar:', e); }
     } else {
