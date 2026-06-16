@@ -14,10 +14,13 @@ var Aluno = (() => {
     const s = Storage.Sessao.obter();
     if (s?.tipo === 'aluno') {
       me = Storage.Alunos.obter(s.id);
-      showShell();
-    } else {
-      showLogin();
     }
+    if (!me) {
+      // Acesso livre: usa o primeiro aluno ativo sem exigir login
+      me = Storage.Alunos.listar()[0] || { id: 'guest', nome: 'Visitante', email: '', equipeId: null, setorId: null };
+      Storage.Sessao.salvar({ tipo: 'aluno', id: me.id, nome: me.nome, email: me.email });
+    }
+    showShell();
   }
 
   function showLogin() {
