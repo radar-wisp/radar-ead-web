@@ -6,6 +6,7 @@ var Aluno = (() => {
 
   let me = null; // aluno logado
   let cur = { cursoId: null, aulaId: null };
+  const ICON_CHECK = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
   /* ════════════════════════════════════
      BOOT
@@ -148,7 +149,7 @@ var Aluno = (() => {
           <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
             ${proxima.curso.capa
               ? `<img src="${proxima.curso.capa}" alt="${x(proxima.curso.titulo)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;flex-shrink:0">`
-              : `<div class="cr-emoji" style="font-size:1.8rem;width:50px;height:50px">${proxima.curso.emoji||'📚'}</div>`}
+              : `<div class="cr-emoji" style="font-size:1.8rem;width:50px;height:50px">${proxima.curso.emoji||'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'}</div>`}
             <div style="flex:1;min-width:0">
               <div style="font-family:var(--font-j);font-weight:700;font-size:.9rem;margin-bottom:2px">${x(proxima.aula.titulo)}</div>
               <div style="font-size:.78rem;color:var(--t3);margin-bottom:8px">${x(proxima.curso.titulo)} · ${proxima.aula.tipo}</div>
@@ -169,7 +170,7 @@ var Aluno = (() => {
     /* Grid de cursos */
     const grid = document.getElementById('h-cursos-grid');
     if (!cursos.length) {
-      grid.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>
+      grid.innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
         <h3>Nenhum curso disponível</h3><p>O admin ainda não publicou cursos.</p></div>`;
       return;
     }
@@ -232,7 +233,7 @@ var Aluno = (() => {
     });
     const grid   = document.getElementById('cursos-grid');
     if (!cursos.length) {
-      grid.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>
+      grid.innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
         <h3>Sem cursos disponíveis</h3><p>Aguarde novos cursos serem publicados.</p></div>`;
       return;
     }
@@ -248,12 +249,12 @@ var Aluno = (() => {
     const done  = pct === 100;
     const thumb = c.capa
       ? `<img src="${c.capa}" alt="${x(c.titulo)}" style="width:100%;height:100%;object-fit:cover;display:block">`
-      : `<span style="font-size:2.8rem">${c.emoji||'📚'}</span>`;
+      : `<span style="font-size:2.8rem">${c.emoji||'<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'}</span>`;
     return `
     <div class="course-card ${pct>0&&!done?'active-card':''}" onclick="Aluno.iniciarCurso('${c.id}')">
       <div class="cc-thumb">
         ${thumb}
-        ${pct > 0 ? `<div class="cc-pct-badge ${done?'done':''}">${done?'✅ Concluído':pct+'%'}</div>` : ''}
+        ${pct > 0 ? `<div class="cc-pct-badge ${done?'done':''}">${done?'<span class=\"badge-check\"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Concluído':pct+'%'}</div>` : ''}
       </div>
       <div class="cc-body">
         <div class="cc-title">${x(c.titulo)}</div>
@@ -360,11 +361,11 @@ var Aluno = (() => {
       case 'pdf':
         screen.innerHTML = aula.conteudo
           ? `<iframe src="${x(aula.conteudo)}" style="width:100%;height:380px;border:none;display:block"></iframe>`
-          : `<div style="color:#8896A9;padding:60px;text-align:center">📄 PDF não configurado</div>`;
+          : `<div style="color:#8896A9;padding:60px;text-align:center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF não configurado</div>`;
         break;
       case 'link':
         screen.innerHTML = `<div style="text-align:center;padding:70px 30px">
-          <div style="font-size:2.5rem;margin-bottom:14px">🔗</div>
+          <div style="font-size:2.5rem;margin-bottom:14px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
           <p style="color:#8896A9;margin-bottom:20px;font-size:.88rem">Material em site externo</p>
           <a href="${x(aula.conteudo||'#')}" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
             Abrir material ↗
@@ -374,7 +375,8 @@ var Aluno = (() => {
         screen.innerHTML = `<div style="color:#8896A9;padding:60px;text-align:center">Tipo não suportado</div>`;
     }
 
-    btn.textContent = isConc ? '✅ Concluída' : '☑️ Marcar como concluída';
+    btn.className = `btn ${isConc ? 'btn-success' : 'btn-primary'}`;
+    btn.innerHTML = `<span class="btn-icon">${ICON_CHECK}</span> ${isConc ? 'Concluída' : 'Marcar como concluída'}`;
     btn.className   = `btn ${isConc ? 'btn-success' : 'btn-primary'}`;
     btn.onclick     = () => toggleConc(aula.id);
   }
@@ -386,7 +388,7 @@ var Aluno = (() => {
       toast('Desmarcada.', 'i');
     } else {
       Storage.Progresso.marcar(me.id, aulaId);
-      toast('Aula concluída! 🎉', 's');
+      toast('Aula concluída!', 's');
       if (Storage.Progresso.cursoConcluido(me.id, cur.cursoId)) {
         setTimeout(mostrarCertificado, 700);
       }
@@ -415,7 +417,7 @@ var Aluno = (() => {
         const active = a.id === aulaAtualId;
         return `<div class="ci-aula ${active?'active':''} ${done?'done':''}"
           onclick="Aluno.selAula('${a.id}')">
-          <div class="ci-dot">${done?'✓':''}</div>
+          <div class="ci-dot">${done?'<span class=\"ci-done-icon\"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>':''}</div>
           <div class="ci-aula-name">${x(a.titulo)}</div>
           ${a.duracao?`<div class="ci-aula-dur">${a.duracao}m</div>`:''}
         </div>`;
