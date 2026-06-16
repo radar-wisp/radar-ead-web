@@ -266,9 +266,13 @@ var Wizard = (() => {
   const _EadStorage = (typeof Storage !== 'undefined' && Storage.Setores) ? Storage : null;
   function _setores() { try { return _EadStorage ? _EadStorage.Setores.listar() : []; } catch(e){ return []; } }
   function _equipes() { try { return _EadStorage ? _EadStorage.Equipes.listar() : []; } catch(e){ return []; } }
-  function _alunos()  { try { return _EadStorage ? _EadStorage.Alunos.listar()  : []; } catch(e){ return []; } }
+  function _alunos()  {
+    try {
+      if (!_EadStorage) return [];
+      return _EadStorage.Alunos.listar().filter(a => a.ativo === true || a.statusAcesso === 'ativo');
+    } catch(e) { return []; }
+  }
   function _selSetorIds()  { return _setores().filter(s => state.acessos.setor.includes(s.nome)).map(s => s.id); }
-  function _selEquipeIds() { return _equipes().filter(e => state.acessos.equipe.includes(e.nome)).map(e => e.id); }
 
   function acOptions(tipo) {
     if (tipo === 'setor')  return _setores().map(s => s.nome).filter(Boolean).sort();
@@ -278,13 +282,7 @@ var Wizard = (() => {
       return _equipes().filter(e => ids.includes(e.setorId)).map(e => e.nome).filter(Boolean).sort();
     }
     if (tipo === 'colab') {
-      let lista = _alunos();
-      const sIds = _selSetorIds(), eIds = _selEquipeIds();
-      // Setor E Equipe preenchidos → só colaboradores vinculados
-      if (sIds.length && eIds.length) {
-        lista = lista.filter(a => sIds.includes(a.setorId) && eIds.includes(a.equipeId));
-      }
-      return lista.map(a => a.nome).filter(Boolean).sort();
+      return _alunos().map(a => a.nome).filter(Boolean).sort();
     }
     return [];
   }
