@@ -104,12 +104,16 @@ var Aluno = (() => {
       el.classList.toggle('active', el.id === 'pg-' + pg)
     );
     document.getElementById('topTitle').textContent = {
-      home:'Início', cursos:'Meus Cursos', player:'Assistindo aula'
+      home:'Início', cursos:'Meus Cursos', player:'Assistindo aula',
+      perfil:'Meu Perfil', certificados:'Meus Certificados', configuracoes:'Configurações'
     }[pg] || pg;
 
-    if (pg === 'home')   renderHome();
-    if (pg === 'cursos') renderCursos();
-    if (pg === 'player') renderPlayer(params);
+    if (pg === 'home')          renderHome();
+    if (pg === 'cursos')        renderCursos();
+    if (pg === 'player')        renderPlayer(params);
+    if (pg === 'perfil')        renderPerfil();
+    if (pg === 'certificados')  renderCertificados();
+    if (pg === 'configuracoes') renderConfiguracoes();
   }
 
   /* ════════════════════════════════════
@@ -432,8 +436,138 @@ var Aluno = (() => {
   }
 
   /* ════════════════════════════════════
-     CERTIFICADO
+     PERFIL
   ════════════════════════════════════ */
+  function renderPerfil() {
+    const dt = me.criadoEm
+      ? new Date(me.criadoEm).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })
+      : '—';
+    document.getElementById('piCadastro').textContent = dt;
+    document.getElementById('piNome').textContent     = me.nome  || '—';
+    document.getElementById('piEmail').textContent    = me.email || '—';
+  }
+
+  /* ════════════════════════════════════
+     CERTIFICADOS
+  ════════════════════════════════════ */
+  function renderCertificados() {
+    const lista = Storage.Certificados.porAluno(me.id);
+    const wrap  = document.getElementById('certs-list');
+    if (!lista.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><h3>Nenhum certificado ainda</h3><p>Conclua um curso para receber seu certificado.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = lista.map(c => {
+      const curso = Storage.Cursos.obter(c.cursoId);
+      const data  = c.dataConclucao || c.dataEmissao
+        ? new Date(c.dataConclucao || c.dataEmissao).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })
+        : '—';
+      return `<div class="card cert-row">
+        <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="flex:1;min-width:0">
+            <div style="font-family:var(--font-j);font-weight:700;font-size:.9rem;margin-bottom:3px">${x(curso?.titulo||'Curso removido')}</div>
+            <div style="font-size:.78rem;color:var(--t3)">Concluído em ${data}</div>
+            <div style="font-size:.72rem;color:var(--t4);margin-top:2px">Código: ${c.codigo||'—'}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="Aluno.baixarCert('${c.id}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function baixarCert(certId) {
+    const c     = Storage.Certificados.obter(certId);
+    const curso = c ? Storage.Cursos.obter(c.cursoId) : null;
+    if (!c) { toast('Certificado não encontrado.', 'e'); return; }
+    // Gera PDF simples via impressão de janela
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificado</title>
+    <style>body{font-family:Georgia,serif;text-align:center;padding:60px 80px;color:#1a1a2e}
+    h1{font-size:2rem;color:#2f45ff;margin-bottom:6px}
+    .sub{color:#666;font-size:.9rem;margin-bottom:40px}
+    .nome{font-size:1.8rem;font-weight:700;border-bottom:2px solid #e0e0e0;padding-bottom:16px;margin-bottom:16px}
+    .curso{font-size:1.1rem;color:#2f45ff;font-weight:600;margin-bottom:8px}
+    .data{color:#888;font-size:.85rem;margin-bottom:30px}
+    .cod{font-size:.72rem;color:#aaa;border-top:1px solid #eee;padding-top:14px;margin-top:30px}
+    @media print{button{display:none}}</style></head><body>
+    <h1>Certificado de Conclusão</h1>
+    <p class="sub">Certificamos que</p>
+    <div class="nome">${x(me.nome)}</div>
+    <div class="curso">${x(curso?.titulo||'—')}</div>
+    <p class="data">Concluído em ${new Date(c.dataConclucao||c.dataEmissao||Date.now()).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</p>
+    <div class="cod">Código de validação: ${c.codigo||'—'}</div>
+    <br><button onclick="window.print()">Imprimir / Salvar PDF</button>
+    </body></html>`);
+    w.document.close();
+  }
+
+  /* ════════════════════════════════════
+     CONFIGURAÇÕES
+  ════════════════════════════════════ */
+  function renderConfiguracoes() {
+    // split nome/sobrenome
+    const partes = (me.nome||'').split(' ');
+    const nome     = partes[0] || '';
+    const sobrenome = partes.slice(1).join(' ');
+
+    document.getElementById('cfgNome').value      = nome;
+    document.getElementById('cfgSobrenome').value = sobrenome;
+    document.getElementById('cfgBio').value       = me.bio || '';
+    _renderCfgAvatar();
+
+    document.getElementById('cfgFotoInput').onchange = e => {
+      const file = e.target.files[0]; if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        Storage.Alunos.atualizar(me.id, { foto: ev.target.result });
+        me = Storage.Alunos.obter(me.id);
+        _renderCfgAvatar();
+        _renderSidebarAvatar();
+        toast('Foto atualizada!', 's');
+      };
+      r.readAsDataURL(file);
+    };
+
+    document.getElementById('cfgSalvar').onclick = () => {
+      const n = document.getElementById('cfgNome').value.trim();
+      const s = document.getElementById('cfgSobrenome').value.trim();
+      const b = document.getElementById('cfgBio').value.trim();
+      if (!n) { toast('Informe seu nome.', 'e'); return; }
+      const nomeCompleto = s ? `${n} ${s}` : n;
+      Storage.Alunos.atualizar(me.id, { nome: nomeCompleto, bio: b });
+      me = Storage.Alunos.obter(me.id);
+      Storage.Sessao.salvar({ tipo:'aluno', id:me.id, nome:me.nome, email:me.email });
+      _renderSidebarAvatar();
+      toast('Perfil atualizado!', 's');
+    };
+  }
+
+  function _renderCfgAvatar() {
+    const el = document.getElementById('cfgAvatarPreview');
+    if (me.foto) {
+      el.style.backgroundImage = `url(${me.foto})`;
+      el.textContent = '';
+    } else {
+      el.style.backgroundImage = '';
+      el.textContent = (me.nome||'A').charAt(0).toUpperCase();
+    }
+  }
+
+  function _renderSidebarAvatar() {
+    const ini = (me?.nome||'A').charAt(0).toUpperCase();
+    document.getElementById('sideAvatar').textContent = ini;
+    document.getElementById('sideName').textContent   = (me?.nome||'').split(' ')[0];
+    if (me.foto) {
+      const av = document.getElementById('sideAvatar');
+      av.style.backgroundImage = `url(${me.foto})`;
+      av.style.backgroundSize  = 'cover';
+      av.textContent = '';
+    }
+  }
+
+
   function mostrarCertificado() {
     const curso = Storage.Cursos.obter(cur.cursoId);
     const cert  = Storage.Certificados.emitir({
@@ -468,6 +602,7 @@ var Aluno = (() => {
     iniciarCurso,
     abrirAula,
     selAula,
+    baixarCert,
   };
 })();
 
