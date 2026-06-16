@@ -112,6 +112,18 @@
       </button>
     </nav>
 
+      <div class="nav-group-label" style="margin-top:10px">Painel</div>
+      <button class="nav-btn" data-pg="perfil">
+        <div class="nb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div> Meu Perfil
+      </button>
+      <button class="nav-btn" data-pg="certificados">
+        <div class="nb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div> Meus Certificados
+      </button>
+      <button class="nav-btn" data-pg="configuracoes">
+        <div class="nb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div> Configurações
+      </button>
+    </nav>
+
     <div class="sidebar-foot">
       <button class="btn btn-ghost btn-full" id="btnLogout">↩ Sair</button>
     </div>
@@ -238,6 +250,66 @@
 
         </div><!-- /player-wrap -->
       </div><!-- /pg-player -->
+
+      <!-- ════ PERFIL ══════════════════════════ -->
+      <div class="page" id="pg-perfil">
+        <div class="ph"><div class="ph-text"><h2>Meu Perfil</h2><p>Suas informações de cadastro</p></div></div>
+        <div class="card" style="max-width:520px">
+          <div class="card-body painel-info">
+            <div class="pi-row">
+              <div class="pi-label">Data de cadastro</div>
+              <div class="pi-val" id="piCadastro">—</div>
+            </div>
+            <div class="pi-row">
+              <div class="pi-label">Nome</div>
+              <div class="pi-val" id="piNome">—</div>
+            </div>
+            <div class="pi-row">
+              <div class="pi-label">E-mail</div>
+              <div class="pi-val" id="piEmail">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CERTIFICADOS ════════════════════ -->
+      <div class="page" id="pg-certificados">
+        <div class="ph"><div class="ph-text"><h2>Meus Certificados</h2><p>Certificados disponíveis para download</p></div></div>
+        <div id="certs-list"></div>
+      </div>
+
+      <!-- ════ CONFIGURAÇÕES ═══════════════════ -->
+      <div class="page" id="pg-configuracoes">
+        <div class="ph"><div class="ph-text"><h2>Configurações</h2><p>Edite suas informações de perfil</p></div></div>
+        <div class="card" style="max-width:520px">
+          <div class="card-body">
+            <!-- Foto de perfil -->
+            <div class="cfg-foto-wrap">
+              <div class="cfg-avatar" id="cfgAvatarPreview"></div>
+              <div>
+                <div style="font-weight:600;font-size:.85rem;margin-bottom:4px">Foto de perfil</div>
+                <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+                  Alterar foto
+                  <input type="file" id="cfgFotoInput" accept="image/*" style="display:none">
+                </label>
+              </div>
+            </div>
+            <div class="fg" style="margin-top:18px">
+              <label>Nome</label>
+              <input type="text" id="cfgNome" placeholder="Seu nome">
+            </div>
+            <div class="fg">
+              <label>Sobrenome</label>
+              <input type="text" id="cfgSobrenome" placeholder="Seu sobrenome">
+            </div>
+            <div class="fg">
+              <label>Bio</label>
+              <textarea id="cfgBio" rows="3" placeholder="Fale um pouco sobre você..." style="width:100%;resize:vertical;font-family:inherit;font-size:.85rem;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--t1);box-sizing:border-box"></textarea>
+            </div>
+            <button class="btn btn-primary" id="cfgSalvar">Salvar alterações</button>
+          </div>
+        </div>
+      </div>
 
     </div><!-- /content -->
   </div><!-- /main -->
