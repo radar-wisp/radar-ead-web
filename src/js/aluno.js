@@ -146,7 +146,9 @@ var Aluno = (() => {
             <div class="card-title"><div class="ct-icon">▶️</div> Continuar assistindo</div>
           </div>
           <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-            <div class="cr-emoji" style="font-size:1.8rem;width:50px;height:50px">${proxima.curso.emoji||'📚'}</div>
+            ${proxima.curso.capa
+              ? `<img src="${proxima.curso.capa}" alt="${x(proxima.curso.titulo)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;flex-shrink:0">`
+              : `<div class="cr-emoji" style="font-size:1.8rem;width:50px;height:50px">${proxima.curso.emoji||'📚'}</div>`}
             <div style="flex:1;min-width:0">
               <div style="font-family:var(--font-j);font-weight:700;font-size:.9rem;margin-bottom:2px">${x(proxima.aula.titulo)}</div>
               <div style="font-size:.78rem;color:var(--t3);margin-bottom:8px">${x(proxima.curso.titulo)} · ${proxima.aula.tipo}</div>
@@ -244,10 +246,13 @@ var Aluno = (() => {
     const mods  = Storage.Modulos.listarPorCurso(c.id).length;
     const total = Storage.Aulas.totalPorCurso(c.id);
     const done  = pct === 100;
+    const thumb = c.capa
+      ? `<img src="${c.capa}" alt="${x(c.titulo)}" style="width:100%;height:100%;object-fit:cover;display:block">`
+      : `<span style="font-size:2.8rem">${c.emoji||'📚'}</span>`;
     return `
     <div class="course-card ${pct>0&&!done?'active-card':''}" onclick="Aluno.iniciarCurso('${c.id}')">
       <div class="cc-thumb">
-        ${c.emoji||'📚'}
+        ${thumb}
         ${pct > 0 ? `<div class="cc-pct-badge ${done?'done':''}">${done?'✅ Concluído':pct+'%'}</div>` : ''}
       </div>
       <div class="cc-body">
