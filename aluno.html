@@ -211,25 +211,40 @@
         <!-- Player + índice -->
         <div class="player-wrap">
 
-          <!-- Coluna esquerda: vídeo/texto -->
-          <div class="player-main">
-            <div class="player-screen" id="playerScreen">
-              <div style="color:#8896A9;text-align:center;padding:60px">
-                <div style="margin-bottom:16px;opacity:.4"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
-                <p style="font-size:.88rem">Selecione uma aula no índice ao lado</p>
+          <!-- Coluna esquerda: vídeo/texto + materiais -->
+          <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+            <div class="player-main">
+              <div class="player-screen" id="playerScreen">
+                <div style="color:#8896A9;text-align:center;padding:60px">
+                  <div style="margin-bottom:16px;opacity:.4"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
+                  <p style="font-size:.88rem">Selecione uma aula no índice ao lado</p>
+                </div>
+              </div>
+
+              <div class="player-info">
+                <div class="player-aula-title" id="playerAulaTitulo">—</div>
+                <div class="player-aula-meta"  id="playerAulaMeta"></div>
+              </div>
+
+              <div class="player-actions">
+                <button class="btn btn-primary" id="btnConcluir"><span class="btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Marcar como concluída</button>
+                <div class="player-nav">
+                  <button class="btn btn-ghost btn-sm" id="btnPrev" disabled>← Anterior</button>
+                  <button class="btn btn-ghost btn-sm" id="btnNext" disabled>Próxima →</button>
+                </div>
               </div>
             </div>
 
-            <div class="player-info">
-              <div class="player-aula-title" id="playerAulaTitulo">—</div>
-              <div class="player-aula-meta"  id="playerAulaMeta"></div>
-            </div>
-
-            <div class="player-actions">
-              <button class="btn btn-primary" id="btnConcluir"><span class="btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Marcar como concluída</button>
-              <div class="player-nav">
-                <button class="btn btn-ghost btn-sm" id="btnPrev" disabled>← Anterior</button>
-                <button class="btn btn-ghost btn-sm" id="btnNext" disabled>Próxima →</button>
+            <!-- Materiais de Apoio (fora do player-main para não sofrer overflow:hidden) -->
+            <div id="playerMateriais" style="display:none">
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title" style="display:flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Materiais de Apoio
+                  </div>
+                </div>
+                <div class="card-body" id="playerMateriaisList"></div>
               </div>
             </div>
           </div>
