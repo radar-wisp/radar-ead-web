@@ -1,5 +1,12 @@
 /**
  * player.js — Player de aula e índice lateral do curso
+ *
+ * Funcionalidades:
+ *  • Índice em accordion (módulos expandir/recolher)
+ *  • Materiais filtrados pela aula atual
+ *  • Acesso sequencial (config.sequencial no curso)
+ *  • Bloqueio por material obrigatório (config.necessarioAntesDaProxima)
+ *  • Compatibilidade de embed: YouTube, Vimeo, Drive, Loom, Panda, MP4
  */
 
 /* global Storage, AlunoState, AlunoUtils, AlunoNav, AlunoCertificados */
@@ -9,22 +16,24 @@ var AlunoPlayer = (() => {
 
   const { ICON_CHECK, x, toast, toEmbed, tipoLabel } = AlunoUtils;
 
+  // Controla quais módulos estão expandidos no índice (por moduloId)
+  const _expandidos = new Set();
+
   function renderPlayer({ cursoId, aulaId } = {}) {
-    const cur = AlunoState.getCur();
     if (cursoId) AlunoState.setCur({ cursoId });
     if (aulaId)  AlunoState.setCur({ aulaId });
 
     const state = AlunoState.getCur();
     if (!state.cursoId) return;
 
-    const me     = AlunoState.getMe();
-    const curso  = Storage.Cursos.obter(state.cursoId);
-    const aula   = state.aulaId ? Storage.Aulas.obter(state.aulaId) : null;
+    const me      = AlunoState.getMe();
+    const curso   = Storage.Cursos.obter(state.cursoId);
+    const aula    = state.aulaId ? Storage.Aulas.obter(state.aulaId) : null;
     const modulos = Storage.Modulos.listarPorCurso(state.cursoId);
-    const todas  = modulos.flatMap(m => Storage.Aulas.listarPorModulo(m.id));
-    const idx    = todas.findIndex(a => a.id === state.aulaId);
-    const pct    = Storage.Progresso.pctCurso(me.id, state.cursoId);
-    const conc   = Storage.Progresso.isConcluida(me.id, state.aulaId || '');
+    const todas   = modulos.flatMap(m => Storage.Aulas.listarPorModulo(m.id));
+    const idx     = todas.findIndex(a => a.id === state.aulaId);
+    const pct     = Storage.Progresso.pctCurso(me.id, state.cursoId);
+    const conc    = Storage.Progresso.isConcluida(me.id, state.aulaId || '');
 
     document.getElementById('playerCursoNome').textContent = curso?.titulo || '';
     document.getElementById('playerTopPct').textContent    = pct + '%';
@@ -35,14 +44,54 @@ var AlunoPlayer = (() => {
 
     _renderConteudo(aula, conc);
     _renderIndice(modulos, state.aulaId);
-    _renderMateriais(state.cursoId);
+    _renderMateriais(state.cursoId, state.aulaId);
 
-    const btnPrev = document.getElementById('btnPrev');
-    const btnNext = document.getElementById('btnNext');
+    const sequencial = !!(curso?.config?.sequencial);
+    const btnPrev    = document.getElementById('btnPrev');
+    const btnNext    = document.getElementById('btnNext');
+
     btnPrev.disabled = idx <= 0;
     btnNext.disabled = idx >= todas.length - 1 || idx < 0;
-    btnPrev.onclick  = () => { if (idx > 0)               selAula(todas[idx - 1].id); };
-    btnNext.onclick  = () => { if (idx < todas.length - 1) selAula(todas[idx + 1].id); };
+
+    btnPrev.onclick = () => {
+      if (idx <= 0) return;
+      selAula(todas[idx - 1].id);
+    };
+
+    btnNext.onclick = () => {
+      if (idx >= todas.length - 1) return;
+      // Verificar material obrigatório antes de avançar
+      if (_temMaterialObrigatorioNaoVisto(state.cursoId, state.aulaId)) {
+        toast('Acesse o material obrigatório antes de avançar.', 'i');
+        return;
+      }
+      // Verificar acesso sequencial
+      if (sequencial && state.aulaId && !Storage.Progresso.isConcluida(me.id, state.aulaId)) {
+        toast('Conclua esta aula antes de avançar.', 'i');
+        return;
+      }
+      selAula(todas[idx + 1].id);
+    };
+  }
+
+  /**
+   * Verifica se há algum material com necessarioAntesDaProxima vinculado
+   * à aula atual que ainda não foi marcado como visualizado.
+   */
+  function _temMaterialObrigatorioNaoVisto(cursoId, aulaId) {
+    if (!aulaId) return false;
+    const me   = AlunoState.getMe();
+    const mats = Storage.Materiais.listar().filter(m =>
+      (m.status || 'ativo') === 'ativo' &&
+      m.aulaId === aulaId &&
+      m.config?.necessarioAntesDaProxima === true
+    );
+    if (!mats.length) return false;
+    // Considera "visto" se estiver salvo em progresso de materiais
+    const vistos = Storage.Progresso.materiaisVistos
+      ? Storage.Progresso.materiaisVistos(me.id)
+      : [];
+    return mats.some(m => !vistos.includes(m.id));
   }
 
   function _renderConteudo(aula, isConc) {
@@ -65,11 +114,19 @@ var AlunoPlayer = (() => {
 
     switch (aula.tipo) {
       case 'video': {
-        const url = toEmbed(aula.conteudo);
-        screen.innerHTML = url
-          ? `<iframe src="${url}" style="width:100%;height:325px;border:none;display:block"
-              allowfullscreen allow="accelerometer;autoplay;encrypted-media;picture-in-picture"></iframe>`
-          : `<div style="color:#8896A9;padding:60px;text-align:center">URL inválida ou não configurada</div>`;
+        const embedUrl = toEmbed(aula.conteudo);
+        // MP4 direto → usar <video>; demais → iframe
+        if (embedUrl && /\.mp4(\?|$)/i.test(embedUrl)) {
+          screen.innerHTML = `<video src="${x(embedUrl)}" controls
+            style="width:100%;height:325px;display:block;background:#000">
+            Seu navegador não suporta reprodução de vídeo.</video>`;
+        } else if (embedUrl) {
+          screen.innerHTML = `<iframe src="${embedUrl}"
+            style="width:100%;height:325px;border:none;display:block"
+            allowfullscreen allow="accelerometer;autoplay;encrypted-media;picture-in-picture"></iframe>`;
+        } else {
+          screen.innerHTML = `<div style="color:#8896A9;padding:60px;text-align:center">URL inválida ou não configurada</div>`;
+        }
         break;
       }
       case 'texto':
@@ -114,6 +171,10 @@ var AlunoPlayer = (() => {
     renderPlayer({});
   }
 
+  /**
+   * Renderiza o índice lateral com módulos em accordion (expandir/recolher).
+   * O módulo da aula ativa é expandido automaticamente.
+   */
   function _renderIndice(modulos, aulaAtualId) {
     const me   = AlunoState.getMe();
     const cur  = AlunoState.getCur();
@@ -124,35 +185,59 @@ var AlunoPlayer = (() => {
     document.getElementById('ci-pct-fill').style.width = pct + '%';
     document.getElementById('ci-pct-num').textContent  = pct + '%';
 
+    // Expandir automaticamente o módulo que contém a aula ativa
+    if (aulaAtualId) {
+      modulos.forEach(m => {
+        const aulas = Storage.Aulas.listarPorModulo(m.id);
+        if (aulas.some(a => a.id === aulaAtualId)) _expandidos.add(m.id);
+      });
+    }
+    // Se nenhum módulo expandido ainda, expande o primeiro
+    if (_expandidos.size === 0 && modulos.length > 0) {
+      _expandidos.add(modulos[0].id);
+    }
+
     wrap.innerHTML = modulos.map(m => {
-      const aulas   = Storage.Aulas.listarPorModulo(m.id);
-      const modConc = aulas.filter(a => concs.includes(a.id)).length;
+      const aulas    = Storage.Aulas.listarPorModulo(m.id);
+      const modConc  = aulas.filter(a => concs.includes(a.id)).length;
+      const expanded = _expandidos.has(m.id);
+      const chevron  = expanded
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
       return `
-      <div class="ci-mod-head">
-        <span>${m.ordem}. ${x(m.titulo)}</span>
-        <span style="font-weight:400;color:var(--t4)">${modConc}/${aulas.length}</span>
+      <div class="ci-mod-head ci-mod-toggle" onclick="Aluno.toggleModulo('${m.id}')" style="cursor:pointer;user-select:none">
+        <span style="flex:1;min-width:0">${m.ordem}. ${x(m.titulo)}</span>
+        <span style="font-weight:400;color:var(--t4);margin-right:6px">${modConc}/${aulas.length}</span>
+        <span style="color:var(--t3);flex-shrink:0">${chevron}</span>
       </div>
-      ${aulas.map(a => {
-        const done   = concs.includes(a.id);
-        const active = a.id === aulaAtualId;
-        return `<div class="ci-aula ${active ? 'active' : ''} ${done ? 'done' : ''}"
-          onclick="Aluno.selAula('${a.id}')">
-          <div class="ci-dot">${done ? '<span class="ci-done-icon"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}</div>
-          <div class="ci-aula-name">${x(a.titulo)}</div>
-          ${a.duracao ? `<div class="ci-aula-dur">${a.duracao}m</div>` : ''}
-        </div>`;
-      }).join('')}`;
+      <div class="ci-mod-body" id="ci-mod-${m.id}" style="display:${expanded ? 'block' : 'none'}">
+        ${aulas.map(a => {
+          const done   = concs.includes(a.id);
+          const active = a.id === aulaAtualId;
+          return `<div class="ci-aula ${active ? 'active' : ''} ${done ? 'done' : ''}"
+            onclick="Aluno.selAula('${a.id}')">
+            <div class="ci-dot">${done ? '<span class="ci-done-icon"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}</div>
+            <div class="ci-aula-name">${x(a.titulo)}</div>
+            ${a.duracao ? `<div class="ci-aula-dur">${a.duracao}m</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`;
     }).join('');
   }
 
-  function _renderMateriais(cursoId) {
+  /**
+   * Renderiza materiais de apoio filtrando apenas os da aula atual.
+   */
+  function _renderMateriais(cursoId, aulaId) {
     const wrap = document.getElementById('playerMateriais');
     const list = document.getElementById('playerMateriaisList');
     if (!wrap || !list) return;
 
     const mats = Storage.Materiais.listar().filter(m =>
       (m.status || 'ativo') === 'ativo' &&
-      (m.cursoId === cursoId || (m.cursosVinc || []).includes(cursoId))
+      (m.cursoId === cursoId || (m.cursosVinc || []).includes(cursoId)) &&
+      (!m.aulaId || m.aulaId === aulaId)
     );
 
     if (!mats.length) { wrap.style.display = 'none'; return; }
@@ -188,8 +273,42 @@ var AlunoPlayer = (() => {
   }
 
   function selAula(aulaId) {
+    const cur    = AlunoState.getCur();
+    const me     = AlunoState.getMe();
+    const curso  = Storage.Cursos.obter(cur.cursoId);
+    const sequencial = !!(curso?.config?.sequencial);
+
+    if (sequencial && aulaId) {
+      const modulos = Storage.Modulos.listarPorCurso(cur.cursoId);
+      const todas   = modulos.flatMap(m => Storage.Aulas.listarPorModulo(m.id));
+      const idxDest = todas.findIndex(a => a.id === aulaId);
+      const concs   = Storage.Progresso.concluidas(me.id);
+      // Bloqueia acesso a aula que ainda não foi liberada sequencialmente
+      for (let i = 0; i < idxDest; i++) {
+        if (!concs.includes(todas[i].id)) {
+          toast('Conclua as aulas anteriores para desbloquear esta.', 'i');
+          return;
+        }
+      }
+    }
+
     AlunoState.setCur({ aulaId });
     renderPlayer({ aulaId });
+  }
+
+  /** Alterna expand/collapse de um módulo no índice */
+  function toggleModulo(moduloId) {
+    if (_expandidos.has(moduloId)) {
+      _expandidos.delete(moduloId);
+    } else {
+      _expandidos.add(moduloId);
+    }
+    const body = document.getElementById(`ci-mod-${moduloId}`);
+    if (body) body.style.display = _expandidos.has(moduloId) ? 'block' : 'none';
+    // Atualiza o chevron re-renderizando só o índice
+    const cur     = AlunoState.getCur();
+    const modulos = Storage.Modulos.listarPorCurso(cur.cursoId);
+    _renderIndice(modulos, cur.aulaId);
   }
 
   function iniciarCurso(cursoId) {
@@ -204,9 +323,10 @@ var AlunoPlayer = (() => {
   }
 
   function abrirAula(cursoId, aulaId) {
+    _expandidos.clear();
     AlunoState.setCur({ cursoId, aulaId });
     AlunoNav.go('player', { cursoId, aulaId });
   }
 
-  return { renderPlayer, selAula, iniciarCurso, abrirAula };
+  return { renderPlayer, selAula, toggleModulo, iniciarCurso, abrirAula };
 })();
