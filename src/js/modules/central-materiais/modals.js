@@ -359,7 +359,8 @@ var MatModals = (() => {
       togRow('mmcfg-ocultar', 'Ocultar após conclusão',           'Desaparece para quem concluiu o curso',        cfg.ocultarAposConclusao) +
       togRow('mmcfg-turma',   'Exibir apenas para turma',         'Visível somente para turmas específicas',      cfg.apenasParaTurma) +
       togRow('mmcfg-compl',   'Material complementar',            'Indicado como recurso extra, não obrigatório', cfg.complementar) +
-      togRow('mmcfg-antes',   'Necessário antes da próxima aula', 'Bloqueia avanço até o aluno visualizar',       cfg.necessarioAntesDaProxima);
+      togRow('mmcfg-antes',   'Necessário antes da próxima aula', 'Bloqueia avanço até o aluno visualizar',       cfg.necessarioAntesDaProxima) +
+      togRow('mmcfg-avaliacao', 'Avaliação Obrigatória',           'Aluno deve concluir a avaliação vinculada ao curso antes de acessar este material', cfg.avaliacaoObrigatoria);
   }
 
   // ── Upload — file e drag & drop ───────────────────────────────
@@ -541,6 +542,7 @@ var MatModals = (() => {
         apenasParaTurma:          getTogOn('mmcfg-turma'),
         complementar:             getTogOn('mmcfg-compl'),
         necessarioAntesDaProxima: getTogOn('mmcfg-antes'),
+        avaliacaoObrigatoria:     getTogOn('mmcfg-avaliacao'),
       },
     };
 
