@@ -490,6 +490,8 @@ tbody tr:hover{background:#FAFBFE}
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
 }
+.ci-mod-toggle:hover{background:var(--blue-soft);color:var(--t2)}
+.ci-mod-body{border-bottom:2px solid var(--border)}
 .ci-aula{
   display:flex;align-items:center;gap:8px;
   padding:9px 13px;border-bottom:1px solid var(--border);
