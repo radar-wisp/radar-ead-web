@@ -39,6 +39,7 @@ var Aluno = (() => {
     iniciarCurso: AlunoPlayer.iniciarCurso,
     abrirAula:    AlunoPlayer.abrirAula,
     selAula:      AlunoPlayer.selAula,
+    toggleModulo: AlunoPlayer.toggleModulo,
     baixarCert:   AlunoCertificados.baixarCert,
   };
 })();
