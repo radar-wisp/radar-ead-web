@@ -9,7 +9,7 @@
  *   fmtDate(iso)           — formata data ISO para pt-BR (dd/mm/aa)
  *   fmtRelative(iso)       — formata data relativa ("2h atrás", "Agora"…)
  *   toast(msg, tipo)       — exibe notificação no container #toasts
- *   toEmbed(url)           — converte URL YouTube para embed
+ *   toEmbed(url)           — converte URL de vídeo para embed (YouTube, Vimeo, Drive, Loom, Panda, MP4)
  *   tipoLabel(tipo)        — rótulo legível de tipo de aula
  */
 
@@ -72,14 +72,36 @@ var EadUtils = (() => {
   }
 
   /**
-   * Converte URL do YouTube para formato embed.
+   * Converte URL de vídeo para formato embed.
+   * Suporta: YouTube, Vimeo, Google Drive, Loom, Panda Video, MP4 direto.
    * @param {string} url
-   * @returns {string}
+   * @returns {string} URL embed ou URL original
    */
   function toEmbed(url) {
     if (!url) return '';
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([A-Za-z0-9_-]{11})/);
-    return m ? `https://www.youtube.com/embed/${m[1]}` : url;
+
+    // YouTube: watch?v=, youtu.be/, /embed/, /shorts/
+    const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+    if (yt) return `https://www.youtube.com/embed/${yt[1]}?rel=0`;
+
+    // Vimeo: vimeo.com/123456789 ou player.vimeo.com/video/123456789
+    const vm = url.match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/);
+    if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+
+    // Google Drive: /file/d/{id}/view → embed
+    const gd = url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/);
+    if (gd) return `https://drive.google.com/file/d/${gd[1]}/preview`;
+
+    // Loom: loom.com/share/{id}
+    const lm = url.match(/loom\.com\/share\/([A-Za-z0-9]+)/);
+    if (lm) return `https://www.loom.com/embed/${lm[1]}`;
+
+    // Panda Video: dashboard.pandavideo.com.br/videos/{id} ou embed
+    const pv = url.match(/pandavideo\.com\.br\/(?:videos|embed)\/([A-Za-z0-9_-]+)/);
+    if (pv) return `https://player-vz.pandavideo.com.br/embed/?v=${pv[1]}`;
+
+    // MP4 direto — retorna como está (tratado pelo player com <video>)
+    return url;
   }
 
   /**
