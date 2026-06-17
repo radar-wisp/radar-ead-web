@@ -2,7 +2,7 @@
  * nav.js — Roteamento interno do Portal do Aluno
  */
 
-/* global Storage, AlunoState, AlunoPages */
+/* global Storage, AlunoState, AlunoPages, AlunoPlayer */
 
 var AlunoNav = (() => {
   'use strict';
@@ -37,7 +37,7 @@ var AlunoNav = (() => {
 
     if (pg === 'home')          AlunoPages.renderHome();
     if (pg === 'cursos')        AlunoPages.renderCursos();
-    if (pg === 'player')        AlunoPages.renderPlayer(params);
+    if (pg === 'player')        AlunoPlayer.renderPlayer(params);
     if (pg === 'perfil')        AlunoPages.renderPerfil();
     if (pg === 'certificados')  AlunoPages.renderCertificados();
     if (pg === 'configuracoes') AlunoPages.renderConfiguracoes();
