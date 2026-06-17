@@ -734,6 +734,38 @@ var Wizard = (() => {
     } catch(e) { console.error('[Wizard] Erro ao persistir módulos/aulas:', e); }
   }
 
+  /**
+   * Persiste state.acessos em Storage.Restricoes (ead_restricoes).
+   * Resolve IDs por nome para setores/equipes/colaboradores.
+   * @param {string} cursoId
+   * @param {'todos'|'restrito'} visib
+   * @param {{ setor: string[], equipe: string[], colab: string[] }} acessos
+   */
+  function _persistirRestricoesAcesso(cursoId, visib, acessos) {
+    try {
+      const S = (typeof Storage !== 'undefined' && Storage.Restricoes) ? Storage : null;
+      if (!S) return;
+      // Limpa restrições anteriores deste curso
+      S.Restricoes.limpar(cursoId);
+      if (visib !== 'restrito') return; // sem restrição = acesso universal
+      const setores  = S.Setores ? S.Setores.listar()  : [];
+      const equipes  = S.Equipes ? S.Equipes.listar()  : [];
+      const alunos   = S.Alunos  ? S.Alunos.listar()   : [];
+      (acessos.setor  || []).forEach(nome => {
+        const s = setores.find(x => x.nome === nome);
+        if (s) S.Restricoes.adicionar({ cursoId, tipo: 'setor',       refId: s.id });
+      });
+      (acessos.equipe || []).forEach(nome => {
+        const e = equipes.find(x => x.nome === nome);
+        if (e) S.Restricoes.adicionar({ cursoId, tipo: 'equipe',      refId: e.id });
+      });
+      (acessos.colab  || []).forEach(nome => {
+        const a = alunos.find(x => x.nome === nome || x.email === nome);
+        if (a) S.Restricoes.adicionar({ cursoId, tipo: 'colaborador', refId: a.id });
+      });
+    } catch(e) { console.error('[Wizard] Erro ao persistir restrições:', e); }
+  }
+
   function _persistirCurso(dadosCurso) {
     // Storage é declarado por storage.js (var Storage = ...) carregado antes deste script.
     // NÃO usar window.Storage — no browser, window.Storage é a Web Storage API nativa,
@@ -742,22 +774,27 @@ var Wizard = (() => {
       if (typeof Storage !== 'undefined' && Storage.Cursos) {
         const novo = Storage.Cursos.criar(dadosCurso);
         _persistirModulosAulas(novo.id, dadosCurso.modulos);
+        _persistirRestricoesAcesso(novo.id, dadosCurso.visib, dadosCurso.acessos);
         console.log('[Wizard] Curso criado:', novo?.id, novo?.titulo);
       } else {
         console.warn('[Wizard] Storage.Cursos não disponível, escrita direta');
         const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        const novoId = genId();
         const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
-        lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
+        lista.push({ ...dadosCurso, id: novoId, criadoEm: new Date().toISOString() });
         localStorage.setItem('ead_cursos', JSON.stringify(lista));
-        localStorage.setItem('ead_seeded_v2', '1');
+        // NÃO setar ead_seeded_v2 — evita reset acidental dos dados pelo seed()
+        _persistirModulosAulas(novoId, dadosCurso.modulos);
       }
     } catch(e) {
       console.error('[Wizard] Erro ao persistir:', e);
       try {
         const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        const novoId = genId();
         const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
-        lista.push({ ...dadosCurso, id: genId(), criadoEm: new Date().toISOString() });
+        lista.push({ ...dadosCurso, id: novoId, criadoEm: new Date().toISOString() });
         localStorage.setItem('ead_cursos', JSON.stringify(lista));
+        _persistirModulosAulas(novoId, dadosCurso.modulos);
       } catch(e2) { console.error('[Wizard] Fallback falhou:', e2); }
     }
     localStorage.removeItem('ead_draft_curso');
@@ -772,6 +809,7 @@ var Wizard = (() => {
         if (typeof Storage !== 'undefined' && Storage.Cursos) {
           Storage.Cursos.atualizar(_editId, dados);
           _persistirModulosAulas(_editId, dados.modulos);
+          _persistirRestricoesAcesso(_editId, dados.visib, dados.acessos);
         } else {
           const lista = JSON.parse(localStorage.getItem('ead_cursos') || '[]');
           const idx = lista.findIndex(c => c.id === _editId);
