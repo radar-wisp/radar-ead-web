@@ -1096,7 +1096,7 @@ tbody tr.selected td { background:#f0f4ff }
 .mal-step.active .mal-step-circle { background:var(--blue); color:#fff; }
 .mal-step.active .mal-step-label { color:var(--text); font-weight:600; }
 .mal-step.done .mal-step-circle { background:var(--green); color:#fff; font-size:0; }
-.mal-step.done .mal-step-circle::before { content:'✓'; font-size:13px; }
+.mal-step.done .mal-step-circle::before { content:'<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'; font-size:13px; }
 .mal-step.done .mal-step-label { color:var(--text3); }
 .mal-step-line { flex:1; height:2px; background:var(--border); margin:0 8px; transition:background .2s; }
 .mal-step-line.done { background:var(--green); }
@@ -1649,7 +1649,7 @@ tbody tr.selected td { background:#f0f4ff }
             <button class="ift-chip" data-tmstatus="aberta"        onclick="Turmas.setStatus(this,'aberta')">● Aberta</button>
             <button class="ift-chip" data-tmstatus="em_andamento"  onclick="Turmas.setStatus(this,'em_andamento')">▶ Em andamento</button>
             <button class="ift-chip" data-tmstatus="encerrada"     onclick="Turmas.setStatus(this,'encerrada')">■ Encerrada</button>
-            <button class="ift-chip" data-tmstatus="cancelada"     onclick="Turmas.setStatus(this,'cancelada')">✕ Cancelada</button>
+            <button class="ift-chip" data-tmstatus="cancelada"     onclick="Turmas.setStatus(this,'cancelada')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelada</button>
             <select id="tm-filtro-status" style="display:none"></select>
           </div>
           <div class="ift-sep"></div>
@@ -2001,7 +2001,7 @@ tbody tr.selected td { background:#f0f4ff }
 
           <div class="ift-status-chips">
             <button class="ift-chip" data-avst="" onclick="Aval.setStatus(this,'')">Todos</button>
-            <button class="ift-chip" data-avst="rascunho"  onclick="Aval.setStatus(this,'rascunho')">✎ Rascunho</button>
+            <button class="ift-chip" data-avst="rascunho"  onclick="Aval.setStatus(this,'rascunho')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rascunho</button>
             <button class="ift-chip" data-avst="publicada" onclick="Aval.setStatus(this,'publicada')">● Publicada</button>
             <button class="ift-chip" data-avst="encerrada" onclick="Aval.setStatus(this,'encerrada')">■ Encerrada</button>
             <button class="ift-chip" data-avst="arquivada" onclick="Aval.setStatus(this,'arquivada')">▣ Arquivada</button>
@@ -2208,7 +2208,7 @@ tbody tr.selected td { background:#f0f4ff }
           <div class="ift-status-chips">
             <button class="ift-chip" data-acst="" onclick="AcessosMod.setStatus(this,'')">Todos</button>
             <button class="ift-chip" data-acst="ativo"     onclick="AcessosMod.setStatus(this,'ativo')">● Ativo</button>
-            <button class="ift-chip" data-acst="expirado"  onclick="AcessosMod.setStatus(this,'expirado')">✕ Expirado</button>
+            <button class="ift-chip" data-acst="expirado"  onclick="AcessosMod.setStatus(this,'expirado')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Expirado</button>
             <button class="ift-chip" data-acst="bloqueado" onclick="AcessosMod.setStatus(this,'bloqueado')">■ Bloqueado</button>
             <button class="ift-chip" data-acst="pendente"  onclick="AcessosMod.setStatus(this,'pendente')">◎ Pendente</button>
             <select id="ac-filtro-status" style="display:none"></select>
@@ -2342,7 +2342,7 @@ tbody tr.selected td { background:#f0f4ff }
             <button class="ift-chip" data-alst="" onclick="AlunosMod.setStatus(this,'')">Todos</button>
             <button class="ift-chip" data-alst="ativo"     onclick="AlunosMod.setStatus(this,'ativo')">● Ativo</button>
             <button class="ift-chip" data-alst="pendente"  onclick="AlunosMod.setStatus(this,'pendente')">◎ Pendente</button>
-            <button class="ift-chip" data-alst="bloqueado" onclick="AlunosMod.setStatus(this,'bloqueado')">✕ Bloqueado</button>
+            <button class="ift-chip" data-alst="bloqueado" onclick="AlunosMod.setStatus(this,'bloqueado')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Bloqueado</button>
             <button class="ift-chip" data-alst="inativo"   onclick="AlunosMod.setStatus(this,'inativo')">▣ Inativo</button>
             <select id="al-filtro-status" style="display:none"></select>
           </div>
@@ -2702,7 +2702,7 @@ tbody tr.selected td { background:#f0f4ff }
               <button class="ift-chip" data-cest="" onclick="CertMod.setStatus(this,'')">Todos</button>
               <button class="ift-chip" data-cest="emitido"  onclick="CertMod.setStatus(this,'emitido')">● Emitido</button>
               <button class="ift-chip" data-cest="pendente" onclick="CertMod.setStatus(this,'pendente')">◎ Pendente</button>
-              <button class="ift-chip" data-cest="expirado" onclick="CertMod.setStatus(this,'expirado')">✕ Expirado</button>
+              <button class="ift-chip" data-cest="expirado" onclick="CertMod.setStatus(this,'expirado')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Expirado</button>
               <button class="ift-chip" data-cest="cancelado" onclick="CertMod.setStatus(this,'cancelado')">■ Cancelado</button>
               <select id="cert-filtro-status" style="display:none"></select>
             </div>
@@ -2908,7 +2908,7 @@ tbody tr.selected td { background:#f0f4ff }
           <div id="mcv-sub" style="font-size:11px;color:var(--text4);margin-top:2px"></div>
         </div>
       </div>
-      <button class="modal-close" onclick="document.getElementById('modal-curso-view').classList.remove('open')">✕</button>
+      <button class="modal-close" onclick="document.getElementById('modal-curso-view').classList.remove('open')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div id="mcv-badges" style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border)"></div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
@@ -2958,7 +2958,7 @@ tbody tr.selected td { background:#f0f4ff }
         <h3 id="mec-titulo">Editar Curso</h3>
         <div id="mec-subtitulo" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
       </div>
-      <button class="modal-close">✕</button>
+      <button class="modal-close"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
     <!-- Tabs -->
@@ -4402,7 +4402,7 @@ var CertMod = (() => {
   const ST = {
     emitido:   { cls:'badge-green',  label:'● Emitido'   },
     pendente:  { cls:'badge-blue',   label:'◎ Pendente'  },
-    expirado:  { cls:'badge-red',    label:'✕ Expirado'  },
+    expirado:  { cls:'badge-red',    label:'<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Expirado'  },
     cancelado: { cls:'badge-gray',   label:'■ Cancelado' },
   };
   function stBadge(s) {
@@ -4662,7 +4662,7 @@ var CertMod = (() => {
   /* ── Visualizador de certificado ────────────────────────────── */
   function visualizar(id) {
     const c = Storage.Certificados.obter(id); if(!c) return;
-    document.getElementById('cv-codigo-badge').textContent = `📋 ${c.codigo}`;
+    document.getElementById('cv-codigo-badge').textContent = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> ${c.codigo}`;
     document.getElementById('cert-render').innerHTML = _renderCertSVG(id);
     document.getElementById('modal-cert-view').classList.add('open');
     document.getElementById('modal-cert-view')._certId = id;
@@ -4907,7 +4907,7 @@ var CertMod = (() => {
     if (!c) {
       res.innerHTML = `
         <div style="padding:14px;background:#fee2e2;border-radius:var(--radius-sm);border:1.5px solid #fca5a5">
-          <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:4px">❌ Certificado não encontrado</div>
+          <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Certificado não encontrado</div>
           <div style="font-size:12px;color:var(--red)">O código informado não existe na base de dados.</div>
         </div>`;
       return;
@@ -4917,7 +4917,7 @@ var CertMod = (() => {
     const clsBg = c.status === 'emitido' ? '#d1fae5' : c.status === 'expirado' ? '#fee2e2' : '#fef3c7';
     const clsBo = c.status === 'emitido' ? '#6ee7b7' : c.status === 'expirado' ? '#fca5a5' : '#fcd34d';
     const clsTxt = c.status === 'emitido' ? 'var(--green-dark)' : c.status === 'expirado' ? 'var(--red)' : 'var(--amber-dark)';
-    const icon  = c.status === 'emitido' ? '✅' : c.status === 'expirado' ? '⚠️' : '❌';
+    const icon  = c.status === 'emitido' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' : c.status === 'expirado' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     res.innerHTML = `
       <div style="padding:14px;background:${clsBg};border-radius:var(--radius-sm);border:1.5px solid ${clsBo}">
         <div style="font-size:14px;font-weight:700;color:${clsTxt};margin-bottom:8px">${icon} Certificado ${ST[c.status]?.label || c.status}</div>
@@ -5084,7 +5084,7 @@ var CertMod = (() => {
     const s = document.getElementById('toasts'); if(!s) return;
     const el = document.createElement('div');
     el.className = `toast ${tipo}`;
-    el.innerHTML = `<span>${{s:'✅',e:'❌',i:'ℹ️'}[tipo]||'ℹ️'}</span><span>${msg}</span>`;
+    el.innerHTML = `<span>${{s:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',e:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',i:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'}[tipo]||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'}</span><span>${msg}</span>`;
     s.appendChild(el); setTimeout(()=>el.remove(), 3500);
   }
 
