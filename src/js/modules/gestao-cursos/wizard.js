@@ -1348,7 +1348,7 @@ var Wizard = (() => {
       const aula = state.modulos[mi]?.aulas[ai];
       if (!aula) return;
       const itens = Object.entries(TIPO_LABEL).map(([k, v]) =>
-        `<button onclick="Conteudo._setAulaTipo(${mi},${ai},'${k}')">${_icoOf(k)} ${v}${k === aula.tipo ? ' ✓' : ''}</button>`
+        `<button onclick="Conteudo._setAulaTipo(${mi},${ai},'${k}')">${_icoOf(k)} ${v}${k === aula.tipo ? ' <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}</button>`
       ).join('');
       openCtx(e, `<div style="font-size:10px;font-weight:700;color:var(--text4);padding:4px 10px;text-transform:uppercase;letter-spacing:.06em">Tipo da aula</div>${itens}`);
     }
