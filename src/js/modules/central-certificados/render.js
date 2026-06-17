@@ -20,7 +20,7 @@ var CertRender = (() => {
     if (!c) return;
 
     const codigoEl = document.getElementById('cv-codigo-badge');
-    if (codigoEl) codigoEl.textContent = `📋 ${c.codigo}`;
+    if (codigoEl) codigoEl.textContent = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> ${c.codigo}`;
 
     const renderEl = document.getElementById('cert-render');
     if (renderEl) renderEl.innerHTML = _renderCertSVG(id);
