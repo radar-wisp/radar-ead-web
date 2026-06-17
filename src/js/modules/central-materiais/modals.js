@@ -74,7 +74,7 @@ var MatModals = (() => {
     if (m.tipo === 'link' && m.url) {
       return `
         <div style="text-align:center">
-          <div style="font-size:36px;margin-bottom:16px">🔗</div>
+          <div style="font-size:36px;margin-bottom:16px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px">${_x(m.nome)}</div>
           <div style="font-size:12px;color:var(--text4);margin-bottom:20px">${_x(m.url)}</div>
           <a href="${_x(m.url)}" target="_blank" class="btn btn-primary">Abrir link externo</a>
