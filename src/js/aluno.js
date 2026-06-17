@@ -171,14 +171,16 @@ var Aluno = (() => {
       continueWrap.style.display = 'none';
     }
 
-    /* Grid de cursos */
+    /* Grid de cursos — apenas iniciados e não concluídos */
     const grid = document.getElementById('h-cursos-grid');
-    if (!cursos.length) {
+    const progList = cursos
+      .map(c => ({ c, pct: Storage.Progresso.pctCurso(me.id, c.id) }))
+      .filter(({ pct }) => pct > 0 && pct < 100);
+    if (!progList.length) {
       grid.innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
-        <h3>Nenhum curso disponível</h3><p>O admin ainda não publicou cursos.</p></div>`;
+        <h3>Nenhum curso em andamento</h3><p>Acesse <strong>Meus Cursos</strong> para começar um curso.</p></div>`;
       return;
     }
-    const progList = cursos.map(c => ({ c, pct: Storage.Progresso.pctCurso(me.id, c.id) }));
     grid.innerHTML = progList.map(({ c, pct }) => courseCard(c, pct)).join('');
   }
 
