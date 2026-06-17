@@ -234,6 +234,16 @@ var AlunoPlayer = (() => {
     const list = document.getElementById('playerMateriaisList');
     if (!wrap || !list) return;
 
+    const me   = AlunoState.getMe();
+    // Verifica se o aluno já foi aprovado na avaliação do curso (para materiais com avaliacaoObrigatoria)
+    const avaliacoes = Storage.Avaliacoes
+      ? Storage.Avaliacoes.porCurso(cursoId).filter(a => a.status === 'publicada')
+      : [];
+    const aprovadoNaAvaliacao = avaliacoes.length === 0 || avaliacoes.some(av => {
+      const respostas = Storage.Respostas ? Storage.Respostas.porAluno(me.id, av.id) : [];
+      return respostas.some(r => r.aprovado);
+    });
+
     const mats = Storage.Materiais.listar().filter(m =>
       (m.status || 'ativo') === 'ativo' &&
       (m.cursoId === cursoId || (m.cursosVinc || []).includes(cursoId)) &&
@@ -250,24 +260,32 @@ var AlunoPlayer = (() => {
       imagem: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
     };
     const defaultIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+    const lockIcon    = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
     list.innerHTML = mats.map(m => {
-      const icon    = TIPO_ICON[m.tipo] || defaultIcon;
-      const hasUrl  = m.url && m.url !== '#simulado';
-      const canDown = m.config?.permitirDownload !== false;
-      const action  = m.tipo === 'link'
-        ? (hasUrl ? `href="${x(m.url)}" target="_blank" rel="noopener"` : '')
-        : (hasUrl && canDown ? `href="${x(m.url)}" download="${x(m.nome)}"` : '');
-      const tag     = action ? 'a' : 'div';
-      return `<${tag} ${action} style="display:flex;align-items:center;gap:10px;padding:9px 12px;
+      const icon      = TIPO_ICON[m.tipo] || defaultIcon;
+      const bloqueado = m.config?.avaliacaoObrigatoria && !aprovadoNaAvaliacao;
+      const hasUrl    = m.url && m.url !== '#simulado';
+      const canDown   = m.config?.permitirDownload !== false;
+      const action    = bloqueado ? '' : (
+        m.tipo === 'link'
+          ? (hasUrl ? `href="${x(m.url)}" target="_blank" rel="noopener"` : '')
+          : (hasUrl && canDown ? `href="${x(m.url)}" download="${x(m.nome)}"` : '')
+      );
+      const tag = action ? 'a' : 'div';
+      const bloqClick = bloqueado
+        ? `onclick="event.preventDefault();EadUtils.toast('Conclua a avaliação do curso para acessar este material.','i')" style="cursor:not-allowed;opacity:.6"`
+        : '';
+      return `<${tag} ${action} ${bloqClick} style="display:flex;align-items:center;gap:10px;padding:9px 12px;
         border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;
         background:var(--surface);text-decoration:none;color:var(--t1);
-        ${action ? 'cursor:pointer;' : ''}transition:background var(--trans)"
-        ${action ? 'onmouseover="this.style.background=\'var(--blue-soft)\'" onmouseout="this.style.background=\'var(--surface)\'"' : ''}>
-        <span style="color:var(--blue);display:flex;flex-shrink:0">${icon}</span>
+        ${!bloqueado && action ? 'cursor:pointer;' : ''}transition:background var(--trans)"
+        ${!bloqueado && action ? 'onmouseover="this.style.background=\'var(--blue-soft)\'" onmouseout="this.style.background=\'var(--surface)\'"' : ''}>
+        <span style="color:${bloqueado ? 'var(--t4)' : 'var(--blue)'};display:flex;flex-shrink:0">${bloqueado ? lockIcon : icon}</span>
         <span style="flex:1;min-width:0;font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x(m.nome)}</span>
         ${m.tamanho ? `<span style="font-size:.72rem;color:var(--t4);flex-shrink:0">${x(m.tamanho)}</span>` : ''}
-        ${action ? `<span style="color:var(--blue);flex-shrink:0;display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>` : ''}
+        ${bloqueado ? `<span style="font-size:.68rem;color:var(--t4);flex-shrink:0">Avaliação pendente</span>` : ''}
+        ${!bloqueado && action ? `<span style="color:var(--blue);flex-shrink:0;display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>` : ''}
       </${tag}>`;
     }).join('');
   }
