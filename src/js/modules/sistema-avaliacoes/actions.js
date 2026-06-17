@@ -158,7 +158,7 @@ var AvalActions = (() => {
           const aluno = Storage.Alunos.obter(r.alunoId);
           const nome  = aluno ? _x(aluno.nome) : 'Aluno ' + String(r.alunoId || '').slice(0, 6);
           const stCls = r.aprovado ? 'badge-green' : 'badge-red';
-          const stLbl = r.aprovado ? '✓ Aprovado'  : '✕ Reprovado';
+          const stLbl = r.aprovado ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovado'  : '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reprovado';
           return `<tr>
             <td style="padding:8px 10px;border-bottom:1px solid #f0f1fb">
               <div style="font-size:12px;font-weight:500;color:var(--text)">${nome}</div>
