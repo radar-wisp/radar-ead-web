@@ -36,6 +36,15 @@ var AvalTable = (() => {
     if (sel) sel.value = value;
     renderTabela();
     _badge();
+    // Auto-expande a seção correspondente ao status filtrado
+    if (value) {
+      const body = document.querySelector(`#av-tbody-${value}`)?.closest('.av-acc-body');
+      if (body && body.style.display === 'none') {
+        body.style.display = 'block';
+        const chev = body.previousElementSibling?.querySelector('.av-chev');
+        if (chev) chev.style.transform = 'rotate(90deg)';
+      }
+    }
   }
 
   function resetFiltros() {
