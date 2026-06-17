@@ -41,10 +41,10 @@ var CursosUtils = (() => {
   // ── Status ─────────────────────────────────────────────────────
   const STATUS_CFG = {
     publicado: { cls: 'badge-green', label: '● Publicado' },
-    rascunho:  { cls: 'badge-gray',  label: '✎ Rascunho'  },
+    rascunho:  { cls: 'badge-gray',  label: '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rascunho'  },
     revisao:   { cls: 'badge-blue',  label: '◎ Revisão'   },
     arquivado: { cls: 'badge-amber', label: '▣ Arquivado' },
-    expirado:  { cls: 'badge-red',   label: '✕ Expirado'  },
+    expirado:  { cls: 'badge-red',   label: '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Expirado'  },
   };
 
   function resolveStatus(curso) {
