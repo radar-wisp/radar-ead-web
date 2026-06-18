@@ -254,20 +254,27 @@ var AlunoPlayer = (() => {
     questoes.forEach((q, i) => {
       html += `<div style="margin-bottom:18px">
         <div style="font-size:.85rem;font-weight:600;color:var(--t1);margin-bottom:8px">${i + 1}. ${x(q.pergunta)}</div>`;
-      if (q.tipo === 'multipla' || q.tipo === 'alternativa') {
+
+      if (q.tipo === 'multipla' || q.tipo === 'unica') {
+        // Múltipla escolha / resposta única — alternativas dinâmicas
         (q.alternativas || []).forEach((alt, ai) => {
           html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:.82rem;color:var(--t2);margin-bottom:4px;border:1px solid transparent;transition:border-color .15s"
             onmouseover="this.style.borderColor='var(--border-d)'" onmouseout="this.style.borderColor='transparent'">
             <input type="radio" name="q_${q.id}" value="${ai}" style="accent-color:var(--blue)"> ${x(alt)}
           </label>`;
         });
-      } else if (q.tipo === 'verdadeiro_falso') {
-        ['Verdadeiro', 'Falso'].forEach((opt, oi) => {
+      } else if (q.tipo === 'vf') {
+        // Verdadeiro/Falso — sempre índices 0/1
+        (q.alternativas?.length ? q.alternativas : ['Verdadeiro', 'Falso']).forEach((opt, oi) => {
           html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:.82rem;color:var(--t2);margin-bottom:4px;border:1px solid transparent">
-            <input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--blue)"> ${opt}
+            <input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--blue)"> ${x(opt)}
           </label>`;
         });
+      } else if (q.tipo === 'descritiva') {
+        html += `<textarea id="desc_${q.id}" rows="3" placeholder="Sua resposta..."
+          style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:.82rem;color:var(--t1);background:var(--surface);resize:vertical"></textarea>`;
       }
+
       html += `</div>`;
     });
     html += `<button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="Aluno._submeterAvaliacao()">
@@ -302,16 +309,24 @@ var AlunoPlayer = (() => {
       : null;
     if (!av) return;
 
-    const questoes = Storage.Questoes.porAvaliacao(av.id);
+    const questoes  = Storage.Questoes.porAvaliacao(av.id);
     const respostas = {};
-    let respondeu = true;
+    let faltando    = false;
+
     questoes.forEach(q => {
-      const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
-      if (!sel) { respondeu = false; }
-      else respostas[q.id] = parseInt(sel.value);
+      if (q.tipo === 'descritiva') {
+        // Descritiva: coleta texto mas não exige preenchimento para envio
+        const ta = document.getElementById(`desc_${q.id}`);
+        respostas[q.id] = ta ? ta.value.trim() : '';
+      } else {
+        const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
+        if (!sel) { faltando = true; }
+        // Envia valor como string para bater com String(q.correta) no Storage
+        else respostas[q.id] = sel.value;
+      }
     });
 
-    if (!respondeu) { toast('Responda todas as questões antes de enviar.', 'i'); return; }
+    if (faltando) { toast('Responda todas as questões antes de enviar.', 'i'); return; }
 
     Storage.Respostas.registrar(av.id, me.id, respostas, 0);
     toast('Respostas enviadas!', 's');
