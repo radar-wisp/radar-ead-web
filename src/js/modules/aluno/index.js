@@ -35,15 +35,16 @@ var Aluno = (() => {
   'use strict';
 
   return {
-    boot:                  AlunoAuth.boot,
-    iniciarCurso:          AlunoPlayer.iniciarCurso,
-    abrirAula:             AlunoPlayer.abrirAula,
-    selAula:               AlunoPlayer.selAula,
-    toggleModulo:          AlunoPlayer.toggleModulo,
-    irParaAvaliacao:       AlunoPlayer.irParaAvaliacao,
-    _submeterAvaliacao:    AlunoPlayer._submeterAvaliacao,
+    boot:                      AlunoAuth.boot,
+    iniciarCurso:              AlunoPlayer.iniciarCurso,
+    abrirAula:                 AlunoPlayer.abrirAula,
+    selAula:                   AlunoPlayer.selAula,
+    toggleModulo:              AlunoPlayer.toggleModulo,
+    abrirAvaliacao:            AlunoPlayer.abrirAvaliacao,
+    fecharAvaliacao:           AlunoPlayer.fecharAvaliacao,
+    _submeterAvaliacao:        AlunoPlayer._submeterAvaliacao,
     _emitirCertificadoComNota: AlunoPlayer._emitirCertificadoComNota,
-    baixarCert:            AlunoCertificados.baixarCert,
+    baixarCert:                AlunoCertificados.baixarCert,
   };
 })();
 
