@@ -4,6 +4,7 @@
  * Funcionalidades:
  *  • Índice em accordion (módulos sempre recolhidos; expande/recolhe só com clique manual)
  *  • Avaliação vinculada aparece no final do índice após todos os módulos
+ *  • Avaliação abre em overlay dedicado (aval-bg), sem interferir no player
  *  • Certificado bloqueado até atingir nota mínima da avaliação (quando config.avaliacao=true)
  *  • Materiais filtrados pela aula atual
  *  • Acesso sequencial (config.sequencial no curso)
@@ -19,11 +20,12 @@ var AlunoPlayer = (() => {
 
   const { ICON_CHECK, x, toast, toEmbed, tipoLabel } = AlunoUtils;
 
-  // Controla quais módulos estão expandidos — inicia vazio (todos recolhidos)
+  // Módulos expandidos no índice — inicia vazio (todos recolhidos)
   const _expandidos = new Set();
 
-  // ID da avaliação sendo exibida no player (null = nenhuma)
-  let _aulaAvalId = null;
+  // ─────────────────────────────────────────────────────────
+  // PLAYER PRINCIPAL
+  // ─────────────────────────────────────────────────────────
 
   function renderPlayer({ cursoId, aulaId } = {}) {
     if (cursoId) AlunoState.setCur({ cursoId });
@@ -40,8 +42,6 @@ var AlunoPlayer = (() => {
     const idx     = todas.findIndex(a => a.id === state.aulaId);
     const pct     = Storage.Progresso.pctCurso(me.id, state.cursoId);
     const conc    = Storage.Progresso.isConcluida(me.id, state.aulaId || '');
-
-    // Avaliação publicada vinculada ao curso (a primeira encontrada)
     const avalCurso = Storage.Avaliacoes
       ? Storage.Avaliacoes.porCurso(state.cursoId).find(a => a.status === 'publicada') || null
       : null;
@@ -50,16 +50,9 @@ var AlunoPlayer = (() => {
     document.getElementById('playerTopPct').textContent    = pct + '%';
     document.getElementById('playerTopFill').style.width   = pct + '%';
     document.getElementById('playerTopFill').className     = 'prog-fill' + (pct === 100 ? ' g' : '');
+    document.getElementById('btnVoltarPlayer').onclick     = () => AlunoNav.go('cursos');
 
-    document.getElementById('btnVoltarPlayer').onclick = () => AlunoNav.go('cursos');
-
-    // Renderiza conteúdo: aula normal ou tela de avaliação
-    if (_aulaAvalId && state.aulaId === '__avaliacao__') {
-      _renderAvaliacao(avalCurso, me, state.cursoId, curso);
-    } else {
-      _renderConteudo(aula, conc, curso, me, todas, idx, avalCurso);
-    }
-
+    _renderConteudo(aula, conc, curso, me);
     _renderIndice(modulos, state.aulaId, avalCurso, me, state.cursoId);
     _renderMateriais(state.cursoId, state.aulaId);
 
@@ -67,52 +60,30 @@ var AlunoPlayer = (() => {
     const btnPrev    = document.getElementById('btnPrev');
     const btnNext    = document.getElementById('btnNext');
 
-    // Na avaliação, Próximo está desabilitado; Anterior volta à última aula
-    const naAvaliacao = state.aulaId === '__avaliacao__';
-    btnPrev.disabled  = naAvaliacao ? false : idx <= 0;
-    btnNext.disabled  = naAvaliacao ? true  : (idx >= todas.length - 1 || idx < 0);
+    btnPrev.disabled = idx <= 0;
+    // Na última aula com avaliação, "próximo" abre a avaliação; sem avaliação, desabilita
+    btnNext.disabled = idx < 0 || (idx >= todas.length - 1 && !avalCurso);
 
     btnPrev.onclick = () => {
-      if (naAvaliacao) {
-        AlunoState.setCur({ aulaId: todas[todas.length - 1]?.id || null });
-        _aulaAvalId = null;
-        renderPlayer({});
-        return;
-      }
       if (idx <= 0) return;
       selAula(todas[idx - 1].id);
     };
 
     btnNext.onclick = () => {
-      if (naAvaliacao || idx >= todas.length - 1) return;
+      if (idx < 0) return;
       if (_temMaterialObrigatorioNaoVisto(state.cursoId, state.aulaId)) {
-        toast('Acesse o material obrigatório antes de avançar.', 'i');
-        return;
+        toast('Acesse o material obrigatório antes de avançar.', 'i'); return;
       }
       if (sequencial && state.aulaId && !Storage.Progresso.isConcluida(me.id, state.aulaId)) {
-        toast('Conclua esta aula antes de avançar.', 'i');
-        return;
+        toast('Conclua esta aula antes de avançar.', 'i'); return;
       }
-      // Última aula → avança para avaliação (se houver)
       if (idx === todas.length - 1 && avalCurso) {
-        _irParaAvaliacao(avalCurso);
-        return;
+        abrirAvaliacao(); return;
       }
-      selAula(todas[idx + 1].id);
+      if (idx < todas.length - 1) selAula(todas[idx + 1].id);
     };
   }
 
-  /** Vai para a tela de avaliação do curso */
-  function _irParaAvaliacao(av) {
-    _aulaAvalId = av.id;
-    AlunoState.setCur({ aulaId: '__avaliacao__' });
-    renderPlayer({});
-  }
-
-  /**
-   * Verifica se há algum material com necessarioAntesDaProxima vinculado
-   * à aula atual que ainda não foi marcado como visualizado.
-   */
   function _temMaterialObrigatorioNaoVisto(cursoId, aulaId) {
     if (!aulaId) return false;
     const me   = AlunoState.getMe();
@@ -123,21 +94,19 @@ var AlunoPlayer = (() => {
     );
     if (!mats.length) return false;
     const vistos = Storage.Progresso.materiaisVistos
-      ? Storage.Progresso.materiaisVistos(me.id)
-      : [];
+      ? Storage.Progresso.materiaisVistos(me.id) : [];
     return mats.some(m => !vistos.includes(m.id));
   }
 
   /**
    * Verifica se o aluno atingiu a nota mínima na avaliação do curso.
-   * Retorna true se não há avaliação obrigatória ou se já foi aprovado.
+   * Retorna true se não há avaliação obrigatória ou se já aprovado.
    */
   function _aprovadoNaAvaliacao(me, cursoId, curso) {
-    if (!curso?.config?.avaliacao) return true; // avaliação não exigida
+    if (!curso?.config?.avaliacao) return true;
     const avs = Storage.Avaliacoes
-      ? Storage.Avaliacoes.porCurso(cursoId).filter(a => a.status === 'publicada')
-      : [];
-    if (!avs.length) return true; // sem avaliação publicada → libera
+      ? Storage.Avaliacoes.porCurso(cursoId).filter(a => a.status === 'publicada') : [];
+    if (!avs.length) return true;
     const notaMin = curso.config.notaMin ?? 70;
     return avs.some(av => {
       const resps = Storage.Respostas ? Storage.Respostas.porAluno(me.id, av.id) : [];
@@ -145,7 +114,7 @@ var AlunoPlayer = (() => {
     });
   }
 
-  function _renderConteudo(aula, isConc, curso, me, todas, idx, avalCurso) {
+  function _renderConteudo(aula, isConc, curso, me) {
     const screen = document.getElementById('playerScreen');
     const title  = document.getElementById('playerAulaTitulo');
     const meta   = document.getElementById('playerAulaMeta');
@@ -155,13 +124,10 @@ var AlunoPlayer = (() => {
       screen.innerHTML = `<div style="color:#8896A9;text-align:center;padding:60px">
         <div style="font-size:3rem;margin-bottom:12px">▶️</div>
         <p>Selecione uma aula no índice</p></div>`;
-      title.textContent = '—';
-      meta.textContent  = '';
-      btn.style.display = 'none';
+      title.textContent = '—'; meta.textContent = ''; btn.style.display = 'none';
       return;
     }
     btn.style.display = '';
-
     title.textContent = aula.titulo;
     meta.textContent  = `${tipoLabel(aula.tipo)}${aula.duracao ? ' · ' + aula.duracao + ' min' : ''}`;
 
@@ -187,11 +153,10 @@ var AlunoPlayer = (() => {
       case 'pdf':
         screen.innerHTML = aula.conteudo
           ? `<iframe src="${x(aula.conteudo)}" style="width:100%;height:380px;border:none;display:block"></iframe>`
-          : `<div style="color:#8896A9;padding:60px;text-align:center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF não configurado</div>`;
+          : `<div style="color:#8896A9;padding:60px;text-align:center">PDF não configurado</div>`;
         break;
       case 'link':
         screen.innerHTML = `<div style="text-align:center;padding:70px 30px">
-          <div style="font-size:2.5rem;margin-bottom:14px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
           <p style="color:#8896A9;margin-bottom:20px;font-size:.88rem">Material em site externo</p>
           <a href="${x(aula.conteudo || '#')}" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
             Abrir material ↗
@@ -206,143 +171,6 @@ var AlunoPlayer = (() => {
     btn.onclick   = () => _toggleConc(aula.id, curso, me);
   }
 
-  /** Renderiza a tela de avaliação do curso no player */
-  function _renderAvaliacao(av, me, cursoId, curso) {
-    const screen = document.getElementById('playerScreen');
-    const title  = document.getElementById('playerAulaTitulo');
-    const meta   = document.getElementById('playerAulaMeta');
-    const btn    = document.getElementById('btnConcluir');
-
-    title.textContent = av ? av.nome : 'Avaliação do Curso';
-    meta.textContent  = av
-      ? `${av.questoes?.length || Storage.Questoes.porAvaliacao(av.id).length} questões · nota mín. ${av.notaMinima ?? curso?.config?.notaMin ?? 70}%`
-      : '';
-    btn.style.display = 'none';
-
-    if (!av) {
-      screen.innerHTML = `<div style="color:#8896A9;padding:60px;text-align:center">Avaliação não disponível.</div>`;
-      return;
-    }
-
-    const respostas = Storage.Respostas ? Storage.Respostas.porAluno(me.id, av.id) : [];
-    const melhor    = respostas.length ? Math.max(...respostas.map(r => r.nota)) : null;
-    const aprovado  = melhor !== null && melhor >= (av.notaMinima ?? curso?.config?.notaMin ?? 70);
-    const tentativas = respostas.length;
-    const maxTent    = av.tentativas || 0; // 0 = ilimitado
-
-    const podeResponder = !maxTent || tentativas < maxTent;
-    const questoes = Storage.Questoes.porAvaliacao(av.id);
-
-    if (!questoes.length) {
-      screen.innerHTML = `<div style="color:#8896A9;padding:60px;text-align:center">Esta avaliação ainda não tem questões cadastradas.</div>`;
-      return;
-    }
-
-    // Se já respondeu, mostra resultado; senão mostra formulário
-    if (tentativas > 0 && !podeResponder) {
-      _renderResultadoAvaliacao(screen, melhor, aprovado, av, curso, me, cursoId);
-      return;
-    }
-
-    // Formulário de questões
-    let html = `<div style="padding:16px 20px;overflow-y:auto;max-height:360px">`;
-    if (tentativas > 0) {
-      html += `<div style="margin-bottom:14px;padding:10px 14px;background:var(--blue-soft);border-radius:var(--radius);font-size:.82rem;color:var(--blue)">
-        Melhor nota anterior: <strong>${melhor}%</strong> · ${aprovado ? '✓ Aprovado' : 'Reprovado'} · Tentativa ${tentativas + 1}${maxTent ? ' de ' + maxTent : ''}
-      </div>`;
-    }
-    questoes.forEach((q, i) => {
-      html += `<div style="margin-bottom:18px">
-        <div style="font-size:.85rem;font-weight:600;color:var(--t1);margin-bottom:8px">${i + 1}. ${x(q.pergunta)}</div>`;
-
-      if (q.tipo === 'multipla' || q.tipo === 'unica') {
-        // Múltipla escolha / resposta única — alternativas dinâmicas
-        (q.alternativas || []).forEach((alt, ai) => {
-          html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:.82rem;color:var(--t2);margin-bottom:4px;border:1px solid transparent;transition:border-color .15s"
-            onmouseover="this.style.borderColor='var(--border-d)'" onmouseout="this.style.borderColor='transparent'">
-            <input type="radio" name="q_${q.id}" value="${ai}" style="accent-color:var(--blue)"> ${x(alt)}
-          </label>`;
-        });
-      } else if (q.tipo === 'vf') {
-        // Verdadeiro/Falso — sempre índices 0/1
-        (q.alternativas?.length ? q.alternativas : ['Verdadeiro', 'Falso']).forEach((opt, oi) => {
-          html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:.82rem;color:var(--t2);margin-bottom:4px;border:1px solid transparent">
-            <input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--blue)"> ${x(opt)}
-          </label>`;
-        });
-      } else if (q.tipo === 'descritiva') {
-        html += `<textarea id="desc_${q.id}" rows="3" placeholder="Sua resposta..."
-          style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:.82rem;color:var(--t1);background:var(--surface);resize:vertical"></textarea>`;
-      }
-
-      html += `</div>`;
-    });
-    html += `<button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="Aluno._submeterAvaliacao()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Enviar respostas
-    </button></div>`;
-    screen.innerHTML = html;
-  }
-
-  function _renderResultadoAvaliacao(screen, nota, aprovado, av, curso, me, cursoId) {
-    const notaMin = av.notaMinima ?? curso?.config?.notaMin ?? 70;
-    const cor     = aprovado ? 'var(--green)' : 'var(--red)';
-    screen.innerHTML = `<div style="text-align:center;padding:50px 30px">
-      <div style="font-size:3.5rem;font-weight:800;color:${cor};margin-bottom:8px">${nota}%</div>
-      <div style="font-size:1rem;font-weight:600;color:${cor};margin-bottom:6px">${aprovado ? '✓ Aprovado!' : '✗ Reprovado'}</div>
-      <div style="font-size:.82rem;color:var(--t3);margin-bottom:24px">Nota mínima: ${notaMin}%</div>
-      ${aprovado
-        ? `<button class="btn btn-success" onclick="Aluno._emitirCertificadoComNota()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Ver certificado
-           </button>`
-        : `<div style="font-size:.82rem;color:var(--t4)">Revise o conteúdo e tente novamente.</div>`
-      }
-    </div>`;
-  }
-
-  /** Submete o formulário de avaliação exibido no player */
-  function _submeterAvaliacao() {
-    const cur    = AlunoState.getCur();
-    const me     = AlunoState.getMe();
-    const curso  = Storage.Cursos.obter(cur.cursoId);
-    const av     = Storage.Avaliacoes
-      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada')
-      : null;
-    if (!av) return;
-
-    const questoes  = Storage.Questoes.porAvaliacao(av.id);
-    const respostas = {};
-    let faltando    = false;
-
-    questoes.forEach(q => {
-      if (q.tipo === 'descritiva') {
-        // Descritiva: coleta texto mas não exige preenchimento para envio
-        const ta = document.getElementById(`desc_${q.id}`);
-        respostas[q.id] = ta ? ta.value.trim() : '';
-      } else {
-        const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
-        if (!sel) { faltando = true; }
-        // Envia valor como string para bater com String(q.correta) no Storage
-        else respostas[q.id] = sel.value;
-      }
-    });
-
-    if (faltando) { toast('Responda todas as questões antes de enviar.', 'i'); return; }
-
-    Storage.Respostas.registrar(av.id, me.id, respostas, 0);
-    toast('Respostas enviadas!', 's');
-    renderPlayer({});
-  }
-
-  /** Emite certificado após aprovação — chamado pelo botão na tela de resultado */
-  function _emitirCertificadoComNota() {
-    const cur   = AlunoState.getCur();
-    const me    = AlunoState.getMe();
-    const curso = Storage.Cursos.obter(cur.cursoId);
-    if (_aprovadoNaAvaliacao(me, cur.cursoId, curso)) {
-      AlunoCertificados.mostrarCertificado();
-    }
-  }
-
   function _toggleConc(aulaId, curso, me) {
     const cur = AlunoState.getCur();
     const era = Storage.Progresso.isConcluida(me.id, aulaId);
@@ -352,7 +180,6 @@ var AlunoPlayer = (() => {
     } else {
       Storage.Progresso.marcar(me.id, aulaId);
       toast('Aula concluída!', 's');
-      // Só emite certificado automaticamente se não houver avaliação obrigatória pendente
       if (Storage.Progresso.cursoConcluido(me.id, cur.cursoId)) {
         if (_aprovadoNaAvaliacao(me, cur.cursoId, curso)) {
           setTimeout(AlunoCertificados.mostrarCertificado, 700);
@@ -365,9 +192,9 @@ var AlunoPlayer = (() => {
   }
 
   /**
-   * Renderiza o índice lateral com módulos em accordion.
-   * Todos iniciam RECOLHIDOS. Expande/recolhe SOMENTE com clique manual.
-   * Ao final, exibe o item de avaliação (se o curso tiver avaliação publicada).
+   * Renderiza o índice lateral com accordion.
+   * Todos os módulos iniciam RECOLHIDOS. Expande/recolhe SOMENTE com clique manual.
+   * Avaliação publicada aparece como item fixo no final.
    */
   function _renderIndice(modulos, aulaAtualId, avalCurso, me, cursoId) {
     const wrap  = document.getElementById('ci-body');
@@ -377,16 +204,13 @@ var AlunoPlayer = (() => {
     document.getElementById('ci-pct-fill').style.width = pct + '%';
     document.getElementById('ci-pct-num').textContent  = pct + '%';
 
-    const naAvaliacao = aulaAtualId === '__avaliacao__';
-
     const CHV_DOWN = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
     const CHV_UP   = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
 
     let html = modulos.map(m => {
-      const aulas    = Storage.Aulas.listarPorModulo(m.id);
-      const modConc  = aulas.filter(a => concs.includes(a.id)).length;
+      const aulas   = Storage.Aulas.listarPorModulo(m.id);
+      const modConc = aulas.filter(a => concs.includes(a.id)).length;
       const expanded = _expandidos.has(m.id);
-
       return `
       <div class="ci-mod-head ci-mod-toggle" onclick="Aluno.toggleModulo('${m.id}')" style="cursor:pointer;user-select:none">
         <span style="flex:1;min-width:0">${m.ordem}. ${x(m.titulo)}</span>
@@ -407,45 +231,40 @@ var AlunoPlayer = (() => {
       </div>`;
     }).join('');
 
-    // Item de avaliação no final do índice
+    // Item de avaliação fixo no final
     if (avalCurso) {
-      const respostas   = Storage.Respostas ? Storage.Respostas.porAluno(me.id, avalCurso.id) : [];
-      const melhor      = respostas.length ? Math.max(...respostas.map(r => r.nota)) : null;
-      const notaMin     = avalCurso.notaMinima ?? 70;
-      const aprovadoAv  = melhor !== null && melhor >= notaMin;
-      const respondeu   = respostas.length > 0;
-      const avalIcon    = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
-      const stateLbl    = aprovadoAv ? `<span style="font-size:.68rem;color:var(--green)">✓ ${melhor}%</span>`
-                        : respondeu  ? `<span style="font-size:.68rem;color:var(--red)">${melhor}%</span>`
-                        : '';
+      const resps      = Storage.Respostas ? Storage.Respostas.porAluno(me.id, avalCurso.id) : [];
+      const melhor     = resps.length ? Math.max(...resps.map(r => r.nota)) : null;
+      const notaMin    = avalCurso.notaMinima ?? 70;
+      const aprovado   = melhor !== null && melhor >= notaMin;
+      const respondeu  = resps.length > 0;
+      const AVAL_ICON  = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+      const statusLbl  = aprovado ? `<span style="font-size:.68rem;color:var(--green)">✓ ${melhor}%</span>`
+                       : respondeu ? `<span style="font-size:.68rem;color:var(--red)">${melhor}%</span>` : '';
       html += `
       <div class="ci-mod-head" style="border-top:2px solid var(--border);background:var(--bg)">
         <span style="flex:1;min-width:0;color:var(--t2)">Avaliação</span>
       </div>
-      <div class="ci-aula ${naAvaliacao ? 'active' : ''} ${aprovadoAv ? 'done' : ''}"
-        onclick="Aluno.irParaAvaliacao()" style="gap:8px">
-        <div class="ci-dot" style="color:${aprovadoAv ? '' : 'var(--blue)'}">
-          ${aprovadoAv ? '<span class="ci-done-icon"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : avalIcon}
+      <div class="ci-aula ${aprovado ? 'done' : ''}" onclick="Aluno.abrirAvaliacao()" style="gap:8px">
+        <div class="ci-dot" style="color:${aprovado ? '' : 'var(--blue)'}">
+          ${aprovado
+            ? '<span class="ci-done-icon"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
+            : AVAL_ICON}
         </div>
         <div class="ci-aula-name">${x(avalCurso.nome)}</div>
-        ${stateLbl}
+        ${statusLbl}
       </div>`;
     }
 
     wrap.innerHTML = html;
   }
 
-  /**
-   * Renderiza materiais de apoio filtrando apenas os da aula atual.
-   */
   function _renderMateriais(cursoId, aulaId) {
     const wrap = document.getElementById('playerMateriais');
     const list = document.getElementById('playerMateriaisList');
     if (!wrap || !list) return;
 
-    if (aulaId === '__avaliacao__') { wrap.style.display = 'none'; return; }
-
-    const me   = AlunoState.getMe();
+    const me    = AlunoState.getMe();
     const curso = Storage.Cursos.obter(cursoId);
     const aprovadoNaAvaliacao = _aprovadoNaAvaliacao(me, cursoId, curso);
 
@@ -454,7 +273,6 @@ var AlunoPlayer = (() => {
       (m.cursoId === cursoId || (m.cursosVinc || []).includes(cursoId)) &&
       (!m.aulaId || m.aulaId === aulaId)
     );
-
     if (!mats.length) { wrap.style.display = 'none'; return; }
     wrap.style.display = '';
 
@@ -479,8 +297,7 @@ var AlunoPlayer = (() => {
       );
       const tag = action ? 'a' : 'div';
       const bloqClick = bloqueado
-        ? `onclick="event.preventDefault();EadUtils.toast('Conclua a avaliação do curso para acessar este material.','i')" style="cursor:not-allowed;opacity:.6"`
-        : '';
+        ? `onclick="event.preventDefault();EadUtils.toast('Conclua a avaliação do curso para acessar este material.','i')" style="cursor:not-allowed;opacity:.6"` : '';
       return `<${tag} ${action} ${bloqClick} style="display:flex;align-items:center;gap:10px;padding:9px 12px;
         border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;
         background:var(--surface);text-decoration:none;color:var(--t1);
@@ -495,8 +312,222 @@ var AlunoPlayer = (() => {
     }).join('');
   }
 
+  // ─────────────────────────────────────────────────────────
+  // OVERLAY DE AVALIAÇÃO
+  // ─────────────────────────────────────────────────────────
+
+  function abrirAvaliacao() {
+    const cur = AlunoState.getCur();
+    const av  = Storage.Avaliacoes
+      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada')
+      : null;
+    if (!av) { toast('Nenhuma avaliação disponível.', 'i'); return; }
+
+    const me    = AlunoState.getMe();
+    const curso = Storage.Cursos.obter(cur.cursoId);
+    const bg    = document.getElementById('avalBg');
+    const titulo = document.getElementById('avalTitulo');
+    const meta   = document.getElementById('avalMeta');
+    const footer = document.getElementById('avalFooter');
+
+    titulo.textContent = av.nome;
+    document.getElementById('btnFecharAval').onclick = fecharAvaliacao;
+
+    _renderBodyAvaliacao(av, me, curso);
+
+    footer.innerHTML = '';
+    bg.classList.add('open');
+  }
+
+  function fecharAvaliacao() {
+    document.getElementById('avalBg').classList.remove('open');
+    // Atualiza índice para refletir novo estado da avaliação
+    const cur     = AlunoState.getCur();
+    const me      = AlunoState.getMe();
+    const curso   = Storage.Cursos.obter(cur.cursoId);
+    const modulos = Storage.Modulos.listarPorCurso(cur.cursoId);
+    const avalCurso = Storage.Avaliacoes
+      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada') || null : null;
+    _renderIndice(modulos, cur.aulaId, avalCurso, me, cur.cursoId);
+  }
+
+  function _renderBodyAvaliacao(av, me, curso) {
+    const body    = document.getElementById('avalBody');
+    const meta    = document.getElementById('avalMeta');
+    const footer  = document.getElementById('avalFooter');
+    const questoes = Storage.Questoes.porAvaliacao(av.id);
+    const resps    = Storage.Respostas ? Storage.Respostas.porAluno(me.id, av.id) : [];
+    const melhor   = resps.length ? Math.max(...resps.map(r => r.nota)) : null;
+    const notaMin  = av.notaMinima ?? curso?.config?.notaMin ?? 70;
+    const aprovado = melhor !== null && melhor >= notaMin;
+    const tentativas = resps.length;
+    const maxTent    = av.tentativas || 0;
+    const podeNovaTentativa = !maxTent || tentativas < maxTent;
+
+    meta.textContent = `${questoes.length} questão(ões) · nota mínima ${notaMin}%${maxTent ? ' · ' + maxTent + ' tentativa(s)' : ''}`;
+
+    // Se já respondeu e não pode mais tentar → mostra resultado final
+    if (tentativas > 0 && !podeNovaTentativa) {
+      _renderResultado(body, footer, melhor, aprovado, notaMin, me, curso, av, questoes, resps[resps.length - 1]);
+      return;
+    }
+
+    if (!questoes.length) {
+      body.innerHTML = `<p style="color:var(--t3);text-align:center;padding:40px 0">Esta avaliação não tem questões cadastradas.</p>`;
+      footer.innerHTML = '';
+      return;
+    }
+
+    // Banner de tentativa anterior
+    let bannerHtml = '';
+    if (tentativas > 0) {
+      bannerHtml = `<div class="aval-prev-banner">
+        Melhor nota anterior: <strong>${melhor}%</strong> · ${aprovado ? '✓ Aprovado' : 'Reprovado'}
+        · Tentativa ${tentativas + 1}${maxTent ? ' de ' + maxTent : ''}
+      </div>`;
+    }
+
+    // Formulário de questões
+    const formsHtml = questoes.map((q, i) => {
+      let inputsHtml = '';
+      if (q.tipo === 'multipla' || q.tipo === 'unica') {
+        inputsHtml = (q.alternativas || []).map((alt, ai) =>
+          `<label class="aval-alt" onclick="this.classList.toggle('selected',true);this.closest('.aval-questao').querySelectorAll('.aval-alt').forEach(l=>l!==this&&l.classList.remove('selected'))">
+            <input type="radio" name="q_${q.id}" value="${ai}"> ${x(alt)}
+          </label>`
+        ).join('');
+      } else if (q.tipo === 'vf') {
+        const opts = q.alternativas?.length ? q.alternativas : ['Verdadeiro', 'Falso'];
+        inputsHtml = opts.map((opt, oi) =>
+          `<label class="aval-alt" onclick="this.classList.toggle('selected',true);this.closest('.aval-questao').querySelectorAll('.aval-alt').forEach(l=>l!==this&&l.classList.remove('selected'))">
+            <input type="radio" name="q_${q.id}" value="${oi}"> ${x(opt)}
+          </label>`
+        ).join('');
+      } else if (q.tipo === 'descritiva') {
+        inputsHtml = `<textarea id="desc_${q.id}" rows="3" placeholder="Sua resposta..."
+          style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:.82rem;color:var(--t1);background:var(--surface);resize:vertical"></textarea>`;
+      }
+      return `<div class="aval-questao">
+        <div class="aval-enunciado">${i + 1}. ${x(q.pergunta)}</div>
+        ${inputsHtml}
+      </div>`;
+    }).join('');
+
+    body.innerHTML = bannerHtml + formsHtml;
+
+    footer.innerHTML = `<button class="btn btn-primary" style="width:100%" onclick="Aluno._submeterAvaliacao()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Enviar respostas
+    </button>`;
+  }
+
+  function _renderResultado(body, footer, nota, aprovado, notaMin, me, curso, av, questoes, ultimaResp) {
+    const cor = aprovado ? 'var(--green)' : 'var(--red,#e53e3e)';
+
+    // Gabarito por questão
+    let gabaritoHtml = '';
+    if (ultimaResp?.respostas && questoes.length) {
+      gabaritoHtml = `<div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-size:.78rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Gabarito</div>`;
+      questoes.forEach((q, i) => {
+        if (q.tipo === 'descritiva') return;
+        const respAluno = String(ultimaResp.respostas[q.id] ?? '');
+        const correta   = String(q.correta);
+        const acertou   = respAluno === correta;
+        const alts      = q.tipo === 'vf'
+          ? (q.alternativas?.length ? q.alternativas : ['Verdadeiro', 'Falso'])
+          : (q.alternativas || []);
+        const nomeResp  = alts[parseInt(respAluno)] ?? `Opção ${respAluno}`;
+        const nomeCorr  = alts[parseInt(correta)]   ?? `Opção ${correta}`;
+        gabaritoHtml += `<div style="margin-bottom:14px">
+          <div style="font-size:.82rem;font-weight:600;color:var(--t1);margin-bottom:6px">${i + 1}. ${x(q.pergunta)}</div>
+          <div style="font-size:.78rem;padding:5px 10px;border-radius:var(--radius);margin-bottom:3px;
+            background:${acertou ? '#f0fdf4' : '#fff5f5'};color:${acertou ? 'var(--green)' : 'var(--red,#e53e3e)'};
+            border:1px solid ${acertou ? 'var(--green)' : 'var(--red,#e53e3e)'}">
+            ${acertou ? '✓' : '✗'} Sua resposta: ${x(nomeResp)}
+          </div>
+          ${!acertou ? `<div style="font-size:.78rem;padding:5px 10px;border-radius:var(--radius);
+            background:#f0fdf4;color:var(--green);border:1px solid var(--green)">
+            ✓ Correta: ${x(nomeCorr)}
+          </div>` : ''}
+        </div>`;
+      });
+      gabaritoHtml += `</div>`;
+    }
+
+    body.innerHTML = `<div class="aval-resultado">
+      <div class="aval-nota-num" style="color:${cor}">${nota}%</div>
+      <div class="aval-nota-lbl" style="color:${cor}">${aprovado ? '✓ Aprovado!' : '✗ Reprovado'}</div>
+      <div class="aval-nota-min">Nota mínima: ${notaMin}%</div>
+      ${aprovado
+        ? `<button class="btn btn-success" onclick="Aluno._emitirCertificadoComNota()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Ver certificado
+           </button>`
+        : `<div style="font-size:.82rem;color:var(--t3)">Revise o conteúdo e tente novamente.</div>`
+      }
+    </div>${gabaritoHtml}`;
+    footer.innerHTML = '';
+  }
+
+  /** Submete o formulário de avaliação do overlay */
+  function _submeterAvaliacao() {
+    const cur = AlunoState.getCur();
+    const me  = AlunoState.getMe();
+    const av  = Storage.Avaliacoes
+      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada')
+      : null;
+    if (!av) return;
+
+    const questoes  = Storage.Questoes.porAvaliacao(av.id);
+    const respostas = {};
+    let faltando    = false;
+
+    questoes.forEach(q => {
+      if (q.tipo === 'descritiva') {
+        const ta = document.getElementById(`desc_${q.id}`);
+        respostas[q.id] = ta ? ta.value.trim() : '';
+      } else {
+        const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
+        if (!sel) { faltando = true; }
+        else respostas[q.id] = sel.value; // string para bater com String(q.correta)
+      }
+    });
+
+    if (faltando) { toast('Responda todas as questões antes de enviar.', 'i'); return; }
+
+    const resp  = Storage.Respostas.registrar(av.id, me.id, respostas, 0);
+    const curso = Storage.Cursos.obter(cur.cursoId);
+    toast(resp.aprovado ? 'Aprovado! 🎉' : 'Respostas enviadas.', resp.aprovado ? 's' : 'i');
+
+    // Re-renderiza o body com resultado
+    const body   = document.getElementById('avalBody');
+    const footer = document.getElementById('avalFooter');
+    const notaMin = av.notaMinima ?? curso?.config?.notaMin ?? 70;
+    _renderResultado(body, footer, resp.nota, resp.aprovado, notaMin, me, curso, av,
+      questoes, resp);
+
+    // Atualiza índice
+    const modulos   = Storage.Modulos.listarPorCurso(cur.cursoId);
+    const avalCurso = Storage.Avaliacoes
+      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada') || null : null;
+    _renderIndice(modulos, cur.aulaId, avalCurso, me, cur.cursoId);
+  }
+
+  /** Emite certificado após aprovação */
+  function _emitirCertificadoComNota() {
+    const cur   = AlunoState.getCur();
+    const me    = AlunoState.getMe();
+    const curso = Storage.Cursos.obter(cur.cursoId);
+    if (_aprovadoNaAvaliacao(me, cur.cursoId, curso)) {
+      fecharAvaliacao();
+      setTimeout(AlunoCertificados.mostrarCertificado, 200);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // ACCORDION & NAVEGAÇÃO
+  // ─────────────────────────────────────────────────────────
+
   function selAula(aulaId) {
-    _aulaAvalId = null;
     const cur    = AlunoState.getCur();
     const me     = AlunoState.getMe();
     const curso  = Storage.Cursos.obter(cur.cursoId);
@@ -509,34 +540,19 @@ var AlunoPlayer = (() => {
       const concs   = Storage.Progresso.concluidas(me.id);
       for (let i = 0; i < idxDest; i++) {
         if (!concs.includes(todas[i].id)) {
-          toast('Conclua as aulas anteriores para desbloquear esta.', 'i');
-          return;
+          toast('Conclua as aulas anteriores para desbloquear esta.', 'i'); return;
         }
       }
     }
-
     AlunoState.setCur({ aulaId });
     renderPlayer({ aulaId });
   }
 
-  /** Navega para a tela de avaliação do curso pelo índice */
-  function irParaAvaliacao() {
-    const cur      = AlunoState.getCur();
-    const avalCurso = Storage.Avaliacoes
-      ? Storage.Avaliacoes.porCurso(cur.cursoId).find(a => a.status === 'publicada')
-      : null;
-    if (!avalCurso) { toast('Nenhuma avaliação disponível.', 'i'); return; }
-    _irParaAvaliacao(avalCurso);
-  }
-
-  /** Alterna expand/collapse de um módulo no índice (SOMENTE clique manual) */
+  /** Alterna expand/collapse de um módulo — SOMENTE via clique manual */
   function toggleModulo(moduloId) {
-    if (_expandidos.has(moduloId)) {
-      _expandidos.delete(moduloId);
-    } else {
-      _expandidos.add(moduloId);
-    }
-    // Atualiza só o bloco deste módulo sem re-renderizar tudo
+    if (_expandidos.has(moduloId)) _expandidos.delete(moduloId);
+    else _expandidos.add(moduloId);
+
     const body = document.getElementById(`ci-mod-${moduloId}`);
     const head = body?.previousElementSibling;
     if (body) body.style.display = _expandidos.has(moduloId) ? 'block' : 'none';
@@ -563,13 +579,13 @@ var AlunoPlayer = (() => {
 
   function abrirAula(cursoId, aulaId) {
     _expandidos.clear();
-    _aulaAvalId = null;
     AlunoState.setCur({ cursoId, aulaId });
     AlunoNav.go('player', { cursoId, aulaId });
   }
 
   return {
     renderPlayer, selAula, toggleModulo, iniciarCurso, abrirAula,
-    irParaAvaliacao, _submeterAvaliacao, _emitirCertificadoComNota,
+    abrirAvaliacao, fecharAvaliacao,
+    _submeterAvaliacao, _emitirCertificadoComNota,
   };
 })();
