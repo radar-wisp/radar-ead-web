@@ -67,9 +67,27 @@ var AlunoCertificados = (() => {
   }
 
   function mostrarCertificado() {
-    const me   = AlunoState.getMe();
-    const cur  = AlunoState.getCur();
+    const me    = AlunoState.getMe();
+    const cur   = AlunoState.getCur();
     const curso = Storage.Cursos.obter(cur.cursoId);
+
+    // Bloqueia se avaliação obrigatória e nota mínima não atingida
+    if (curso?.config?.avaliacao) {
+      const notaMin = curso.config.notaMin ?? 70;
+      const avs = Storage.Avaliacoes
+        ? Storage.Avaliacoes.porCurso(cur.cursoId).filter(a => a.status === 'publicada')
+        : [];
+      if (avs.length) {
+        const aprovado = avs.some(av => {
+          const resps = Storage.Respostas ? Storage.Respostas.porAluno(me.id, av.id) : [];
+          return resps.some(r => r.nota >= notaMin);
+        });
+        if (!aprovado) {
+          EadUtils.toast(`Faça a avaliação com nota mínima de ${notaMin}% para emitir o certificado.`, 'i');
+          return;
+        }
+      }
+    }
     const cert  = Storage.Certificados.emitir({
       alunoId: me.id,
       cursoId: cur.cursoId,
